@@ -1,20 +1,23 @@
 import random
 
+#character set: \/-|
+
 class StartNode:
     def start_node():
-        starttrack = random.randint(1, 4)
-        startnode_pos = random.randint(1, 8)
+        startxnode = startynode = 0
+        starttrack = random.randint(0, 3)
+        startnode_pos = random.randint(0, 7)
         if starttrack == 1:
-            startxnode = 0 #0
+            startxnode = 0
         if starttrack == 3:
-            startxnode = 7 #7
+            startxnode = 7
         if starttrack == 2:
-            startynode = 0 #0
+            startynode = 0
         if starttrack == 4:
-            startynode = 7 #7
+            startynode = 7
 
         if starttrack == 1 or starttrack == 3:
-            startynode = startnode_pos
+            startynode = startnode_pos 
         if starttrack == 2 or starttrack == 4:
             startxnode = startnode_pos
 
@@ -35,9 +38,20 @@ class Generate_Board:
             board.append([])
             for j in range(8):
                 board[i].append(0)
+                
+        start = StartNode.start_node()
+        end = StartNode.start_node()
         board[start[0]][start[1]] = "S"
         board[end[0]][end[1]] = "E"
         return board
-x = Generate_Board.generate_board()
-print(x)
+
+    #print the board in a more readable format
+
+    def print_board(board):
+        for row in board:
+            print(' '.join(map(str, row)))
+
+
+board = Generate_Board.generate_board()
+Generate_Board.print_board(board)
 
