@@ -1,127 +1,87 @@
 import random
 
-#character set: \/-|
-#boxdrawing characters: ┌ ┐ └ ┘ ─ │ ┬ ┴ ├ ┤ ┼
+# Box drawing characters: ┌ ┐ └ ┘ ─ │ ┬ ┴ ├ ┤ ┼
 
 class StartNode:
-    def start_node():
-        startxnode = startynode = 0
-        starttrack = random.randint(0, 3)
-        startnode_pos = random.randint(0, 7)
-        if starttrack == 1:
-            startxnode = 0
-        if starttrack == 3:
-            startxnode = 7
-        if starttrack == 2:
-            startynode = 0
-        if starttrack == 4:
-            startynode = 7
-
-        if starttrack == 1 or starttrack == 3:
-            startynode = startnode_pos 
-        if starttrack == 2 or starttrack == 4:
-            startxnode = startnode_pos
-
+    def start_node(board_size):
+        edge = False
+        while not edge:
+            startxnode = random.randint(0, board_size - 1)
+            startynode = random.randint(0, board_size - 1)
+            if startxnode == 0 or startxnode == board_size - 1 or startynode == 0 or startynode == board_size - 1:
+                edge = True
         return startxnode, startynode
 
 
-
 class Generate_Board:
-    #generate an 8x8 board and then put the start and end nodes on the board
     def generate_board():
+        size = int(input("Enter the size of the board: "))
         board = []
-        for i in range(8):
-            board.append([])
-            for j in range(8):
-                board[i].append(0)
+        for i in range(size):
+            board.append([0] * size)
                 
-        start = StartNode.start_node()
-        end = StartNode.start_node()
-        while end == start:
-            end = StartNode.start_node()
+        start = StartNode.start_node(size)
         board[start[0]][start[1]] = "S"
-        board[end[0]][end[1]] = "E"
-        return board
+        return board, start
 
-    #print the board in a more readable format
 
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
 
 
+class Generate_Random_Path:
+
+    def is_edge(node, size):
+        x, y = node
+        return x == 0 or x == size - 1 or y == 0 or y == size - 1
 
 
+    def accept_board(board):
+        size = len(board)
+        for i in range(size):
+            if all(cell == 0 for cell in board[i]):  # Check for empty row
+                return False
+            if all(board[j][i] == 0 for j in range(size)):  # Check for empty column
+                return False
+        return True
+
+    @staticmethod
+    def generate_path(board, start):
+        size = len(board)
+        max_length = random.randint(20, 40)
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+        while True:
+            virtual_board = [row[:] for row in board]
+            stack = [start]
+            path_length = 0
+            last_node = start
+            
+            while stack and path_length < max_length:
+                current = stack.pop()
+                x, y = current
+                if virtual_board[x][y] == 0 or (x, y) == start:
+                    if (x, y) != start:
+                        virtual_board[x][y] = 1
+                    path_length += 1
+                    last_node = (x, y)
+                    random.shuffle(directions)  # Shuffle directions to get random path
+
+                    for direction in directions:
+                        new_x, new_y = x + direction[0], y + direction[1]
+                        if 0 <= new_x < size and 0 <= new_y < size and virtual_board[new_x][new_y] == 0:
+                            stack.append((new_x, new_y))
+
+            if Generate_Random_Path.is_edge(last_node, size) and Generate_Random_Path.accept_board(virtual_board):
+                # Set the last node to 'E'
+                virtual_board[last_node[0]][last_node[1]] = 'E'
+                # Ensure the start node remains 'S'
+                virtual_board[start[0]][start[1]] = 'S'
+                Generate_Board.print_board(virtual_board)
+                return virtual_board
 
 
-
-class Generate_Numbers():
-
-    def generate_nums():
-        count = 0
-        sum = 0
-        sum2 = 0
-
-        while sum > 40 or sum == 0:
-            rowgeneration = []
-            count = 0
-            sum = 0
-            for i in range(8):
-                if count == 0:
-                    num = random.randint(1, 5)
-                    rowgeneration.append(num)
-                elif count >= 1 and count <= 6:
-                    num = random.randint(1, 8)
-                    rowgeneration.append(num)
-                elif count == 7:
-                    num = random.randint(1, 5)
-                    rowgeneration.append(num)
-                count += 1
-                sum = sum + num
-
-        #generate 8 more numbers that add up to the sum of the previous 8 numbers
-        #append to colgeneration
-        colgeneration = []
-        #while sum2 != sum and all numbers in colgeneration are less than 9
-        while sum2 != sum:
-            colgeneration = []
-            for i in range(8):
-                if i == 0:
-                    num = random.randint(1, 5)
-                    colgeneration.append(num)
-                elif i >= 1 and i <= 6:
-                    num = random.randint(1, 8)
-                    colgeneration.append(num)
-                elif i == 7:
-                    num = sum - sum2
-                    colgeneration.append(num)
-                sum2 += num
-            if colgeneration[7] < 1 or colgeneration[7] > 8:
-                sum2 = 0
-
-        print(sum)
-        print(sum2)
-        return rowgeneration, colgeneration
-
-        #return generation in a readable format
-    
-
-
-
-class DisplayBoard():
-    def display_board():
-        #print the board in format: top row is space, then the numbers in rowgeneration then the other rows all begin with the first number in colgeneration followed by the rest of the numbers in the row
-        board = Generate_Board.generate_board()
-        rowgeneration, colgeneration = Generate_Numbers.generate_nums()
-        print("  ", end = "")
-        for i in rowgeneration:
-            print(i, end = " ")
-        print()
-        for i in range(8):
-            print(colgeneration[i], end = " ")
-            for j in range(8):
-                print(board[i][j], end = " ")
-            print()
-        return board, rowgeneration, colgeneration
-
-DisplayBoard.display_board()
+# Usage
+board, start = Generate_Board.generate_board()
+path_board = Generate_Random_Path.generate_path(board, start)
