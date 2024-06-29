@@ -30,55 +30,52 @@ class Generate_Board:
             print(' '.join(map(str, row)))
 
 
-class Generate_Random_Path:
+class GenerateRandomPath:
 
-    def is_edge(node, size):
-        x, y = node
-        return x == 0 or x == size - 1 or y == 0 or y == size - 1
+    def start_node(board_size):
+        edge = False
+        while not edge:
+            startxnode = random.randint(0, board_size - 1)
+            startynode = random.randint(0, board_size - 1)
+            if startxnode == 0 or startxnode == board_size - 1 or startynode == 0 or startynode == board_size - 1:
+                edge = True
+        return startxnode, startynode
 
-    def accept_board(board):
-        size = len(board)
-        for i in range(size):
-            if all(cell == 0 for cell in board[i]):
-                return False
-            if all(board[j][i] == 0 for j in range(size)):
-                return False
-        return True
+    def dfs(start, board_size, min_length=30):
+        visited = set()
+        stack = [(start, [start])]
 
-    def generate_path(board, start):
-        size = len(board)
-        max_length = random.randint(30, 40)
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        while stack:
+            v, path = stack.pop()
 
-        while True:
-            virtual_board = [row[:] for row in board]
-            stack = [start]
-            path_length = 0
-            last_node = start
-            bignums = 0
-            
-            while stack and path_length < max_length: #bignums
-                current = stack.pop()
-                x, y = current
-                if virtual_board[x][y] == 0 or (x, y) == start:
-                    if (x, y) != start:
-                        virtual_board[x][y] = 1
-                    path_length += 1
-                    last_node = (x, y)
-                    random.shuffle(directions)
+            if len(path) >= min_length:
+                return path
 
-                    for direction in directions:
-                        new_x, new_y = x + direction[0], y + direction[1]
-                        if 0 <= new_x < size and 0 <= new_y < size and virtual_board[new_x][new_y] == 0:
-                            stack.append((new_x, new_y))
+            if v in visited:
+                continue
 
-            if Generate_Random_Path.is_edge(last_node, size) and Generate_Random_Path.accept_board(virtual_board):
-                virtual_board[last_node[0]][last_node[1]] = 'E'
-                # Ensure the start node remains 'S'
-                virtual_board[start[0]][start[1]] = 'S'
-                Generate_Board.print_board(virtual_board)
-                return virtual_board
+            visited.add(v)
+            (x, y) = v 
+            all_next = []
 
+            for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                x1, y1 = x + dx, y + dy
+                if x1 < 0 or x1 >= board_size or y1 < 0 or y1 >= board_size:
+                    continue
+                if (x1, y1) in visited:
+                    continue
+                all_next.append((x1, y1))
 
-board, start = Generate_Board.generate_board()
-path_board = Generate_Random_Path.generate_path(board, start)
+            if all_next:
+                next_node = random.choice(all_next)
+                stack.append((next_node, path + [next_node]))
+
+        return None  # If no valid path is found
+
+if __name__ == "__main__":
+    board_size = int(input("Enter the size of the board: "))
+    path = None
+    while path is None:
+        start = GenerateRandomPath.start_node(board_size)
+        path = GenerateRandomPath.dfs(start, board_size)
+    print(path)
