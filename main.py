@@ -116,6 +116,8 @@ class Solver:
     LU = "┘"
     H = "─"
     V = "│"
+    DOT = "."
+    NULL = "0"
     
     characters = {
         'RD': RD,
@@ -130,7 +132,7 @@ class Solver:
         size = int(input("Enter the size of the board: "))
         board = []
         for i in range(size):
-            board.append([0] * size)
+            board.append(["N"] * size)
 
         # User selects character for the starting position
         while True:
@@ -178,48 +180,339 @@ class Solver:
 
 
     def Solve(board, start, end):
-        # First stage: change all 0s which connect to a start or end node to '.'
-        # Print the board and solve first stage
-        print("Initial board:")
-        Solver.print_board(board)
-        print("\nFirst stage:")
+        any_changes = True
+        while any_changes:
+            any_changes = False
+            RD = "┌"
+            LD = "┐"
+            RU = "└"
+            LU = "┘"
+            H = "─"
+            V = "│"
+            DOT = "."
+            NULL = "N"
+            
+            definites = {
+                'RD': RD,
+                'LD': LD,
+                'RU': RU,
+                'LU': LU,
+                'H': H,
+                'V': V,
+                '.': DOT
+            }
+            # First stage: change all 0s which connect to a start or end node to '.'
+            # Print the board and solve first stage
+            print("Initial board:")
+            Solver.print_board(board)
+            print("\nFirst stage:")
 
-        for i in range(len(board)):
-            for j in range(len(board)):
-                if board[i][j] in Solver.characters.values():
-                    if board[i][j] == Solver.RD:
-                        if i + 1 < len(board):
-                            board[i + 1][j] = '.'
-                        if j + 1 < len(board):
-                            board[i][j + 1] = '.'
-                    elif board[i][j] == Solver.LD:
-                        if i + 1 < len(board):
-                            board[i + 1][j] = '.'
-                        if j - 1 >= 0:
-                            board[i][j - 1] = '.'
-                    elif board[i][j] == Solver.RU:
-                        if i - 1 >= 0:
-                            board[i - 1][j] = '.'
-                        if j + 1 < len(board):
-                            board[i][j + 1] = '.'
-                    elif board[i][j] == Solver.LU:
-                        if i - 1 >= 0:
-                            board[i - 1][j] = '.'
-                        if j - 1 >= 0:
-                            board[i][j - 1] = '.'
-                    elif board[i][j] == Solver.H:
-                        if j + 1 < len(board):
-                            board[i][j + 1] = '.'
-                        if j - 1 >= 0:
-                            board[i][j - 1] = '.'
-                    elif board[i][j] == Solver.V:
-                        if i + 1 < len(board):
-                            board[i + 1][j] = '.'
-                        if i - 1 >= 0:
-                            board[i - 1][j] = '.'
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] in Solver.characters.values():
+                        if board[i][j] == Solver.RD:
+                            if i + 1 < len(board) and board[i + 1][j] == "N":
+                                board[i + 1][j] = '.'
+                                any_changes = True
+                            if j + 1 < len(board) and board[i][j + 1] == "N":
+                                board[i][j + 1] = '.'
+                                any_changes = True
+                        elif board[i][j] == Solver.LD:
+                            if i + 1 < len(board) and board[i + 1][j] == "N":
+                                board[i + 1][j] = '.'
+                                any_changes = True
+                            if j - 1 >= 0 and board[i][j - 1] == "N":
+                                board[i][j - 1] = '.'
+                                any_changes = True
+                        elif board[i][j] == Solver.RU:
+                            if i - 1 >= 0 and board[i - 1][j] == "N":
+                                board[i - 1][j] = '.'
+                                any_changes = True
+                            if j + 1 < len(board) and board[i][j + 1] == "N":
+                                board[i][j + 1] = '.'
+                                any_changes = True
+                        elif board[i][j] == Solver.LU:
+                            if i - 1 >= 0 and board[i - 1][j] == "N":
+                                board[i - 1][j] = '.'
+                                any_changes = True
+                            if j - 1 >= 0 and board[i][j - 1] == "N":
+                                board[i][j - 1] = '.'
+                                any_changes = True
+                        elif board[i][j] == Solver.H:
+                            if j + 1 < len(board) and board[i][j + 1] == "N":
+                                board[i][j + 1] = '.'
+                                any_changes = True
+                            if j - 1 >= 0 and board[i][j - 1] == "N":
+                                board[i][j - 1] = '.'
+                                any_changes = True
+                        elif board[i][j] == Solver.V:
+                            if i + 1 < len(board) and board[i + 1][j] == "N":
+                                board[i + 1][j] = '.'
+                                any_changes = True
+                            if i - 1 >= 0 and board[i - 1][j] == "N":
+                                board[i - 1][j] = '.'
+                                any_changes = True
 
-        Solver.print_board(board)
+            Solver.print_board(board)
+            # Second stage: check each column to see if all possible nodes are used
+            column_totals = [2, 6, 5, 3, 5, 5]
+            row_totals = [2, 5, 5, 5, 4, 5]
 
-# Generate the board, print it, and solve the first stage
+            changed = True
+            while changed == True:
+                changed = False
+
+                ######## Check each column ########
+                for j in range(len(board)):
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][j] in definites.values():
+                            count += 1
+                    if count == column_totals[j]:
+                        for i in range(len(board)):
+                            if board[i][j] == "N":
+                                board[i][j] = 'X'
+                                changed = True
+                                any_changes = True
+                
+                #do the same for rows
+                for i in range(len(board)):
+                    count = 0
+                    for j in range(len(board)):
+                        if board[i][j] in definites.values():
+                            count += 1
+                    if count == row_totals[i]:
+                        for j in range(len(board)):
+                            if board[i][j] == "N":
+                                board[i][j] = 'X'
+                                changed = True
+                                any_changes = True
+
+                # if number of non-Xs in each column is equal to the column total, change all 0s to dots
+                for j in range(len(board)):
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][j] != 'X':
+                            count += 1
+                    if count == column_totals[j]:
+                        for i in range(len(board)):
+                            if board[i][j] == "N":
+                                board[i][j] = '.'
+                                changed = True
+                                any_changes = True
+                
+                # do the same for rows
+                for i in range(len(board)):
+                    count = 0
+                    for j in range(len(board)):
+                        if board[i][j] != 'X':
+                            count += 1
+                    if count == row_totals[i]:
+                        for j in range(len(board)):
+                            if board[i][j] == "N":
+                                board[i][j] = '.'
+                                changed = True
+                                any_changes = True
+
+
+
+            print()
+            print("Second stage:")
+            Solver.print_board(board)
+
+
+            ###### THIRD STAGE
+
+            # for each dot in the grid
+            # if it is adjacent to 2 from 'characters', change it the character which fits the pattern
+            # if square to the left is H, RD, or RU, and square to the right is H, LD, or LU, then change dot to H
+            # if square to the left is H, RD, or RU, and square above is V, RD, or LD, then change dot to LU
+            # if square to the left is H, RD or RU, and square below is V, RU, or LU, then change dot to LD
+            # if square above is V, RD, or LD, and square below is V, RU, or LU, then change dot to V
+            # if square to the right is H, LD, or LU, and square above is V, RD, or LD, then change dot to RU
+            # if square to the right is H, LD, or LU, and square below is V, RU, or LU, then change dot to RD
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == '.':
+                        directions = []
+                        count = 0
+                        if j - 1 >= 0 and ((board[i][j-1] == H) or board[i][j-1] == RD or board[i][j-1] == RU):
+                            directions.append('left')
+                            count += 1
+                        if i - 1 >= 0 and ((board[i-1][j] == V) or board[i-1][j] == RD or board[i-1][j] == LD):
+                            directions.append('up')
+                            count += 1
+                        if i + 1 < len(board) and ((board[i+1][j] == V) or board[i+1][j] == RU or board[i+1][j] == LU):
+                            directions.append('down')
+                            count += 1
+                        if j + 1 < len(board) and ((board[i][j+1] == H) or board[i][j+1] == LD or board[i][j+1] == LU):
+                            directions.append('right')
+                            count += 1
+                        if count == 2:
+                            if directions[0] == 'left' and directions[1] == 'right':
+                                board[i][j] = H
+                                any_changes = True
+                            elif directions[0] == 'left' and directions[1] == 'up':
+                                board[i][j] = LU
+                                any_changes = True
+                            elif directions[0] == 'left' and directions[1] == 'down':
+                                board[i][j] = LD
+                                any_changes = True
+                            elif directions[0] == 'up' and directions[1] == 'down':
+                                board[i][j] = V
+                                any_changes = True
+                            elif directions[0] == 'right' and directions[1] == 'up':
+                                board[i][j] = RU
+                                any_changes = True
+                            elif directions[0] == 'right' and directions[1] == 'down':
+                                board[i][j] = RD
+                                any_changes = True
+                            
+
+            
+            print()
+            print("Third stage:")
+            Solver.print_board(board)
+
+            indefinites = {
+                'RD': RD,
+                'LD': LD,
+                'RU': RU,
+                'LU': LU,
+                'H': H,
+                'V': V,
+                '.': DOT,
+                'N': NULL
+            }
+            
+            ###### FOURTH STAGE
+            # for each empty/null square in the grid
+            # if it is adjacent to 0 or 1 squares from 'indefinites', change it to 'X'
+
+            changed = True
+            while changed:
+                changed = False
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] == "N":
+                            count = 0
+                            if i - 1 >= 0 and ((board[i-1][j] == "N") or (board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD) or (board[i-1][j] == ".")):
+                                count += 1
+                            if i + 1 < len(board) and ((board[i+1][j] == "N") or (board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU) or (board[i+1][j] == ".")):
+                                count += 1
+                            if j - 1 >= 0 and ((board[i][j-1] == "N") or (board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU) or (board[i][j-1] == ".")):
+                                count += 1
+                            if j + 1 < len(board) and ((board[i][j+1] == "N") or (board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU) or (board[i][j+1] == ".")):
+                                count += 1
+                            if count <= 1:
+                                board[i][j] = 'X'
+                                changed = True
+                                any_changes = True
+            print()
+            print("Fourth stage:")
+            Solver.print_board(board)
+
+
+                
+            ##### STAGE 5
+            # for each dot in the grid
+            # if it is adjacent to exactly 2 from 'characters', change it the character which fits the pattern
+            # if square to the left is H, RD, or RU, and square to the right is H, LD, or LU, then change dot to H
+            # if square to the left is H, RD, or RU, and square above is V, RD, or LD, then change dot to LU
+            # if square to the left is H, RD or RU, and square below is V, RU, or LU, then change dot to LD
+            # if square above is V, RD, or LD, and square below is V, RU, or LU, then change dot to V
+            # if square to the right is H, LD, or LU, and square above is V, RD, or LD, then change dot to RU
+            # if square to the right is H, LD, or LU, and square below is V, RU, or LU, then change dot to RD
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == '.':
+                        ########
+                        #check each direction
+                        ########
+                        #use a count to check how many characters from indefinites are adjacent to the dot
+                        count = 0
+                        directions = []
+                        #check if the square to the left is a character
+                        if j - 1 >= 0 and (board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU or board[i][j-1] == '.' or board[i][j-1] == "N"):
+                            count += 1
+                            directions.append('left')
+                        #check if the square to the right is a character
+                        if j + 1 < len(board) and (board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU or board[i][j+1] == '.' or board[i][j+1] == "N"):
+                            count += 1
+                            directions.append('right')
+                        #check if the square above is a character
+                        if i - 1 >= 0 and (board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD or board[i-1][j] == '.' or board[i-1][j] == "N"):
+                            count += 1
+                            directions.append('up')
+                        #check if the square below is a character
+                        if i + 1 < len(board) and (board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU or board[i+1][j] == '.' or board[i+1][j] == "N"):
+                            count += 1
+                            directions.append('down')
+                        #if there are exactly 2 characters adjacent to the dot
+                        # draw the appropriate character
+                        if count == 2:
+                            if directions[0] == 'left' and directions[1] == 'right':
+                                board[i][j] = H
+                                any_changes = True
+                            elif directions[0] == 'left' and directions[1] == 'up':
+                                board[i][j] = LU
+                                any_changes = True
+                            elif directions[0] == 'left' and directions[1] == 'down':
+                                board[i][j] = LD
+                                any_changes = True
+                            elif directions[0] == 'up' and directions[1] == 'down':
+                                board[i][j] = V
+                                any_changes = True
+                            elif directions[0] == 'right' and directions[1] == 'up':
+                                board[i][j] = RU
+                                any_changes = True
+                            elif directions[0] == 'right' and directions[1] == 'down':
+                                board[i][j] = RD
+                                any_changes = True
+                        elif count == 3:
+                            if 'left' in directions and 'down' in directions and 'up' in directions:
+                                if i - 1 >= 0 and j-1 >= 0 and board[i-1][j-1] == RD:
+                                    directions.remove('left')
+                            if 'right' in directions and 'down' in directions and 'up' in directions:
+                                if i - 1 >= 0 and j+1 < len(board) and board[i-1][j+1] == LD:
+                                    directions.remove('right')
+                            if 'up' in directions and 'left' in directions and 'right' in directions:
+                                if i - 1 >= 0 and j-1 >= 0 and board[i-1][j-1] == RD:
+                                    directions.remove('left')
+                                if i - 1 >= 0 and j+1 < len(board) and board[i-1][j+1] == LD:
+                                    directions.remove('right')
+                            if 'down' in directions and 'left' in directions and 'right' in directions:
+                                if i + 1 < len(board) and j-1 >= 0 and board[i+1][j-1] == RU:
+                                    directions.remove('left')
+                                if i + 1 < len(board) and j+1 < len(board) and board[i+1][j+1] == LU:
+                                    directions.remove('right')
+                            if len(directions) == 2:
+                                if directions[0] == 'left' and directions[1] == 'right':
+                                    board[i][j] = H
+                                    any_changes = True
+                                elif directions[0] == 'left' and directions[1] == 'up':
+                                    board[i][j] = LU
+                                    any_changes = True
+                                elif directions[0] == 'left' and directions[1] == 'down':
+                                    board[i][j] = LD
+                                    any_changes = True
+                                elif directions[0] == 'up' and directions[1] == 'down':
+                                    board[i][j] = V
+                                    any_changes = True
+                                elif directions[0] == 'right' and directions[1] == 'up':
+                                    board[i][j] = RU
+                                    any_changes = True
+                                elif directions[0] == 'right' and directions[1] == 'down':
+                                    board[i][j] = RD
+                                    any_changes = True
+                                    
+
+
+            print()
+            print("Fifth stage:")
+            Solver.print_board(board)
+
+
+
 board, start, end = Solver.generate_board()
 Solver.Solve(board, start, end)
