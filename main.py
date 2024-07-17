@@ -255,8 +255,8 @@ class Solver:
 
             Solver.print_board(board)
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [2, 6, 5, 3, 5, 5]
-            row_totals = [2, 5, 5, 5, 4, 5]
+            column_totals = [3,5,5,2,3,2]
+            row_totals = [2,2,3,6,6,1]
 
             changed = True
             while changed == True:
@@ -336,16 +336,16 @@ class Solver:
                     if board[i][j] == '.':
                         directions = []
                         count = 0
-                        if j - 1 >= 0 and ((board[i][j-1] == H) or board[i][j-1] == RD or board[i][j-1] == RU):
+                        if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU)):
                             directions.append('left')
                             count += 1
-                        if i - 1 >= 0 and ((board[i-1][j] == V) or board[i-1][j] == RD or board[i-1][j] == LD):
+                        if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD)):
                             directions.append('up')
                             count += 1
-                        if i + 1 < len(board) and ((board[i+1][j] == V) or board[i+1][j] == RU or board[i+1][j] == LU):
+                        if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU)):
                             directions.append('down')
                             count += 1
-                        if j + 1 < len(board) and ((board[i][j+1] == H) or board[i][j+1] == LD or board[i][j+1] == LU):
+                        if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU)):
                             directions.append('right')
                             count += 1
                         if count == 2:
@@ -361,10 +361,10 @@ class Solver:
                             elif directions[0] == 'up' and directions[1] == 'down':
                                 board[i][j] = V
                                 any_changes = True
-                            elif directions[0] == 'right' and directions[1] == 'up':
+                            elif directions[0] == 'up' and directions[1] == 'right':
                                 board[i][j] = RU
                                 any_changes = True
-                            elif directions[0] == 'right' and directions[1] == 'down':
+                            elif directions[0] == 'down' and directions[1] == 'right':
                                 board[i][j] = RD
                                 any_changes = True
                             
@@ -433,19 +433,19 @@ class Solver:
                         count = 0
                         directions = []
                         #check if the square to the left is a character
-                        if j - 1 >= 0 and (board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU or board[i][j-1] == '.' or board[i][j-1] == "N"):
+                        if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU) or (board[i][j-1] == '.') or (board[i][j-1] == "N")):
                             count += 1
                             directions.append('left')
                         #check if the square to the right is a character
-                        if j + 1 < len(board) and (board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU or board[i][j+1] == '.' or board[i][j+1] == "N"):
+                        if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU) or (board[i][j+1] == '.') or (board[i][j+1] == "N")):
                             count += 1
                             directions.append('right')
                         #check if the square above is a character
-                        if i - 1 >= 0 and (board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD or board[i-1][j] == '.' or board[i-1][j] == "N"):
+                        if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD) or (board[i-1][j] == '.') or (board[i-1][j] == "N")):
                             count += 1
                             directions.append('up')
                         #check if the square below is a character
-                        if i + 1 < len(board) and (board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU or board[i+1][j] == '.' or board[i+1][j] == "N"):
+                        if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU) or (board[i+1][j] == '.') or (board[i+1][j] == "N")):
                             count += 1
                             directions.append('down')
                         #if there are exactly 2 characters adjacent to the dot
@@ -478,14 +478,26 @@ class Solver:
                                     directions.remove('right')
                             if 'up' in directions and 'left' in directions and 'right' in directions:
                                 if i - 1 >= 0 and j-1 >= 0 and board[i-1][j-1] == RD:
-                                    directions.remove('left')
+                                    if board[i-1][j] == LD:
+                                        directions.remove('left')
+                                    if board[i][j-1] == RU:
+                                        directions.remove('up')
                                 if i - 1 >= 0 and j+1 < len(board) and board[i-1][j+1] == LD:
-                                    directions.remove('right')
+                                    if board[i-1][j] == RD:
+                                        directions.remove('right')
+                                    if board[i][j+1] == LU:
+                                        directions.remove('up')
                             if 'down' in directions and 'left' in directions and 'right' in directions:
                                 if i + 1 < len(board) and j-1 >= 0 and board[i+1][j-1] == RU:
-                                    directions.remove('left')
+                                    if board[i+1][j] == LU:
+                                        directions.remove('left')
+                                    if board[i][j-1] == RD:
+                                        directions.remove('down')
                                 if i + 1 < len(board) and j+1 < len(board) and board[i+1][j+1] == LU:
-                                    directions.remove('right')
+                                    if board[i+1][j] == RU:
+                                        directions.remove('right')
+                                    if board[i][j+1] == LD:
+                                        directions.remove('down')
                             if len(directions) == 2:
                                 if directions[0] == 'left' and directions[1] == 'right':
                                     board[i][j] = H
@@ -511,6 +523,10 @@ class Solver:
             print()
             print("Fifth stage:")
             Solver.print_board(board)
+
+
+
+
 
 
 
