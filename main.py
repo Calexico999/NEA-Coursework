@@ -171,6 +171,38 @@ class Solver:
             except ValueError:
                 print("Invalid format. Please enter the position in the format x,y with integers.")
 
+        othernodes = True
+        while othernodes:
+            #asks user if there are any more nodes to add
+            #if yes, asks for position and character
+            #if no, breaks the loop
+            morenodes = input("Are there any more nodes to add? (Y/N): ")
+            if morenodes.lower() == 'y':
+                while True:
+                    try:
+                        node = input("Enter the position in the format x,y: ").split(',')
+                        node = (int(node[0]), int(node[1]))
+                        if 0 <= node[0] < size and 0 <= node[1] < size:
+                            if node != start and node != end:
+                                char_choice = input(f"Choose a character for the position {node} (RD, LD, RU, LU, H, V): ")
+                                if char_choice in Solver.characters:
+                                    board[node[0]][node[1]] = Solver.characters[char_choice]
+                                    break
+                                else:
+                                    print("Invalid character choice. Please choose from RD, LD, RU, LU, H, V.")
+                            else:
+                                print("Node position cannot be the same as start or end position.")
+                        else:
+                            print(f"Invalid position. Please enter values between 0 and {size-1}.")
+                    except ValueError:
+                        print("Invalid format. Please enter the position in the format x,y with integers.")
+            elif morenodes.lower() == 'n':
+                othernodes = False
+            else:
+                print("Invalid input. Please enter Y or N.")
+
+        
+
         return board, start, end
 
 
@@ -180,9 +212,12 @@ class Solver:
 
 
     def Solve(board, start, end):
+        edgerulesneeded = False
+
         any_changes = True
         while any_changes:
             any_changes = False
+            edgerulesneeded = False
             RD = "┌"
             LD = "┐"
             RU = "└"
@@ -191,6 +226,7 @@ class Solver:
             V = "│"
             DOT = "."
             NULL = "N"
+            X = "X"
             
             definites = {
                 'RD': RD,
@@ -200,6 +236,16 @@ class Solver:
                 'H': H,
                 'V': V,
                 '.': DOT
+            }
+
+            knowns = {
+                'RD': RD,
+                'LD': LD,
+                'RU': RU,
+                'LU': LU,
+                'H': H,
+                'V': V,
+                'X': 'X'
             }
             # First stage: change all 0s which connect to a start or end node to '.'
             # Print the board and solve first stage
@@ -255,8 +301,8 @@ class Solver:
 
             Solver.print_board(board)
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [3,5,5,2,3,2]
-            row_totals = [2,2,3,6,6,1]
+            column_totals = [1,2,5,4,4,6,6,2]
+            row_totals = [3,3,6,4,3,5,3,3]
 
             changed = True
             while changed == True:
@@ -367,6 +413,7 @@ class Solver:
                             elif directions[0] == 'down' and directions[1] == 'right':
                                 board[i][j] = RD
                                 any_changes = True
+
                             
 
             
@@ -469,13 +516,29 @@ class Solver:
                             elif directions[0] == 'right' and directions[1] == 'down':
                                 board[i][j] = RD
                                 any_changes = True
-                        elif count == 3:
+                        if count == 3:
                             if 'left' in directions and 'down' in directions and 'up' in directions:
                                 if i - 1 >= 0 and j-1 >= 0 and board[i-1][j-1] == RD:
-                                    directions.remove('left')
+                                    if board[i-1][j] == LD:
+                                        directions.remove('left')
+                                    if board[i][j-1] == RU:
+                                        directions.remove('up')
+                                if i + 1 < len(board) and j-1 >= 0 and board[i+1][j-1] == RU:
+                                    if board[i+1][j] == LU:
+                                        directions.remove('left')
+                                    if board[i][j-1] == RD:
+                                        directions.remove('down')
                             if 'right' in directions and 'down' in directions and 'up' in directions:
                                 if i - 1 >= 0 and j+1 < len(board) and board[i-1][j+1] == LD:
-                                    directions.remove('right')
+                                    if board[i-1][j] == RD:
+                                        directions.remove('right')
+                                    if board[i][j+1] == LU:
+                                        directions.remove('up')
+                                if i + 1 < len(board) and j+1 < len(board) and board[i+1][j+1] == LU:
+                                    if board[i+1][j] == RU:
+                                        directions.remove('right')
+                                    if board[i][j+1] == LD:
+                                        directions.remove('down')
                             if 'up' in directions and 'left' in directions and 'right' in directions:
                                 if i - 1 >= 0 and j-1 >= 0 and board[i-1][j-1] == RD:
                                     if board[i-1][j] == LD:
@@ -523,6 +586,113 @@ class Solver:
             print()
             print("Fifth stage:")
             Solver.print_board(board)
+
+
+            if any_changes == False:
+                edgerulesneeded = True
+
+            if edgerulesneeded == True:
+                ##### STAGE 6 #####
+                # for each column
+                # if every square in the column is in knowns, add the column to edgecolumns
+                # for each row
+                # if every square in the row is in knowns, add the row to edgerows
+                edgecolumns = []
+                edgerows = []
+                edgecolumns.append(-1)
+                edgecolumns.append(len(board))
+                edgerows.append(-1)
+                edgerows.append(len(board))
+
+
+                for j in range(len(board)):
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][j] in knowns.values():
+                            count += 1
+                    if count == len(board):
+                        edgecolumns.append(j)
+                for i in range(len(board)):
+                    count = 0
+                    for j in range(len(board)):
+                        if board[i][j] in knowns.values():
+                            count += 1
+                    if count == len(board):
+                        edgerows.append(i)
+                print("Edge columns:", edgecolumns)
+                print("Edge rows:", edgerows)
+
+                # for each column
+                # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
+                # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
+                # if the length of list is 1, change the square to a dot, and change all other 'N's in the column to 'X'
+                for j in range(len(board)):
+
+                    if (j - 1 in edgecolumns) or (j + 1 in edgecolumns):
+                        count = 0
+                        for i in range(len(board)):
+                            if board[i][j] in definites.values():
+                                count += 1
+                        if count == column_totals[j] - 1:
+                            dots = []
+                            for i in range(len(board)):
+                                if board[i][j] == "N":
+                                    possible = False
+                                    if i - 1 >= 0 and board[i-1][j] == ".":
+                                        dots.append((i, j))
+                                        possible = True
+                                    if i + 1 < len(board) and board[i+1][j] == ".":
+                                        dots.append((i, j))
+                                        possible = True
+                                    if possible == False:
+                                        board[i][j] = "X"
+                                        any_changes = True
+                                    
+                            if len(dots) == 1:
+                                board[dots[0][0]][dots[0][1]] = "."
+                                any_changes = True
+                                for i in range(len(board)):
+                                    if board[i][j] == "N":
+                                        board[i][j] = "X"
+                                        any_changes = True
+                # do the same for rows
+                for i in range(len(board)):
+                    if (i - 1 in edgerows) or (i + 1 in edgerows):
+                        count = 0
+                        for j in range(len(board)):
+                            if board[i][j] in definites.values():
+                                count += 1
+                        if count == row_totals[i] - 1:
+                            dots = []
+                            for j in range(len(board)):
+                                if board[i][j] == "N":
+                                    possible = False
+                                    if j - 1 >= 0 and board[i][j-1] == ".":
+                                        dots.append((i, j))
+                                        possible = True
+                                    if j + 1 < len(board) and board[i][j+1] == ".":
+                                        dots.append((i, j))
+                                        possible = True
+                                    if possible == False:
+                                        board[i][j] = "X"
+                                        any_changes = True
+                                    
+                            if len(dots) == 1:
+                                board[dots[0][0]][dots[0][1]] = "."
+                                any_changes = True
+                                for j in range(len(board)):
+                                    if board[i][j] == "N":
+                                        board[i][j] = "X"
+                                        any_changes = True
+
+                #### STAGE 7 ####
+                #loop rule
+                #for each dot
+                #for example if the square below is LU and square below to the left is RU
+
+                
+
+
 
 
 
