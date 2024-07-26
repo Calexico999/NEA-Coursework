@@ -312,8 +312,10 @@ class Solver:
 
             Solver.print_board(board)
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [1,3,1,2,5,6,6,5]
-            row_totals = [2,3,4,6,6,5,2,1]
+            column_totals = [5,5,3,5,4,5,5,2]
+            row_totals = [2,4,5,5,4,4,3,7]
+
+            
 
             changed = True
             while changed == True:
@@ -1433,7 +1435,32 @@ class Solver:
             print()
             print("Fifth stage:")
             Solver.print_board(board)
+            
+            ## CHECK IF ALL NODES ARE EITHER SHAPES OR Xs
+            allnodes = True
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == 'N' or board[i][j] == '.':
+                        allnodes = False
+            if allnodes == True:
+                # if number of nodes which are shapes is equal to sum of every number in column_totals, then print("Solved correctly")
+                # else print("Solved incorrectly")
+                count = 0
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] in shapes.values():
+                            count += 1
+                total = 0
+                for i in range(len(column_totals)):
+                    total += column_totals[i]
+                if count == total:
+                    print("Solved correctly")
+                else:
+                    print("Solved incorrectly")
+                break
 
+
+            edgerulesneeded = False
 
             if any_changes == False:
                 edgerulesneeded = True
@@ -1548,22 +1575,26 @@ class Solver:
                 possiblementup = False
                 possibles = 0
                 for j in range(len(board)):
-                    if j - 1 in edgecolumns:
-                        if column_totals[j-1] == 1 and column_totals[j+1] == 1:
+                    if j - 1 in edgecolumns and j+1 < len(board) and j-1 >= 0:
+                        if (column_totals[j-1] == 1 or column_totals[j-1] == 0) and column_totals[j+1] == 1:
                             for i in range(len(board)):
-                                if board[i][j-1] in shapes:
+                                if (board[i][j-1] in shapes.values()):
+                                    place = i
                                     counter = 1
                                     k = i
                                     while counter < column_totals[j]:
                                         if k > len(board):
                                             break
                                         if board[k][j] == "X":
+                                            counter = -10000
                                             break
                                         k += 1
                                         counter += 1
                                     if counter == column_totals[j]:
                                         possiblementdown = True
                                         possibles += 1
+                                    counter = 1
+                                    k = i
                                     while counter < column_totals[j]:
                                         if k < 0:
                                             break
@@ -1578,7 +1609,7 @@ class Solver:
                             if possibles == 1:
                                 if possiblementdown == True:
                                     counter = 1
-                                    k = i
+                                    k = place
                                     while counter < column_totals[j]:
                                         board[k][j] = "."
                                         k += 1
@@ -1586,7 +1617,7 @@ class Solver:
                                     any_changes = True
                                 if possiblementup == True:
                                     counter = 1
-                                    k = i
+                                    k = place
                                     while counter < column_totals[j]:
                                         board[k][j] = "."
                                         k -= 1
@@ -1596,29 +1627,181 @@ class Solver:
 
                                        
                 # do the same for rows
+                possiblementright = False
+                possiblementleft = False
+                possibles = 0
                 for i in range(len(board)):
-                    if i - 1 in edgerows:
-                        if row_totals[i-1] == 1 and row_totals[i+1] == 1:
+                    if i - 1 in edgerows and i+1 < len(board) and i-1 >= 0:
+                        if (row_totals[i-1] == 1 or row_totals[i-1] == 0) and row_totals[i+1] == 1:
                             for j in range(len(board)):
-                                if board[i-1][j] == "N":
-                                    valid = True
-                                    for k in range(j, j + row_totals[i-1]):
+                                if (board[i-1][j] == H) or (board[i-1][j] == RD) or (board[i-1][j] == RU) or (board[i-1][j] == LD) or (board[i-1][j] == LU) or (board[i-1][j] == V):
+                                    place = j
+                                    counter = 1
+                                    k = j
+                                    while counter < row_totals[i]:
+                                        if k > len(board):
+                                            break
                                         if board[i][k] == "X":
-                                            valid = False
-                                    if valid == True:
-                                        for k in range(j, j + row_totals[i-1]):
-                                            board[i][k] = "."
-                                        any_changes = True
-                                    valid = True
-                                    for k in range(j, j - row_totals[i-1], -1):
+                                            counter = -10000
+                                            break
+                                        k += 1
+                                        counter += 1
+                                    if counter == row_totals[i]:
+                                        possiblementright = True
+                                        possibles += 1
+                                    counter = 1
+                                    k = j
+                                    while counter < row_totals[i]:
+                                        if k < 0:
+                                            break
                                         if board[i][k] == "X":
-                                            valid = False
-                                    if valid == True:
-                                        for k in range(j, j - row_totals[i-1], -1):
-                                            board[i][k] = "."
-                                        any_changes = True
+                                            break
+                                        k -= 1
+                                        counter += 1
+                                    if counter == row_totals[i]:
+                                        possiblementleft = True
+                                        possibles += 1
 
+                            if possibles == 1:
+                                if possiblementright == True:
+                                    counter = 1
+                                    k = place
+                                    while counter < row_totals[i]:
+                                        board[i][k] = "."
+                                        k += 1
+                                        counter += 1
+                                    any_changes = True
+                                if possiblementleft == True:
+                                    counter = 1
+                                    k = place
+                                    while counter < row_totals[i]:
+                                        board[i][k] = "."
+                                        k -= 1
+                                        counter += 1
+                                    any_changes = True
+                
 
+                # do the same but swap left and right
+                # for each column
+                # if column to the right is an edge
+                # if column to the right has column total = 1
+                # if column to the left has column total = 1
+                # go to the node to the left of the node in right column
+                # including this node, go down until nodes in column = column total
+                # if any of these nodes are 'X', this direction is considered invalid
+                # including this node, go up until nodes in column = column total
+                # if any of these nodes are 'X', this direction is considered invalid
+                # if one of the directions is valid, change all of these nodes to '.'
+                possiblementdown = False
+                possiblementup = False
+                possibles = 0
+                for j in range(len(board)):
+                    if j + 1 in edgecolumns and j-1 >= 0 and j+1 < len(board):
+                        if (column_totals[j+1] == 1 or column_totals[j+1] == 0) and column_totals[j-1] == 1:
+                            for i in range(len(board)):
+                                if (board[i][j+1] in shapes.values()):
+                                    place = i
+                                    counter = 1
+                                    k = i
+                                    while counter < column_totals[j]:
+                                        if k > len(board):
+                                            break
+                                        if board[k][j] == "X":
+                                            counter = -10000
+                                            break
+                                        k += 1
+                                        counter += 1
+                                    if counter == column_totals[j]:
+                                        possiblementdown = True
+                                        possibles += 1
+                                    counter = 1
+                                    k = i
+                                    while counter < column_totals[j]:
+                                        if k < 0:
+                                            break
+                                        if board[k][j] == "X":
+                                            break
+                                        k -= 1
+                                        counter += 1
+                                    if counter == column_totals[j]:
+                                        possiblementup = True
+                                        possibles += 1
+
+                            if possibles == 1:
+                                if possiblementdown == True:
+                                    counter = 1
+                                    k = place
+                                    while counter < column_totals[j]:
+                                        board[k][j] = "."
+                                        k += 1
+                                        counter += 1
+                                    any_changes = True
+                                if possiblementup == True:
+                                    counter = 1
+                                    k = place
+                                    while counter < column_totals[j]:
+                                        board[k][j] = "."
+                                        k -= 1
+                                        counter += 1
+                                    any_changes = True
+                
+                # do the same for rows
+                possiblementright = False
+                possiblementleft = False
+                possibles = 0
+                for i in range(len(board)):
+                    if i + 1 in edgerows and i-1 >= 0 and i + 1 < len(board):
+                        if (row_totals[i+1] == 1 or row_totals[i+1] == 0) and row_totals[i-1] == 1:
+                            for j in range(len(board)):
+                                if (board[i+1][j] == H) or (board[i+1][j] == RD) or (board[i+1][j] == RU) or (board[i+1][j] == LD) or (board[i+1][j] == LU) or (board[i+1][j] == V):
+                                    place = j
+                                    counter = 1
+                                    k = j
+                                    while counter < row_totals[i]:
+                                        if k > len(board):
+                                            break
+                                        if board[i][k] == "X":
+                                            counter = -10000
+                                            break
+                                        k += 1
+                                        counter += 1
+                                    if counter == row_totals[i]:
+                                        possiblementright = True
+                                        possibles += 1
+                                    counter = 1
+                                    k = j
+                                    while counter < row_totals[i]:
+                                        if k < 0:
+                                            break
+                                        if board[i][k] == "X":
+                                            break
+                                        k -= 1
+                                        counter += 1
+                                    if counter == row_totals[i]:
+                                        possiblementleft = True
+                                        possibles += 1
+
+                            if possibles == 1:
+                                if possiblementright == True:
+                                    counter = 1
+                                    k = place
+                                    while counter < row_totals[i]:
+                                        board[i][k] = "."
+                                        k += 1
+                                        counter += 1
+                                    any_changes = True
+                                if possiblementleft == True:
+                                    counter = 1
+                                    k = place
+                                    while counter < row_totals[i]:
+                                        board[i][k] = "."
+                                        k -= 1
+                                        counter += 1
+                                    any_changes = True
+                
+                
+                print("Unique rule used")
+                print()
 
 
 board, start, end = Solver.generate_board()
