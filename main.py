@@ -129,7 +129,11 @@ class Solver:
     }
 
     def generate_board():
-        size = int(input("Enter the size of the board: "))
+        size = int(input("Enter the edge length of the board, in range 4 <= length <= 10: "))
+        if size < 4 or size > 10:
+            print("Invalid size")
+            size = int(input("Enter the edge length of the board, in range 4 <= length <= 10: "))
+        
         board = []
         for i in range(size):
             board.append(["N"] * size)
@@ -173,9 +177,7 @@ class Solver:
 
         othernodes = True
         while othernodes:
-            #asks user if there are any more nodes to add
-            #if yes, asks for position and character
-            #if no, breaks the loop
+            # User defines position and shape of any other given nodes
             morenodes = input("Are there any more nodes to add? (Y/N): ")
             if morenodes.lower() == 'y':
                 while True:
@@ -213,7 +215,6 @@ class Solver:
 
     def Solve(board, start, end):
         edgerulesneeded = False
-
         any_changes = True
         while any_changes:
             any_changes = False
@@ -257,9 +258,7 @@ class Solver:
                 'V': V
             }
 
-
             # First stage: change all 0s which connect to a start or end node to '.'
-            # Print the board and solve first stage
             print("Initial board:")
             Solver.print_board(board)
             print("\nFirst stage:")
@@ -311,17 +310,13 @@ class Solver:
                                 any_changes = True
 
             Solver.print_board(board)
+
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [5,5,3,5,4,5,5,2]
-            row_totals = [2,4,5,5,4,4,3,7]
-
-            
-
+            column_totals = [5,6,2,1,2,6,7,5]
+            row_totals = [7,7,5,4,3,3,4,1]
             changed = True
             while changed == True:
                 changed = False
-
-                ######## Check each column ########
                 for j in range(len(board)):
                     count = 0
                     for i in range(len(board)):
@@ -333,8 +328,6 @@ class Solver:
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
-                
-                #do the same for rows
                 for i in range(len(board)):
                     count = 0
                     for j in range(len(board)):
@@ -359,7 +352,6 @@ class Solver:
                                 board[i][j] = '.'
                                 changed = True
                                 any_changes = True
-                
                 # do the same for rows
                 for i in range(len(board)):
                     count = 0
@@ -373,23 +365,13 @@ class Solver:
                                 changed = True
                                 any_changes = True
 
-
-
             print()
             print("Second stage:")
             Solver.print_board(board)
 
-
             ###### THIRD STAGE
-
             # for each dot in the grid
             # if it is adjacent to 2 from 'characters', change it the character which fits the pattern
-            # if square to the left is H, RD, or RU, and square to the right is H, LD, or LU, then change dot to H
-            # if square to the left is H, RD, or RU, and square above is V, RD, or LD, then change dot to LU
-            # if square to the left is H, RD or RU, and square below is V, RU, or LU, then change dot to LD
-            # if square above is V, RD, or LD, and square below is V, RU, or LU, then change dot to V
-            # if square to the right is H, LD, or LU, and square above is V, RD, or LD, then change dot to RU
-            # if square to the right is H, LD, or LU, and square below is V, RU, or LU, then change dot to RD
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] == '.':
@@ -429,8 +411,6 @@ class Solver:
                                 any_changes = True
 
                             
-
-            
             print()
             print("Third stage:")
             Solver.print_board(board)
@@ -447,7 +427,7 @@ class Solver:
             }
             
             ###### FOURTH STAGE
-            # for each empty/null square in the grid
+            # for each empty square in the grid
             # if it is adjacent to 0 or 1 squares from 'indefinites', change it to 'X'
 
             changed = True
@@ -473,39 +453,23 @@ class Solver:
             print("Fourth stage:")
             Solver.print_board(board)
 
-
-                
             ##### STAGE 5
             # for each dot in the grid
             # if it is adjacent to exactly 2 from 'characters', change it the character which fits the pattern
-            # if square to the left is H, RD, or RU, and square to the right is H, LD, or LU, then change dot to H
-            # if square to the left is H, RD, or RU, and square above is V, RD, or LD, then change dot to LU
-            # if square to the left is H, RD or RU, and square below is V, RU, or LU, then change dot to LD
-            # if square above is V, RD, or LD, and square below is V, RU, or LU, then change dot to V
-            # if square to the right is H, LD, or LU, and square above is V, RD, or LD, then change dot to RU
-            # if square to the right is H, LD, or LU, and square below is V, RU, or LU, then change dot to RD
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] == '.':
-                        ########
-                        #check each direction
-                        ########
-                        #use a count to check how many characters from indefinites are adjacent to the dot
                         count = 0
                         directions = []
-                        #check if the square to the left is a character
                         if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU) or (board[i][j-1] == '.') or (board[i][j-1] == "N")):
                             count += 1
                             directions.append('left')
-                        #check if the square to the right is a character
                         if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU) or (board[i][j+1] == '.') or (board[i][j+1] == "N")):
                             count += 1
                             directions.append('right')
-                        #check if the square above is a character
                         if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD) or (board[i-1][j] == '.') or (board[i-1][j] == "N")):
                             count += 1
                             directions.append('up')
-                        #check if the square below is a character
                         if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU) or (board[i+1][j] == '.') or (board[i+1][j] == "N")):
                             count += 1
                             directions.append('down')
@@ -593,28 +557,24 @@ class Solver:
                                                 i2 = i2
                                                 j2 = j2-1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove left from shapedir
                                                     shapedir.remove('left')
                                                 j2 = j2 + 1
                                             if 'right' in shapedir:
                                                 i2 = i2
                                                 j2 = j2+1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove right from shapedir
                                                     shapedir.remove('right')
                                                 j2 = j2 - 1
                                             if 'up' in shapedir:
                                                 i2 = i2-1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove up from shapedir
                                                     shapedir.remove('up')
                                                 i2 = i2 + 1
                                             if 'down' in shapedir:
                                                 i2 = i2+1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove down from shapedir
                                                     shapedir.remove('down')
                                                 i2 = i2 - 1
                                         if len(shapedir) == 1:
@@ -699,28 +659,24 @@ class Solver:
                                                             i2 = i2
                                                             j2 = j2-1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove left from shapedir
                                                                 shapedir.remove('left')
                                                             j2 = j2 + 1
                                                         if 'right' in shapedir:
                                                             i2 = i2
                                                             j2 = j2+1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove right from shapedir
                                                                 shapedir.remove('right')
                                                             j2 = j2 - 1
                                                         if 'up' in shapedir:
                                                             i2 = i2-1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove up from shapedir
                                                                 shapedir.remove('up')
                                                             i2 = i2 + 1
                                                         if 'down' in shapedir:
                                                             i2 = i2+1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove down from shapedir
                                                                 shapedir.remove('down')
                                                             i2 = i2 - 1
                                                         
@@ -814,28 +770,24 @@ class Solver:
                                                 i2 = i2
                                                 j2 = j2-1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove left from shapedir
                                                     shapedir.remove('left')
                                                 j2 = j2 + 1
                                             if 'right' in shapedir:
                                                 i2 = i2
                                                 j2 = j2+1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove right from shapedir
                                                     shapedir.remove('right')
                                                 j2 = j2 - 1
                                             if 'up' in shapedir:
                                                 i2 = i2-1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove up from shapedir
                                                     shapedir.remove('up')
                                                 i2 = i2 + 1
                                             if 'down' in shapedir:
                                                 i2 = i2+1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove down from shapedir
                                                     shapedir.remove('down')
                                                 i2 = i2 - 1
                                         if len(shapedir) == 1:
@@ -920,28 +872,24 @@ class Solver:
                                                             i2 = i2
                                                             j2 = j2-1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove left from shapedir
                                                                 shapedir.remove('left')
                                                             j2 = j2 + 1
                                                         if 'right' in shapedir:
                                                             i2 = i2
                                                             j2 = j2+1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove right from shapedir
                                                                 shapedir.remove('right')
                                                             j2 = j2 - 1
                                                         if 'up' in shapedir:
                                                             i2 = i2-1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove up from shapedir
                                                                 shapedir.remove('up')
                                                             i2 = i2 + 1
                                                         if 'down' in shapedir:
                                                             i2 = i2+1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove down from shapedir
                                                                 shapedir.remove('down')
                                                             i2 = i2 - 1
                                                     if len(shapedir) == 1:
@@ -1033,28 +981,24 @@ class Solver:
                                                 i2 = i2
                                                 j2 = j2-1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove left from shapedir
                                                     shapedir.remove('left')
                                                 j2 = j2 + 1
                                             if 'right' in shapedir:
                                                 i2 = i2
                                                 j2 = j2+1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove right from shapedir
                                                     shapedir.remove('right')
                                                 j2 = j2 - 1
                                             if 'up' in shapedir:
                                                 i2 = i2-1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove up from shapedir
                                                     shapedir.remove('up')
                                                 i2 = i2 + 1
                                             if 'down' in shapedir:
                                                 i2 = i2+1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove down from shapedir
                                                     shapedir.remove('down')
                                                 i2 = i2 - 1
                                         if len(shapedir) == 1:
@@ -1139,28 +1083,24 @@ class Solver:
                                                             i2 = i2
                                                             j2 = j2-1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove left from shapedir
                                                                 shapedir.remove('left')
                                                             j2 = j2 + 1
                                                         if 'right' in shapedir:
                                                             i2 = i2
                                                             j2 = j2+1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove right from shapedir
                                                                 shapedir.remove('right')
                                                             j2 = j2 - 1
                                                         if 'up' in shapedir:
                                                             i2 = i2-1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove up from shapedir
                                                                 shapedir.remove('up')
                                                             i2 = i2 + 1
                                                         if 'down' in shapedir:
                                                             i2 = i2+1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove down from shapedir
                                                                 shapedir.remove('down')
                                                             i2 = i2 - 1
                                                     if len(shapedir) == 1:
@@ -1251,28 +1191,24 @@ class Solver:
                                                 i2 = i2
                                                 j2 = j2-1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove left from shapedir
                                                     shapedir.remove('left')
                                                 j2 = j2 + 1
                                             if 'right' in shapedir:
                                                 i2 = i2
                                                 j2 = j2+1
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove right from shapedir
                                                     shapedir.remove('right')
                                                 j2 = j2 - 1
                                             if 'up' in shapedir:
                                                 i2 = i2-1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove up from shapedir
                                                     shapedir.remove('up')
                                                 i2 = i2 + 1
                                             if 'down' in shapedir:
                                                 i2 = i2+1
                                                 j2 = j2
                                                 if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    #remove down from shapedir
                                                     shapedir.remove('down')
                                                 i2 = i2 - 1
                                         if len(shapedir) == 1:
@@ -1357,28 +1293,24 @@ class Solver:
                                                             i2 = i2
                                                             j2 = j2-1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove left from shapedir
                                                                 shapedir.remove('left')
                                                             j2 = j2 + 1
                                                         if 'right' in shapedir:
                                                             i2 = i2
                                                             j2 = j2+1
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove right from shapedir
                                                                 shapedir.remove('right')
                                                             j2 = j2 - 1
                                                         if 'up' in shapedir:
                                                             i2 = i2-1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove up from shapedir
                                                                 shapedir.remove('up')
                                                             i2 = i2 + 1
                                                         if 'down' in shapedir:
                                                             i2 = i2+1
                                                             j2 = j2
                                                             if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                #remove down from shapedir
                                                                 shapedir.remove('down')
                                                             i2 = i2 - 1
                                                     if len(shapedir) == 1:
@@ -1408,8 +1340,6 @@ class Solver:
                                     if outofrange == False and i == i1 and j-1 == j1 and change == True:
                                         directions.remove('left')
 
-
-
                             if len(directions) == 2:
                                 if directions[0] == 'left' and directions[1] == 'right':
                                     board[i][j] = H
@@ -1429,22 +1359,20 @@ class Solver:
                                 elif directions[0] == 'right' and directions[1] == 'down':
                                     board[i][j] = RD
                                     any_changes = True
-                                    
-
-
+                                
             print()
             print("Fifth stage:")
             Solver.print_board(board)
             
-            ## CHECK IF ALL NODES ARE EITHER SHAPES OR Xs
+            ## check if all nodes are filled in with shapes or Xs
             allnodes = True
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] == 'N' or board[i][j] == '.':
                         allnodes = False
             if allnodes == True:
-                # if number of nodes which are shapes is equal to sum of every number in column_totals, then print("Solved correctly")
-                # else print("Solved incorrectly")
+                # if number of nodes which are shapes is equal to sum of every number in column_totals, program has solved correctly
+                # else program has solved incorrectly
                 count = 0
                 for i in range(len(board)):
                     for j in range(len(board)):
@@ -1459,12 +1387,9 @@ class Solver:
                     print("Solved incorrectly")
                 break
 
-
             edgerulesneeded = False
-
             if any_changes == False:
                 edgerulesneeded = True
-
             if edgerulesneeded == True:
                 ##### STAGE 6 #####
                 # for each column
@@ -1477,7 +1402,6 @@ class Solver:
                 edgecolumns.append(len(board))
                 edgerows.append(-1)
                 edgerows.append(len(board))
-
 
                 for j in range(len(board)):
                     count = 0
@@ -1501,7 +1425,6 @@ class Solver:
                 # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
                 # if the length of list is 1, change the square to a dot, and change all other 'N's in the column to 'X'
                 for j in range(len(board)):
-
                     if (j - 1 in edgecolumns) or (j + 1 in edgecolumns):
                         count = 0
                         for i in range(len(board)):
@@ -1623,9 +1546,7 @@ class Solver:
                                         k -= 1
                                         counter += 1
                                     any_changes = True
-                                    
-
-                                       
+                                                           
                 # do the same for rows
                 possiblementright = False
                 possiblementleft = False
@@ -1680,7 +1601,6 @@ class Solver:
                                         counter += 1
                                     any_changes = True
                 
-
                 # do the same but swap left and right
                 # for each column
                 # if column to the right is an edge
@@ -1799,10 +1719,8 @@ class Solver:
                                         counter += 1
                                     any_changes = True
                 
-                
                 print("Unique rule used")
                 print()
-
 
 board, start, end = Solver.generate_board()
 Solver.Solve(board, start, end)
