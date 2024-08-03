@@ -312,8 +312,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [5,6,2,1,2,6,7,5]
-            row_totals = [7,7,5,4,3,3,4,1]
+            column_totals = [5,3,5,4,2,3,4,4]
+            row_totals = [2,3,7,5,7,2,3,1]
             changed = True
             while changed == True:
                 changed = False
@@ -1373,15 +1373,15 @@ class Solver:
             if allnodes == True:
                 # if number of nodes which are shapes is equal to sum of every number in column_totals, program has solved correctly
                 # else program has solved incorrectly
-                count = 0
+                counter = 0
                 for i in range(len(board)):
                     for j in range(len(board)):
                         if board[i][j] in shapes.values():
-                            count += 1
+                            counter += 1
                 total = 0
                 for i in range(len(column_totals)):
                     total += column_totals[i]
-                if count == total:
+                if counter == total:
                     print("Solved correctly")
                 else:
                     print("Solved incorrectly")
@@ -1719,8 +1719,86 @@ class Solver:
                                         counter += 1
                                     any_changes = True
                 
-                print("Unique rule used")
+                print("Unique rule used")###
                 print()
+
+
+
+                ##### other unique rule #####
+                # if column to the right has column total = 1
+                # if one of the nodes in column is a H, RD, RU
+                # make the corresponding node in the column to the right an H
+
+                for j in range(len(board)):
+                    if j + 1 < len(board):
+                        if column_totals[j+1] == 1:
+                            for i in range(len(board)):
+                                if board[i][j] == H:
+                                    board[i][j+1] = H
+                                    any_changes = True
+                                if board[i][j] == RD:
+                                    board[i][j+1] = H
+                                    any_changes = True
+                                if board[i][j] == RU:
+                                    board[i][j+1] = H
+                                    any_changes = True
+                
+                # do the same for rows
+                for i in range(len(board)):
+                    if i + 1 < len(board):
+                        if row_totals[i+1] == 1:
+                            for j in range(len(board)):
+                                if board[i][j] == V:
+                                    board[i+1][j] = V
+                                    any_changes = True
+                                if board[i][j] == RD:
+                                    board[i+1][j] = V
+                                    any_changes = True
+                                if board[i][j] == LD:
+                                    board[i+1][j] = V
+                                    any_changes = True
+                # do the same but swap left and right
+                # if column to the left has column total = 1
+                # if one of the nodes in column is a H, LD, LU
+                # make the corresponding node in the column to the left an H
+                for j in range(len(board)):
+                    if j - 1 >= 0:
+                        if column_totals[j-1] == 1:
+                            for i in range(len(board)):
+                                if board[i][j] == H:
+                                    board[i][j-1] = H
+                                    any_changes = True
+                                if board[i][j] == LD:
+                                    board[i][j-1] = H
+                                    any_changes = True
+                                if board[i][j] == LU:
+                                    board[i][j-1] = H
+                                    any_changes = True
+                
+                # do the same for rows
+                for i in range(len(board)):
+                    if i - 1 >= 0:
+                        if row_totals[i-1] == 1:
+                            for j in range(len(board)):
+                                if board[i][j] == V:
+                                    board[i-1][j] = V
+                                    any_changes = True
+                                if board[i][j] == RU:
+                                    board[i-1][j] = V
+                                    any_changes = True
+                                if board[i][j] == LU:
+                                    board[i-1][j] = V
+                                    any_changes = True
+
+                print("Unique rule used")###
+                print()
+
+
+
+
+        
+
+
 
 board, start, end = Solver.generate_board()
 Solver.Solve(board, start, end)
