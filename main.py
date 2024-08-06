@@ -118,7 +118,6 @@ class Solver:
     V = "│"
     DOT = "."
     NULL = "0"
-    
     characters = {
         'RD': RD,
         'LD': LD,
@@ -127,6 +126,7 @@ class Solver:
         'H': H,
         'V': V
     }
+    
 
     def generate_board():
         size = int(input("Enter the edge length of the board, in range 4 <= length <= 10: "))
@@ -214,106 +214,150 @@ class Solver:
 
 
     def Solve(board, start, end):
+        bruteforceneeded = False
+        solved_wrongly = False
+        path_directions = []
+        guesscount = 0
         edgerulesneeded = False
         any_changes = True
-        while any_changes:
+        RD = "┌"
+        LD = "┐"
+        RU = "└"
+        LU = "┘"
+        H = "─"
+        V = "│"
+        DOT = "."
+        NULL = "N"
+        X = "X"
+        grid2 = []
+        unsures = []
+        flagimpossible = False
+        trynew = False
+        firsttime = True
+        possibledirs = []
+        dots = []
+        unsureshapes = []
+        minicount = 0
+        trysecond = False
+        dots_two = []
+
+        definites = {
+            'RD': RD,
+            'LD': LD,
+            'RU': RU,
+            'LU': LU,
+            'H': H,
+            'V': V,
+            '.': DOT
+        }
+
+        knowns = {
+            'RD': RD,
+            'LD': LD,
+            'RU': RU,
+            'LU': LU,
+            'H': H,
+            'V': V,
+            'X': 'X'
+        }
+
+        shapes = {
+            'RD': RD,
+            'LD': LD,
+            'RU': RU,
+            'LU': LU,
+            'H': H,
+            'V': V
+        }###moved
+
+        # save the current grid to grid2
+
+        while any_changes or bruteforceneeded:
+                
             any_changes = False
             edgerulesneeded = False
-            RD = "┌"
-            LD = "┐"
-            RU = "└"
-            LU = "┘"
-            H = "─"
-            V = "│"
-            DOT = "."
-            NULL = "N"
-            X = "X"
+            flagimpossible = False
             
-            definites = {
-                'RD': RD,
-                'LD': LD,
-                'RU': RU,
-                'LU': LU,
-                'H': H,
-                'V': V,
-                '.': DOT
-            }
-
-            knowns = {
-                'RD': RD,
-                'LD': LD,
-                'RU': RU,
-                'LU': LU,
-                'H': H,
-                'V': V,
-                'X': 'X'
-            }
-
-            shapes = {
-                'RD': RD,
-                'LD': LD,
-                'RU': RU,
-                'LU': LU,
-                'H': H,
-                'V': V
-            }
 
             # First stage: change all 0s which connect to a start or end node to '.'
             print("Initial board:")
             Solver.print_board(board)
             print("\nFirst stage:")
-
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] in Solver.characters.values():
                         if board[i][j] == Solver.RD:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
+                                if bruteforceneeded == True:    
+                                    unsures.append((i+1, j, board[i+1][j], 1))
                                 board[i + 1][j] = '.'
                                 any_changes = True
                             if j + 1 < len(board) and board[i][j + 1] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j+1, board[i][j+1], 1))
                                 board[i][j + 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.LD:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i+1, j, board[i+1][j], 1))
                                 board[i + 1][j] = '.'
                                 any_changes = True
                             if j - 1 >= 0 and board[i][j - 1] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j-1, board[i][j-1], 1))
                                 board[i][j - 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.RU:
                             if i - 1 >= 0 and board[i - 1][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i-1, j, board[i-1][j], 1))
                                 board[i - 1][j] = '.'
                                 any_changes = True
                             if j + 1 < len(board) and board[i][j + 1] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j+1, board[i][j+1], 1))
                                 board[i][j + 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.LU:
                             if i - 1 >= 0 and board[i - 1][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i-1, j, board[i-1][j], 1))
                                 board[i - 1][j] = '.'
                                 any_changes = True
                             if j - 1 >= 0 and board[i][j - 1] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j-1, board[i][j-1], 1))
                                 board[i][j - 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.H:
                             if j + 1 < len(board) and board[i][j + 1] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j+1, board[i][j+1], 1))
                                 board[i][j + 1] = '.'
                                 any_changes = True
                             if j - 1 >= 0 and board[i][j - 1] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j-1, board[i][j-1], 1))
                                 board[i][j - 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.V:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i+1, j, board[i+1][j], 1))
                                 board[i + 1][j] = '.'
                                 any_changes = True
                             if i - 1 >= 0 and board[i - 1][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i-1, j, board[i-1][j], 1))
                                 board[i - 1][j] = '.'
                                 any_changes = True
 
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [5,3,5,4,2,3,4,4]
-            row_totals = [2,3,7,5,7,2,3,1]
+            column_totals = [2,2,2,3,8,6,2,2]
+            row_totals = [2,2,2,4,5,4,5,3]
             changed = True
             while changed == True:
                 changed = False
@@ -325,9 +369,14 @@ class Solver:
                     if count == column_totals[j]:
                         for i in range(len(board)):
                             if board[i][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
+
+                    if count > column_totals[j]:
+                        flagimpossible = True
                 for i in range(len(board)):
                     count = 0
                     for j in range(len(board)):
@@ -336,9 +385,14 @@ class Solver:
                     if count == row_totals[i]:
                         for j in range(len(board)):
                             if board[i][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
+
+                    if count > row_totals[i]:
+                        flagimpossible = True
 
                 # if number of non-Xs in each column is equal to the column total, change all 0s to dots
                 for j in range(len(board)):
@@ -349,6 +403,8 @@ class Solver:
                     if count == column_totals[j]:
                         for i in range(len(board)):
                             if board[i][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = '.'
                                 changed = True
                                 any_changes = True
@@ -361,6 +417,8 @@ class Solver:
                     if count == row_totals[i]:
                         for j in range(len(board)):
                             if board[i][j] == "N":
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = '.'
                                 changed = True
                                 any_changes = True
@@ -392,21 +450,33 @@ class Solver:
                         
                         if count == 2:
                             if directions[0] == 'left' and directions[1] == 'right':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = H
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'up':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LU
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'down':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LD
                                 any_changes = True
                             elif directions[0] == 'up' and directions[1] == 'down':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = V
                                 any_changes = True
                             elif directions[0] == 'up' and directions[1] == 'right':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RU
                                 any_changes = True
                             elif directions[0] == 'down' and directions[1] == 'right':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RD
                                 any_changes = True
 
@@ -446,6 +516,8 @@ class Solver:
                             if j + 1 < len(board) and ((board[i][j+1] == "N") or (board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU) or (board[i][j+1] == ".")):
                                 count += 1
                             if count <= 1:
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
@@ -461,10 +533,12 @@ class Solver:
                     if board[i][j] == '.':
                         count = 0
                         directions = []
+                        if board[4][3] == '.' and board[4][2] == "." and board[3][3] == "." and board[3][2] == ".":
+                            print("fix")
                         if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU) or (board[i][j-1] == '.') or (board[i][j-1] == "N")):
                             count += 1
                             directions.append('left')
-                        if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU) or (board[i][j+1] == '.') or (board[i][j+1] == "N")):
+                        if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU) or (board[i][j+1] == DOT) or (board[i][j+1] == "N")):
                             count += 1
                             directions.append('right')
                         if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD) or (board[i-1][j] == '.') or (board[i-1][j] == "N")):
@@ -477,21 +551,33 @@ class Solver:
                         # draw the appropriate character
                         if count == 2:
                             if directions[0] == 'left' and directions[1] == 'right':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = H
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'up':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LU
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'down':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LD
                                 any_changes = True
                             elif directions[0] == 'up' and directions[1] == 'down':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = V
                                 any_changes = True
                             elif directions[0] == 'right' and directions[1] == 'up':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RU
                                 any_changes = True
                             elif directions[0] == 'right' and directions[1] == 'down':
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RD
                                 any_changes = True
                         if count == 3:
@@ -1122,13 +1208,17 @@ class Solver:
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
                                     if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        directions.remove('right')
+                                        if 'right' in directions:
+                                            directions.remove('right')
                                     if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        directions.remove('down')
+                                        if 'down' in directions:
+                                            directions.remove('down')
                                     if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        directions.remove('up')
+                                        if 'up' in directions:
+                                            directions.remove('up')
                                     if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        directions.remove('left')
+                                        if 'left' in directions:
+                                            directions.remove('left')
                             
                             if j + 1 < len(board):
                                 if (board[i][j+1] == LU) or (board[i][j+1] == LD) or (board[i][j+1] == H):
@@ -1341,6 +1431,8 @@ class Solver:
                                         directions.remove('left')
 
                             if len(directions) == 2:
+                                if bruteforceneeded == True:
+                                    unsures.append((i, j, board[i][j], 1))
                                 if directions[0] == 'left' and directions[1] == 'right':
                                     board[i][j] = H
                                     any_changes = True
@@ -1364,28 +1456,6 @@ class Solver:
             print("Fifth stage:")
             Solver.print_board(board)
             
-            ## check if all nodes are filled in with shapes or Xs
-            allnodes = True
-            for i in range(len(board)):
-                for j in range(len(board)):
-                    if board[i][j] == 'N' or board[i][j] == '.':
-                        allnodes = False
-            if allnodes == True:
-                # if number of nodes which are shapes is equal to sum of every number in column_totals, program has solved correctly
-                # else program has solved incorrectly
-                counter = 0
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] in shapes.values():
-                            counter += 1
-                total = 0
-                for i in range(len(column_totals)):
-                    total += column_totals[i]
-                if counter == total:
-                    print("Solved correctly")
-                else:
-                    print("Solved incorrectly")
-                break
 
             edgerulesneeded = False
             if any_changes == False:
@@ -1442,6 +1512,8 @@ class Solver:
                                         dots.append((i, j))
                                         possible = True
                                     if possible == False:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                                     
@@ -1450,6 +1522,8 @@ class Solver:
                                 any_changes = True
                                 for i in range(len(board)):
                                     if board[i][j] == "N":
+                                        if bruteforceneeded == True:
+                                            unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                 # do the same for rows
@@ -1471,6 +1545,8 @@ class Solver:
                                         dots.append((i, j))
                                         possible = True
                                     if possible == False:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                                     
@@ -1479,6 +1555,8 @@ class Solver:
                                 any_changes = True
                                 for j in range(len(board)):
                                     if board[i][j] == "N":
+                                        if bruteforceneeded == True:
+                                            unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                 
@@ -1534,6 +1612,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((k, j, board[k][j], 1))
                                         board[k][j] = "."
                                         k += 1
                                         counter += 1
@@ -1542,6 +1622,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((k, j, board[k][j], 1))
                                         board[k][j] = "."
                                         k -= 1
                                         counter += 1
@@ -1588,6 +1670,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,k,board[i][k],1))
                                         board[i][k] = "."
                                         k += 1
                                         counter += 1
@@ -1596,6 +1680,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,k,board[i][k],1))
                                         board[i][k] = "."
                                         k -= 1
                                         counter += 1
@@ -1652,6 +1738,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((k,j,board[k][j],1))
                                         board[k][j] = "."
                                         k += 1
                                         counter += 1
@@ -1660,6 +1748,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((k,j,board[k][j],1))
                                         board[k][j] = "."
                                         k -= 1
                                         counter += 1
@@ -1706,6 +1796,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,k,board[i][k],1))
                                         board[i][k] = "."
                                         k += 1
                                         counter += 1
@@ -1714,6 +1806,8 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,k,board[i][k],1))
                                         board[i][k] = "."
                                         k -= 1
                                         counter += 1
@@ -1734,14 +1828,23 @@ class Solver:
                         if column_totals[j+1] == 1:
                             for i in range(len(board)):
                                 if board[i][j] == H:
-                                    board[i][j+1] = H
-                                    any_changes = True
+                                    if board[i][j+1] != H:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,j+1,board[i][j+1],1))
+                                        board[i][j+1] = H
+                                        any_changes = True
                                 if board[i][j] == RD:
-                                    board[i][j+1] = H
-                                    any_changes = True
+                                    if board[i][j+1] != H:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,j+1,board[i][j+1],1))
+                                        board[i][j+1] = H
+                                        any_changes = True
                                 if board[i][j] == RU:
-                                    board[i][j+1] = H
-                                    any_changes = True
+                                    if board[i][j+1] != H:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,j+1,board[i][j+1],1))
+                                        board[i][j+1] = H
+                                        any_changes = True
                 
                 # do the same for rows
                 for i in range(len(board)):
@@ -1749,14 +1852,23 @@ class Solver:
                         if row_totals[i+1] == 1:
                             for j in range(len(board)):
                                 if board[i][j] == V:
-                                    board[i+1][j] = V
-                                    any_changes = True
+                                    if board[i+1][j] != V:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i+1,j,board[i+1][j],1))
+                                        board[i+1][j] = V
+                                        any_changes = True
                                 if board[i][j] == RD:
-                                    board[i+1][j] = V
-                                    any_changes = True
+                                    if board[i+1][j] != V:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i+1,j,board[i+1][j],1))
+                                        board[i+1][j] = V
+                                        any_changes = True
                                 if board[i][j] == LD:
-                                    board[i+1][j] = V
-                                    any_changes = True
+                                    if board[i+1][j] != V:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i+1,j,board[i+1][j],1))
+                                        board[i+1][j] = V
+                                        any_changes = True
                 # do the same but swap left and right
                 # if column to the left has column total = 1
                 # if one of the nodes in column is a H, LD, LU
@@ -1766,14 +1878,23 @@ class Solver:
                         if column_totals[j-1] == 1:
                             for i in range(len(board)):
                                 if board[i][j] == H:
-                                    board[i][j-1] = H
-                                    any_changes = True
+                                    if board[i][j-1] != H:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,j-1,board[i][j-1],1))
+                                        board[i][j-1] = H
+                                        any_changes = True
                                 if board[i][j] == LD:
-                                    board[i][j-1] = H
-                                    any_changes = True
+                                    if board[i][j-1] != H:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,j-1,board[i][j-1],1))
+                                        board[i][j-1] = H
+                                        any_changes = True
                                 if board[i][j] == LU:
-                                    board[i][j-1] = H
-                                    any_changes = True
+                                    if board[i][j-1] != H:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i,j-1,board[i][j-1],1))
+                                        board[i][j-1] = H
+                                        any_changes = True
                 
                 # do the same for rows
                 for i in range(len(board)):
@@ -1781,24 +1902,270 @@ class Solver:
                         if row_totals[i-1] == 1:
                             for j in range(len(board)):
                                 if board[i][j] == V:
-                                    board[i-1][j] = V
-                                    any_changes = True
+                                    if board[i-1][j] != V:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i-1,j,board[i-1][j],1))
+                                        board[i-1][j] = V
+                                        any_changes = True
                                 if board[i][j] == RU:
-                                    board[i-1][j] = V
-                                    any_changes = True
+                                    if board[i-1][j] != V:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i-1,j,board[i-1][j],1))
+                                        board[i-1][j] = V
+                                        any_changes = True
                                 if board[i][j] == LU:
-                                    board[i-1][j] = V
-                                    any_changes = True
+                                    if board[i-1][j] != V:
+                                        if bruteforceneeded == True:
+                                            unsures.append((i-1,j,board[i-1][j],1))
+                                        board[i-1][j] = V
+                                        any_changes = True
 
                 print("Unique rule used")###
-                print()
+
+            # for each shape in grid
+            # determine what directions the shape goes in
+            # check if the shape in each direction is a compatible shape
+
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] in shapes.values():
+                        shapedirections = []
+                        if board[i][j] == H:
+                            shapedirections.append('left')
+                            shapedirections.append('right')
+                        if board[i][j] == V:
+                            shapedirections.append('up')
+                            shapedirections.append('down')
+                        if board[i][j] == RD:
+                            shapedirections.append('right')
+                            shapedirections.append('down')
+                        if board[i][j] == RU:
+                            shapedirections.append('right')
+                            shapedirections.append('up')
+                        if board[i][j] == LD:
+                            shapedirections.append('left')
+                            shapedirections.append('down')
+                        if board[i][j] == LU:
+                            shapedirections.append('left')
+                            shapedirections.append('up')
+                        for direction in shapedirections:
+                            if direction == 'left' and j - 1 >= 0:
+                                if board[i][j-1] == V or board[i][j-1] == LU or board[i][j-1] == LD:
+                                    flagimpossible = True
+                            if direction == 'right' and j + 1 < len(board):
+                                if board[i][j+1] == V or board[i][j+1] == RU or board[i][j+1] == RD:
+                                    flagimpossible = True
+                            if direction == 'up' and i - 1 >= 0:
+                                if board[i-1][j] == H or board[i-1][j] == RU or board[i-1][j] == LU:
+                                    flagimpossible = True
+                            if direction == 'down' and i + 1 < len(board):
+                                if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
+                                    flagimpossible = True
+
+            #### for each dot in the grid
+            # if the dot is surrounded by 3 'X's, flag as impossible
+
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == ".":
+                        count = 0
+                        if i - 1 >= 0 and board[i-1][j] == "X":
+                            count += 1
+                        if i + 1 < len(board) and board[i+1][j] == "X":
+                            count += 1
+                        if j - 1 >= 0 and board[i][j-1] == "X":
+                            count += 1
+                        if j + 1 < len(board) and board[i][j+1] == "X":
+                            count += 1
+                        if count >= 3:
+                            flagimpossible = True
 
 
 
 
-        
+            # for dot in grid
+            # if the dot is surrounded by 3 shapes which go into it, flag as impossible
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == ".":
+                        count = 0
+                        # if the shape to the left is a shape that goes right
+                        if j - 1 >= 0 and board[i][j-1] in shapes.values():
+                            if board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU:
+                                count += 1
+                        # if the shape to the right is a shape that goes left
+                        if j + 1 < len(board) and board[i][j+1] in shapes.values():
+                            if board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU:
+                                count += 1
+                        # if the shape above is a shape that goes down
+                        if i - 1 >= 0 and board[i-1][j] in shapes.values():
+                            if board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD:
+                                count += 1
+                        # if the shape below is a shape that goes up
+                        if i + 1 < len(board) and board[i+1][j] in shapes.values():
+                            if board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU:
+                                count += 1
+                        if count >= 3:
+                            flagimpossible = True
 
 
+            if flagimpossible == True:
+                trynew = True
+                        
+            edgerulesneeded = False
+            if any_changes == False:
+                print("No changes made, entering guessing stage")
+                bruteforceneeded = True
+
+            if (bruteforceneeded == True and any_changes == False) or trynew == True:
+                print("Brute force needed")
+
+                # reverse unsures
+
+                unsures = unsures[::-1]
+                ####add all unsures back to board in reverse order
+                for unsure in unsures:
+                    board[unsure[0]][unsure[1]] = unsure[2]
+                unsures = []
+
+                
+
+
+                if trynew == True:
+                    if trysecond == False:
+                        unsureshapes.pop(0)
+                    if trysecond == True:
+                        unsureshapes.pop(1)
+                    trysecond = False
+
+                if len(unsureshapes) == 1:
+                    # make the board square of save_state the shape in unsureshapes
+                    board[save_state[0]][save_state[1]] = unsureshapes[0]
+                    unsureshapes.pop(0)
+                    trynew = False
+                    any_changes = True
+
+
+                if len(unsureshapes) == 2:
+                    trysecond = True
+                    any_changes = True
+
+
+                if trysecond == True:
+                    board[save_state[0]][save_state[1]] = save_state[2]
+
+                    board[nodeguess[0]][nodeguess[1]] = nodeguess[3]
+
+                    
+
+
+
+
+                ###### brute force ######
+
+                #for dot in board
+                # find the number of possible shapes that can go in the dot
+                # if only one possible shape, change the dot to that shape
+                # if two possible shapes, add a tuple to 'dots_two' in the form (i, j, shape1, shape2)
+                
+                if minicount == 0:
+                    minicount += 1
+                    any_changes = False
+                    for i in range(len(board)):
+                        for j in range(len(board)):
+                            if board[i][j] == ".":
+                                possible = []
+                                ### for each dot that connects to a shape
+                                # for example if the shape at [i][j-1] is H, RD, RU, check the other three directions to see if any are dots or 'N's
+                                # if they are add the corresponding shapes to 'possible'
+                                if j - 1 >= 0 and (board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU):
+                                    if j + 1 < len(board) and (board[i][j+1] == "." or board[i][j+1] == "N"):
+                                        possible.append(H)
+                                    if i - 1 >= 0 and (board[i-1][j] == "." or board[i-1][j] == "N"):
+                                        possible.append(LU)
+                                    if i + 1 < len(board) and (board[i+1][j] == "." or board[i+1][j] == "N"):
+                                        possible.append(LD)
+
+                                if j + 1 < len(board) and (board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU):
+                                    if j - 1 >= 0 and (board[i][j-1] == "." or board[i][j-1] == "N"):
+                                        possible.append(H)
+                                    if i - 1 >= 0 and (board[i-1][j] == "." or board[i-1][j] == "N"):
+                                        possible.append(RU)
+                                    if i + 1 < len(board) and (board[i+1][j] == "." or board[i+1][j] == "N"):
+                                        possible.append(RD)
+                                
+                                if i - 1 >= 0 and (board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD):
+                                    if i + 1 < len(board) and (board[i+1][j] == "." or board[i+1][j] == "N"):
+                                        possible.append(V)
+                                    if j - 1 >= 0 and (board[i][j-1] == "." or board[i][j-1] == "N"):
+                                        possible.append(LU)
+                                    if j + 1 < len(board) and (board[i][j+1] == "." or board[i][j+1] == "N"):
+                                        possible.append(RU)
+
+                                if i + 1 < len(board) and (board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU):
+                                    if i - 1 >= 0 and (board[i-1][j] == "." or board[i-1][j] == "N"):
+                                        possible.append(V)
+                                    if j - 1 >= 0 and (board[i][j-1] == "." or board[i][j-1] == "N"):
+                                        possible.append(LD)
+                                    if j + 1 < len(board) and (board[i][j+1] == "." or board[i][j+1] == "N"):
+                                        possible.append(RD)
+
+                                if len(possible) == 1:
+                                    board[i][j] = possible[0]
+                                    any_changes = True
+                                if len(possible) == 2:
+                                    dots_two.append((i, j, possible[0], possible[1]))
+
+
+
+                if any_changes == False:
+                    ##### nodeguess = first node in dots_two
+                    # change the board position designated by the first and second parts of nodeguess to the first shape in the third part of nodeguess
+                    # add both shapes to 'unsureshapes'
+                    # save old state of board square to save_state
+
+                    ## save state includes the coordinates of the node, and the shape of the node
+                    save_state = [dots_two[0][0], dots_two[0][1], board[dots_two[0][0]][dots_two[0][1]]]
+
+                    nodeguess = dots_two[0]
+                    board[nodeguess[0]][nodeguess[1]] = nodeguess[2]
+                    unsureshapes.append(nodeguess[2])
+                    unsureshapes.append(nodeguess[3])
+                    dots_two.pop(0)
+
+
+                print("Brute force used")
+
+
+
+
+
+
+
+            ## check if all nodes are filled in with shapes or Xs
+            allnodes = True
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == 'N' or board[i][j] == '.':
+                        allnodes = False
+            if allnodes == True:
+                # if number of nodes which are shapes is equal to sum of every number in column_totals, program has solved correctly
+                # else program has solved incorrectly
+                counter = 0
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] in shapes.values():
+                            counter += 1
+                total = 0
+                for i in range(len(column_totals)):
+                    total += column_totals[i]
+                if counter == total:
+                    print("Solved correctly")
+
+                else:
+                    print("Solved incorrectly")
+                    solved_wrongly = True
+                break
 
 board, start, end = Solver.generate_board()
 Solver.Solve(board, start, end)
