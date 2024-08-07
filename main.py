@@ -356,8 +356,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [2,2,2,3,8,6,2,2]
-            row_totals = [2,2,2,4,5,4,5,3]
+            column_totals = [5,4,4,5,7,4,2,5]
+            row_totals = [3,5,6,4,8,4,5,1]
             changed = True
             while changed == True:
                 changed = False
@@ -521,9 +521,9 @@ class Solver:
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
-            print()
             print("Fourth stage:")
             Solver.print_board(board)
+            print()
 
             ##### STAGE 5
             # for each dot in the grid
@@ -785,13 +785,17 @@ class Solver:
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
                                     if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        directions.remove('right')
+                                        if 'right' in directions:
+                                            directions.remove('right')
                                     if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        directions.remove('down')
+                                        if 'down' in directions:
+                                            directions.remove('down')
                                     if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        directions.remove('up')
+                                        if 'up' in directions:
+                                            directions.remove('up')
                                     if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        directions.remove('left')
+                                        if 'left' in directions:
+                                            directions.remove('left')
 
 
 
@@ -998,13 +1002,17 @@ class Solver:
                                                         outofrange = True
 
                                     if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        directions.remove('right')
+                                        if 'right' in directions:
+                                            directions.remove('right')
                                     if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        directions.remove('down')
+                                        if 'down' in directions:
+                                            directions.remove('down')
                                     if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        directions.remove('up')
+                                        if 'up' in directions:
+                                            directions.remove('up')
                                     if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        directions.remove('left')
+                                        if 'left' in directions:
+                                            directions.remove('left')
                                 
                             if j - 1 >= 0:
                                 if (board[i][j-1] == RU) or (board[i][j-1] == RD) or (board[i][j-1] == H):
@@ -1422,13 +1430,17 @@ class Solver:
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
                                     if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        directions.remove('right')
+                                        if 'right' in directions:
+                                            directions.remove('right')
                                     if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        directions.remove('down')
+                                        if 'down' in directions:
+                                            directions.remove('down')
                                     if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        directions.remove('up')
+                                        if 'up' in directions:
+                                            directions.remove('up')
                                     if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        directions.remove('left')
+                                        if 'left' in directions:
+                                            directions.remove('left')
 
                             if len(directions) == 2:
                                 if bruteforceneeded == True:
@@ -1455,7 +1467,199 @@ class Solver:
             print()
             print("Fifth stage:")
             Solver.print_board(board)
+
+
+            i,j = start
+            previ,prevj = start
+            iend,jend = end
+            isashape = True
+            fromstartcount = 1
+            donestart = False
+
+            if j == 0:
+                if board[i][j] == H:
+                    j = j + 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == LU and donestart == False:
+                    i = i - 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == LD and donestart == False:
+                    i = i + 1
+                    fromstartcount += 1
+                    donestart = True
+
+            if j == len(board) - 1:
+                if board[i][j] == H and donestart == False:
+                    j = j - 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == RU and donestart == False:
+                    i = i - 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == RD and donestart == False:
+                    i = i + 1
+                    fromstartcount += 1
+                    donestart = True
             
+            if i == 0:
+                if board[i][j] == V and donestart == False:
+                    i = i + 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == RU and donestart == False:
+                    j = j + 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == LU and donestart == False:
+                    j = j - 1
+                    fromstartcount += 1
+                    donestart = True
+            
+            if i == len(board) - 1:
+                if board[i][j] == V and donestart == False:
+                    i = i - 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == RD and donestart == False:
+                    j = j + 1
+                    fromstartcount += 1
+                    donestart = True
+                if board[i][j] == LD and donestart == False:
+                    j = j - 1
+                    fromstartcount += 1
+                    donestart = True
+
+
+            if board[i][j] in shapes.values():
+                isashape = True
+            else:
+                isashape = False
+
+            while isashape == True and (iend != i or jend != j):
+                isashape = False
+                done = False
+                # if node is an H and prevnode was to the left
+                # move right
+                if board[i][j] == H and prevj < j:
+                    previ = i
+                    prevj = j
+                    j = j + 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                if board[i][j] == H and prevj > j and done == False:
+                    previ = i
+                    prevj = j
+                    j = j - 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                #if node is a V and prevnode was above
+                # move down
+                if board[i][j] == V and previ < i and done == False:
+                    previ = i
+                    prevj = j
+                    i = i + 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                if board[i][j] == V and previ > i and done == False:
+                    previ = i
+                    prevj = j
+                    i = i - 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+
+                #if node is a LU and prevnode was to the left
+                # move up
+                if board[i][j] == LU and prevj < j and done == False:
+                    previ = i
+                    prevj = j
+                    i = i - 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                if board[i][j] == LU and prevj == j and done == False:
+                    previ = i
+                    prevj = j
+                    j = j - 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+
+                #if node is a LD and prevnode was to the left
+                # move down
+                if board[i][j] == LD and prevj < j and done == False:
+                    previ = i
+                    prevj = j
+                    i = i + 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                if board[i][j] == LD and prevj == j and done == False:
+                    previ = i
+                    prevj = j
+                    j = j - 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+
+                #if node is a RU and prevnode was to the right
+                # move up
+                if board[i][j] == RU and prevj > j and done == False:
+                    previ = i
+                    prevj = j
+                    i = i - 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                if board[i][j] == RU and prevj == j and done == False:
+                    previ = i
+                    prevj = j
+                    j = j + 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+
+                #if node is a RD and prevnode was to the right
+                # move down
+                if board[i][j] == RD and prevj > j and done == False:
+                    previ = i
+                    prevj = j
+                    i = i + 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+                if board[i][j] == RD and prevj == j and done == False:
+                    previ = i
+                    prevj = j
+                    j = j + 1
+                    fromstartcount += 1
+                    isashape = True
+                    done = True
+
+            if iend == i and jend == j:
+                nodenumber = 0
+                # for i in column_totals
+                # add to nodenumber
+
+                for i in range(len(column_totals)):
+                    nodenumber += column_totals[i]
+
+                if fromstartcount != nodenumber:
+                    flagimpossible = True
+                else:
+                    flagimpossible = False
+                    any_changes = False
+                    print("Solved succesfully")
+                    break
+
+
+
 
             edgerulesneeded = False
             if any_changes == False:
@@ -2028,8 +2232,6 @@ class Solver:
                     board[unsure[0]][unsure[1]] = unsure[2]
                 unsures = []
 
-                
-
 
                 if trynew == True:
                     if trysecond == False:
@@ -2055,10 +2257,6 @@ class Solver:
                     board[save_state[0]][save_state[1]] = save_state[2]
 
                     board[nodeguess[0]][nodeguess[1]] = nodeguess[3]
-
-                    
-
-
 
 
                 ###### brute force ######
@@ -2138,34 +2336,6 @@ class Solver:
 
 
 
-
-
-
-
-            ## check if all nodes are filled in with shapes or Xs
-            allnodes = True
-            for i in range(len(board)):
-                for j in range(len(board)):
-                    if board[i][j] == 'N' or board[i][j] == '.':
-                        allnodes = False
-            if allnodes == True:
-                # if number of nodes which are shapes is equal to sum of every number in column_totals, program has solved correctly
-                # else program has solved incorrectly
-                counter = 0
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] in shapes.values():
-                            counter += 1
-                total = 0
-                for i in range(len(column_totals)):
-                    total += column_totals[i]
-                if counter == total:
-                    print("Solved correctly")
-
-                else:
-                    print("Solved incorrectly")
-                    solved_wrongly = True
-                break
 
 board, start, end = Solver.generate_board()
 Solver.Solve(board, start, end)
