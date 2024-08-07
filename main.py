@@ -277,6 +277,7 @@ class Solver:
             any_changes = False
             edgerulesneeded = False
             flagimpossible = False
+            alreadyreplaced = False
             
 
             # First stage: change all 0s which connect to a start or end node to '.'
@@ -288,68 +289,129 @@ class Solver:
                     if board[i][j] in Solver.characters.values():
                         if board[i][j] == Solver.RD:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
-                                if bruteforceneeded == True:    
-                                    unsures.append((i+1, j, board[i+1][j], 1))
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i + 1) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i+1, j, board[i+1][j], 1))
+
                                 board[i + 1][j] = '.'
                                 any_changes = True
                             if j + 1 < len(board) and board[i][j + 1] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j+1, board[i][j+1], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j + 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j+1, board[i][j+1], 1))
                                 board[i][j + 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.LD:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i+1, j, board[i+1][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i + 1) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i+1, j, board[i+1][j], 1))
                                 board[i + 1][j] = '.'
                                 any_changes = True
                             if j - 1 >= 0 and board[i][j - 1] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j-1, board[i][j-1], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j - 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j-1, board[i][j-1], 1))
                                 board[i][j - 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.RU:
                             if i - 1 >= 0 and board[i - 1][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i-1, j, board[i-1][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i - 1) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i-1, j, board[i-1][j], 1))
                                 board[i - 1][j] = '.'
                                 any_changes = True
                             if j + 1 < len(board) and board[i][j + 1] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j+1, board[i][j+1], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j + 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j+1, board[i][j+1], 1))
                                 board[i][j + 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.LU:
                             if i - 1 >= 0 and board[i - 1][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i-1, j, board[i-1][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i - 1) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i-1, j, board[i-1][j], 1))
                                 board[i - 1][j] = '.'
                                 any_changes = True
                             if j - 1 >= 0 and board[i][j - 1] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j-1, board[i][j-1], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j - 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j-1, board[i][j-1], 1))
                                 board[i][j - 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.H:
                             if j + 1 < len(board) and board[i][j + 1] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j+1, board[i][j+1], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j + 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j+1, board[i][j+1], 1))
                                 board[i][j + 1] = '.'
                                 any_changes = True
                             if j - 1 >= 0 and board[i][j - 1] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j-1, board[i][j-1], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j - 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j-1, board[i][j-1], 1))
                                 board[i][j - 1] = '.'
                                 any_changes = True
                         elif board[i][j] == Solver.V:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i+1, j, board[i+1][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i + 1) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i+1, j, board[i+1][j], 1))
                                 board[i + 1][j] = '.'
                                 any_changes = True
                             if i - 1 >= 0 and board[i - 1][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i-1, j, board[i-1][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i - 1) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i-1, j, board[i-1][j], 1))
                                 board[i - 1][j] = '.'
                                 any_changes = True
 
@@ -370,7 +432,13 @@ class Solver:
                         for i in range(len(board)):
                             if board[i][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
+
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
@@ -386,7 +454,12 @@ class Solver:
                         for j in range(len(board)):
                             if board[i][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
@@ -404,7 +477,12 @@ class Solver:
                         for i in range(len(board)):
                             if board[i][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = '.'
                                 changed = True
                                 any_changes = True
@@ -418,7 +496,12 @@ class Solver:
                         for j in range(len(board)):
                             if board[i][j] == "N":
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = '.'
                                 changed = True
                                 any_changes = True
@@ -451,32 +534,62 @@ class Solver:
                         if count == 2:
                             if directions[0] == 'left' and directions[1] == 'right':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = H
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'up':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LU
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'down':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LD
                                 any_changes = True
                             elif directions[0] == 'up' and directions[1] == 'down':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = V
                                 any_changes = True
                             elif directions[0] == 'up' and directions[1] == 'right':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RU
                                 any_changes = True
                             elif directions[0] == 'down' and directions[1] == 'right':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RD
                                 any_changes = True
 
@@ -517,7 +630,12 @@ class Solver:
                                 count += 1
                             if count <= 1:
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
@@ -552,32 +670,62 @@ class Solver:
                         if count == 2:
                             if directions[0] == 'left' and directions[1] == 'right':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = H
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'up':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LU
                                 any_changes = True
                             elif directions[0] == 'left' and directions[1] == 'down':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = LD
                                 any_changes = True
                             elif directions[0] == 'up' and directions[1] == 'down':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = V
                                 any_changes = True
                             elif directions[0] == 'right' and directions[1] == 'up':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RU
                                 any_changes = True
                             elif directions[0] == 'right' and directions[1] == 'down':
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 board[i][j] = RD
                                 any_changes = True
                         if count == 3:
@@ -1444,7 +1592,12 @@ class Solver:
 
                             if len(directions) == 2:
                                 if bruteforceneeded == True:
-                                    unsures.append((i, j, board[i][j], 1))
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == i) and (u[1] == j):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((i, j, board[i][j], 1))
                                 if directions[0] == 'left' and directions[1] == 'right':
                                     board[i][j] = H
                                     any_changes = True
@@ -1717,17 +1870,34 @@ class Solver:
                                         possible = True
                                     if possible == False:
                                         if bruteforceneeded == True:
-                                            unsures.append((i, j, board[i][j], 1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                                     
                             if len(dots) == 1:
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == dots[0][0]) and (u[1] == dots[0][1]):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((dots[0][0], dots[0][1], board[dots[0][0]][dots[0][1]], 1))
                                 board[dots[0][0]][dots[0][1]] = "."
                                 any_changes = True
                                 for i in range(len(board)):
                                     if board[i][j] == "N":
                                         if bruteforceneeded == True:
-                                            unsures.append((i, j, board[i][j], 1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                 # do the same for rows
@@ -1750,17 +1920,34 @@ class Solver:
                                         possible = True
                                     if possible == False:
                                         if bruteforceneeded == True:
-                                            unsures.append((i, j, board[i][j], 1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                                     
                             if len(dots) == 1:
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == dots[0][0]) and (u[1] == dots[0][1]):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((dots[0][0], dots[0][1], board[dots[0][0]][dots[0][1]], 1))
                                 board[dots[0][0]][dots[0][1]] = "."
                                 any_changes = True
                                 for j in range(len(board)):
                                     if board[i][j] == "N":
                                         if bruteforceneeded == True:
-                                            unsures.append((i, j, board[i][j], 1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, j, board[i][j], 1))
                                         board[i][j] = "X"
                                         any_changes = True
                 
@@ -1817,7 +2004,12 @@ class Solver:
                                     k = place
                                     while counter < column_totals[j]:
                                         if bruteforceneeded == True:
-                                            unsures.append((k, j, board[k][j], 1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == k) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((k, j, board[k][j], 1))
                                         board[k][j] = "."
                                         k += 1
                                         counter += 1
@@ -1827,7 +2019,12 @@ class Solver:
                                     k = place
                                     while counter < column_totals[j]:
                                         if bruteforceneeded == True:
-                                            unsures.append((k, j, board[k][j], 1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == k) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((k, j, board[k][j], 1))
                                         board[k][j] = "."
                                         k -= 1
                                         counter += 1
@@ -1875,7 +2072,12 @@ class Solver:
                                     k = place
                                     while counter < row_totals[i]:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,k,board[i][k],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == k):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, k, board[i][k], 1))
                                         board[i][k] = "."
                                         k += 1
                                         counter += 1
@@ -1885,7 +2087,12 @@ class Solver:
                                     k = place
                                     while counter < row_totals[i]:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,k,board[i][k],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == k):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, k, board[i][k], 1))
                                         board[i][k] = "."
                                         k -= 1
                                         counter += 1
@@ -1943,7 +2150,12 @@ class Solver:
                                     k = place
                                     while counter < column_totals[j]:
                                         if bruteforceneeded == True:
-                                            unsures.append((k,j,board[k][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == k) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((k, j, board[k][j], 1))
                                         board[k][j] = "."
                                         k += 1
                                         counter += 1
@@ -1953,7 +2165,12 @@ class Solver:
                                     k = place
                                     while counter < column_totals[j]:
                                         if bruteforceneeded == True:
-                                            unsures.append((k,j,board[k][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == k) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((k, j, board[k][j], 1))
                                         board[k][j] = "."
                                         k -= 1
                                         counter += 1
@@ -2001,7 +2218,12 @@ class Solver:
                                     k = place
                                     while counter < row_totals[i]:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,k,board[i][k],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == k):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, k, board[i][k], 1))
                                         board[i][k] = "."
                                         k += 1
                                         counter += 1
@@ -2011,7 +2233,12 @@ class Solver:
                                     k = place
                                     while counter < row_totals[i]:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,k,board[i][k],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == k):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, k, board[i][k], 1))
                                         board[i][k] = "."
                                         k -= 1
                                         counter += 1
@@ -2034,19 +2261,34 @@ class Solver:
                                 if board[i][j] == H:
                                     if board[i][j+1] != H:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,j+1,board[i][j+1],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j+1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i,j+1,board[i][j+1],1))
                                         board[i][j+1] = H
                                         any_changes = True
                                 if board[i][j] == RD:
                                     if board[i][j+1] != H:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,j+1,board[i][j+1],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j+1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i,j+1,board[i][j+1],1))
                                         board[i][j+1] = H
                                         any_changes = True
                                 if board[i][j] == RU:
                                     if board[i][j+1] != H:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,j+1,board[i][j+1],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j+1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i,j+1,board[i][j+1],1))
                                         board[i][j+1] = H
                                         any_changes = True
                 
@@ -2058,19 +2300,34 @@ class Solver:
                                 if board[i][j] == V:
                                     if board[i+1][j] != V:
                                         if bruteforceneeded == True:
-                                            unsures.append((i+1,j,board[i+1][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i+1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i+1,j,board[i+1][j],1))
                                         board[i+1][j] = V
                                         any_changes = True
                                 if board[i][j] == RD:
                                     if board[i+1][j] != V:
                                         if bruteforceneeded == True:
-                                            unsures.append((i+1,j,board[i+1][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i+1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i+1,j,board[i+1][j],1))
                                         board[i+1][j] = V
                                         any_changes = True
                                 if board[i][j] == LD:
                                     if board[i+1][j] != V:
                                         if bruteforceneeded == True:
-                                            unsures.append((i+1,j,board[i+1][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i+1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i+1,j,board[i+1][j],1))
                                         board[i+1][j] = V
                                         any_changes = True
                 # do the same but swap left and right
@@ -2084,19 +2341,34 @@ class Solver:
                                 if board[i][j] == H:
                                     if board[i][j-1] != H:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,j-1,board[i][j-1],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j-1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i,j-1,board[i][j-1],1))
                                         board[i][j-1] = H
                                         any_changes = True
                                 if board[i][j] == LD:
                                     if board[i][j-1] != H:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,j-1,board[i][j-1],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j-1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i,j-1,board[i][j-1],1))
                                         board[i][j-1] = H
                                         any_changes = True
                                 if board[i][j] == LU:
                                     if board[i][j-1] != H:
                                         if bruteforceneeded == True:
-                                            unsures.append((i,j-1,board[i][j-1],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == j-1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i,j-1,board[i][j-1],1))
                                         board[i][j-1] = H
                                         any_changes = True
                 
@@ -2108,19 +2380,34 @@ class Solver:
                                 if board[i][j] == V:
                                     if board[i-1][j] != V:
                                         if bruteforceneeded == True:
-                                            unsures.append((i-1,j,board[i-1][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i-1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i-1,j,board[i-1][j],1))
                                         board[i-1][j] = V
                                         any_changes = True
                                 if board[i][j] == RU:
                                     if board[i-1][j] != V:
                                         if bruteforceneeded == True:
-                                            unsures.append((i-1,j,board[i-1][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i-1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i-1,j,board[i-1][j],1))
                                         board[i-1][j] = V
                                         any_changes = True
                                 if board[i][j] == LU:
                                     if board[i-1][j] != V:
                                         if bruteforceneeded == True:
-                                            unsures.append((i-1,j,board[i-1][j],1))
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i-1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i-1,j,board[i-1][j],1))
                                         board[i-1][j] = V
                                         any_changes = True
 
