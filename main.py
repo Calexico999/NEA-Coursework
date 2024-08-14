@@ -432,8 +432,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [1,4,4,8,5,5,5,6,4,4]
-            row_totals = [5,3,5,7,4,6,9,3,3,1]
+            column_totals = [1,2,6,3,6,6,5,5,2,6]
+            row_totals = [6,3,3,4,3,5,6,3,3,6]
             changed = True
             while changed == True:
                 changed = False
@@ -2677,103 +2677,616 @@ class Solver:
                 print()
                 Solver.print_board(board)
 
+                # unique rule
 
-                #### other unique rule ####
-                # if rowtotal = number of nodes in row which are in definites + 1
-                # if the row above has none from definites
-                # if number of dots in row = 1:
-                # go up from that dot
+                # if 2nd column has column total = 2
+                # if start and end are not in column 2
+                # if there is exactly one dot in column 2
+                # make the dot an H
+                if column_totals[1] == 2:
+                    if any_changes == False:
+                        # if column 1 has no shapes
+                        count = 0
+                        
+                        for i in range(len(board)):
+                            if board[i][0] in shapes.values():
+                                count += 1
+                        if count == 0:
+                            satisfactory = False
+                            count = 0
+                            dotpos = []
+                            for i in range(len(board)):
+                                if board[i][1] == ".":
+                                    count += 1
+                                    dotpos.append(i)
 
-                # for i in range(len(board)):
-                #     if row_totals[i] == sum([1 for j in range(len(board)) if board[i][j] in definites.values()]) + 1:
-                #         if i - 1 >= 0:
-                #             if sum([1 for j in range(len(board)) if board[i-1][j] in definites.values()]) == 0:
-                #                 dots = []
-                #                 for j in range(len(board)):
-                #                     if board[i][j] == ".":
-                #                         dots.append(j)
-                #                 if len(dots) == 1:
-                #                     for k in range(i, -1, -1):
-                #                         if bruteforceneeded == True:
-                #                             alreadyreplaced = False
-                #                             for u in unsures:
-                #                                 if (u[0] == k) and (u[1] == dots[0]):
-                #                                     alreadyreplaced = True
-                #                             if alreadyreplaced == False:
-                #                                 unsures.append((k, dots[0], board[k][dots[0]], 1))
-                #                         board[k][dots[0]] = "."
-                #                         any_changes = True
+                            if count == 1:
+                                satisfactory = True
+                            if satisfactory == True:
+                                # change the dot in column 2 to an H
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == dotpos[0]) and (u[1] == 1):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((dotpos[0], 1, board[dotpos[0]][1], 1))
+                                board[dotpos[0]][1] = H
+                                any_changes = True
 
-                # # do the same for columns
-                # for j in range(len(board)):
-                #     if column_totals[j] == sum([1 for i in range(len(board)) if board[i][j] in definites.values()]) + 1:
-                #         if j - 1 >= 0:
-                #             if sum([1 for i in range(len(board)) if board[i][j-1] in definites.values()]) == 0:
-                #                 dots = []
-                #                 for i in range(len(board)):
-                #                     if board[i][j] == ".":
-                #                         dots.append(i)
-                #                 if len(dots) == 1:
-                #                     for k in range(j, -1, -1):
-                #                         if bruteforceneeded == True:
-                #                             alreadyreplaced = False
-                #                             for u in unsures:
-                #                                 if (u[0] == dots[0]) and (u[1] == k):
-                #                                     alreadyreplaced = True
-                #                             if alreadyreplaced == False:
-                #                                 unsures.append((dots[0], k, board[dots[0]][k], 1))
-                #                         board[dots[0]][k] = "."
-                #                         any_changes = True
+                # if 2nd row has row total = 2
+                # if start and end are not in row 2
+                # if there is exactly one dot in row 2
+                # make the dot a V
+                if row_totals[1] == 2:
+                    if any_changes == False:
+                        count = 0
+                        # if row 1 has no shapes
+                        for j in range(len(board)):
+                            if board[0][j] in shapes.values():
+                                count += 1
+                        if count == 0:
+                            satisfactory = False
+                            count = 0
+                            dotpos = []
+                            for j in range(len(board)):
+                                if board[1][j] == ".":
+                                    count += 1
+                                    dotpos.append(j)
+
+                            if count == 1:
+                                satisfactory = True
+                            if satisfactory == True:
+                                # change the dot in row 2 to a V
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == 1) and (u[1] == dotpos[0]):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((1, dotpos[0], board[1][dotpos[0]], 1))
+                                board[1][dotpos[0]] = V
+                                any_changes = True
+
+                # if penultimate column has column total = 2
+                # if start and end are not in penultimate column
+                # if there is exactly one dot in penultimate column
+                # make the dot an H
+                if column_totals[len(board) - 2] == 2:
+                    if any_changes == False:
+                        # if last column has no shapes
+                        count = 0
+                        for i in range(len(board)):
+                            if board[i][len(board) - 1] in shapes.values():
+                                count += 1
+                        if count == 0:
+                            satisfactory = False
+                            count = 0
+                            dotpos = []
+                            for i in range(len(board)):
+                                if board[i][len(board) - 2] == ".":
+                                    count += 1
+                                    dotpos.append(i)
+
+                            if count == 1:
+                                satisfactory = True
+                            if satisfactory == True:
+                                # change the dot in penultimate column to an H
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == dotpos[0]) and (u[1] == len(board) - 2):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((dotpos[0], len(board) - 2, board[dotpos[0]][len(board) - 2], 1))
+                                board[dotpos[0]][len(board) - 2] = H
+                                any_changes = True
+
+                # if penultimate row has row total = 2
+                # if start and end are not in penultimate row
+                # if there is exactly one dot in penultimate row
+                # make the dot a V
+                if row_totals[len(board) - 2] == 2:
+                    if any_changes == False:
+                        # if last row has no shapes
+                        count = 0
+                        for j in range(len(board)):
+                            if board[len(board) - 1][j] in shapes.values():
+                                count += 1
+                        if count == 0:
+                            satisfactory = False
+                            count = 0
+                            dotpos = []
+                            for j in range(len(board)):
+                                if board[len(board) - 2][j] == ".":
+                                    count += 1
+                                    dotpos.append(j)
+
+                            if count == 1:
+                                satisfactory = True
+                            if satisfactory == True:
+                                # change the dot in penultimate row to a V
+                                if bruteforceneeded == True:
+                                    alreadyreplaced = False
+                                    for u in unsures:
+                                        if (u[0] == len(board) - 2) and (u[1] == dotpos[0]):
+                                            alreadyreplaced = True
+                                    if alreadyreplaced == False:
+                                        unsures.append((len(board) - 2, dotpos[0], board[len(board) - 2][dotpos[0]], 1))
+                                board[len(board) - 2][dotpos[0]] = V
+                                any_changes = True
 
 
-                # # if a row has a number of nodes in definites + 1
-                # # if the row below has none from definites
-                # # if number of dots in row = 1:
-                # # go down from that dot
-                # for i in range(len(board)):
-                #     if row_totals[i] == sum([1 for j in range(len(board)) if board[i][j] in definites.values()]) + 1:
-                #         if i + 1 < len(board):
-                #             if sum([1 for j in range(len(board)) if board[i+1][j] in definites.values()]) == 0:
-                #                 dots = []
-                #                 for j in range(len(board)):
-                #                     if board[i][j] == ".":
-                #                         dots.append(j)
-                #                 if len(dots) == 1:
-                #                     for k in range(i, len(board)):
-                #                         if bruteforceneeded == True:
-                #                             alreadyreplaced = False
-                #                             for u in unsures:
-                #                                 if (u[0] == k) and (u[1] == dots[0]):
-                #                                     alreadyreplaced = True
-                #                             if alreadyreplaced == False:
-                #                                 unsures.append((k, dots[0], board[k][dots[0]], 1))
-                #                         board[k][dots[0]] = "."
-                #                         any_changes = True
 
-                # # do the same for columns
-                # for j in range(len(board)):
-                #     if column_totals[j] == sum([1 for i in range(len(board)) if board[i][j] in definites.values()]) + 1:
-                #         if j + 1 < len(board):
-                #             if sum([1 for i in range(len(board)) if board[i][j+1] in definites.values()]) == 0:
-                #                 dots = []
-                #                 for i in range(len(board)):
-                #                     if board[i][j] == ".":
-                #                         dots.append(i)
-                #                 if len(dots) == 1:
-                #                     for k in range(j, len(board)):
-                #                         if bruteforceneeded == True:
-                #                             alreadyreplaced = False
-                #                             for u in unsures:
-                #                                 if (u[0] == dots[0]) and (u[1] == k):
-                #                                     alreadyreplaced = True
-                #                             if alreadyreplaced == False:
-                #                                 unsures.append((dots[0], k, board[dots[0]][k], 1))
-                #                         board[dots[0]][k] = "."
-                #                         any_changes = True
+            # if column total of 2nd column = 2
+            # if there is 1 H in the column and no other shapes or dots in the column
+            # if there is 1 dot in the 1st column and there is a V or LD above it
+            # make the dot an V until definites in column = column total
+            # if column_totals[1] == 2:
+            #     if any_changes == False:
+            #         satisfactory = False
+            #         count = 0
+            #         for i in range(len(board)):
+            #             if board[i][1] == H:
+            #                 count += 1
+            #         if count == 1:
+            #             for i in range(len(board)):
+            #                 if board[i][1] in definites.values() and board[i][1] != H:
+            #                     satisfactory = False
+            #             if satisfactory == True:
+            #                 count = 0
+            #                 dotpos = []
+            #                 for i in range(len(board)):
+            #                     if board[i][0] == ".":
+            #                         count += 1
+            #                         dotpos.append(i)
+            #                 if count == 1:
+            #                     if dotpos[0] - 1 >= 0 and (board[dotpos[0] - 1][0] == V or board[dotpos[0] - 1][0] == LD) or board[dotpos[0] - 1][0] == RD:
 
-                # print("Unique rule used")###
-                # print()
-                # Solver.print_board(board)
+
+            #                         #counter = number in column in definites
+            #                         counter = 0
+            #                         for i in range(len(board)):
+            #                             if board[i][0] in definites.values():
+            #                                 counter += 1
+
+            #                         k = dotpos[0]
+            #                         while counter < column_totals[1]:
+            #                             if bruteforceneeded == True:
+            #                                 alreadyreplaced = False
+            #                                 for u in unsures:
+            #                                     if (u[0] == k) and (u[1] == 1):
+            #                                         alreadyreplaced = True
+            #                                 if alreadyreplaced == False:
+            #                                     unsures.append((k, 1, board[k][1], 1))
+            #                             board[k][0] = V
+            #                             k += 1
+            #                             counter += 1
+            #                         any_changes = True
+
+            # # if row total of 2nd row = 2
+            # # if there is 1 V in the row and no other shapes or dots in the row
+            # # if there is 1 dot in the 1st row and there is a H or RD or RU to the left of it
+
+
+
+
+
+            #
+
+            if column_totals[1] == 2:
+                if any_changes == False:
+                    satisfactory = False
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][1] == H:
+                            count += 1
+                    if count == 1:
+                        for i in range(len(board)):
+                            if board[i][1] in definites.values() and board[i][1] != H:
+                                satisfactory = False
+                        if satisfactory == True:
+                            for i in range(len(board)):
+                                #if node is a LD or RD, make the nodes above the node Xs
+                                # if node is a LU or RU, make the nodes below the node Xs
+
+                                if (board[i][0] == LD) or (board[i][0] == RD):
+                                    while i < 0:
+                                        i -= 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == 0):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, 0, board[i][0], 1))
+                                        board[i][0] = "X"
+                                        any_changes = True
+
+                                if (board[i][0] == LU) or (board[i][0] == RU):
+                                    while i < len(board):
+                                        i += 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == 0):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, 0, board[i][0], 1))
+                                        board[i][0] = "X"
+                                        any_changes = True
+                                
+                            # if Xs in column[0] = len(board) - column_totals[0]
+                            # continue
+                            # else
+                            # find the first shape in column[0]
+                            # if the shape is a LD or RD
+                            # countercolumn = 1
+                            # while countercolumn < column_totals[0]
+                            # go down making each node a dot
+
+                            # if the shape is a LU or RU
+                            # countercolumn = 1
+                            # while countercolumn < column_totals[0]
+                            # go up making each node a dot
+
+
+                            # if the shape is a V
+                            #continue
+
+                            for i in range(len(board)):
+                                if board[i][0] == "X":
+                                    count += 1
+                            if count == len(board) - column_totals[0]:
+                                continue
+                            else:
+                                found = False
+                                for i in range(len(board)):
+                                    if board[i][0] in shapes.values():
+                                        found = True
+                                        if board[i][0] == LD or board[i][0] == RD:
+                                            counter = 2
+                                            k = i + 1
+                                            while counter <= column_totals[0]:
+                                                if k >= len(board):
+                                                    break
+
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == k) and (u[1] == 0):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((k, 0, board[k][0], 1))
+                                                board[k][0] = "."
+                                                k += 1
+                                                counter += 1
+                                                any_changes = True
+                                        if board[i][0] == LU or board[i][0] == RU:
+                                            counter = 2
+                                            k = i - 1
+                                            while counter <= column_totals[0]:
+                                                if k < 0:
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == k) and (u[1] == 0):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((k, 0, board[k][0], 1))
+                                                board[k][0] = "."
+                                                k -= 1
+                                                counter += 1
+                                                any_changes = True
+
+
+            if row_totals[1] == 2:
+                if any_changes == False:
+                    satisfactory = False
+                    count = 0
+                    for j in range(len(board)):
+                        if board[1][j] == V:
+                            count += 1
+                    if count == 1:
+                        for j in range(len(board)):
+                            if board[1][j] in definites.values() and board[1][j] != V:
+                                satisfactory = False
+                        if satisfactory == True:
+                            for j in range(len(board)):
+                                if (board[0][j] == H) or (board[0][j] == RD) or (board[0][j] == RU):
+                                    while j < 0:
+                                        j -= 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == 0) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((0, j, board[0][j], 1))
+                                        board[0][j] = "X"
+                                        any_changes = True
+                                if (board[0][j] == LD) or (board[0][j] == RD):
+                                    while j < len(board):
+                                        j += 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == 0) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((0, j, board[0][j], 1))
+                                        board[0][j] = "X"
+                                        any_changes = True
+
+                            # if Xs in row[0] = len(board) - row_totals[0]
+                            # continue
+                            # else
+                            # find the first shape in row[0]
+                            # if the shape is a RD or RU
+                            # countercolumn = 1
+                            # while countercolumn < row_totals[0]
+                            # go right making each node a dot
+
+                            # if the shape is a LD or LU
+                            # countercolumn = 1
+                            # while countercolumn < row_totals[0]
+                            # go left making each node a dot
+
+                            # if the shape is a H
+                            #continue
+
+                            for j in range(len(board)):
+                                if board[0][j] == "X":
+                                    count += 1
+                            if count == len(board) - row_totals[0]:
+                                continue
+                            else:
+                                found = False
+                                for j in range(len(board)):
+                                    if board[0][j] in shapes.values():
+                                        found = True
+                                        if board[0][j] == RD or board[0][j] == RU:
+                                            counter = 2
+                                            k = j + 1
+                                            while counter <= row_totals[0]:
+                                                if k >= len(board):
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == 0) and (u[1] == k):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((0, k, board[0][k], 1))
+                                                board[0][k] = "."
+                                                k += 1
+                                                counter += 1
+                                                any_changes = True
+                                        if board[0][j] == LD or board[0][j] == LU:
+                                            counter = 2
+                                            k = j - 1
+                                            while counter <= row_totals[0]:
+                                                if k < 0:
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == 0) and (u[1] == k):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((0, k, board[0][k], 1))
+                                                board[0][k] = "."
+                                                k -= 1
+                                                counter += 1
+                                                any_changes = True
+
+
+            if column_totals[len(board) - 2] == 2:
+                if any_changes == False:
+                    satisfactory = True
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][len(board) - 2] == H:
+                            count += 1
+                    if count == 1:
+                        for i in range(len(board)):
+                            if board[i][len(board) - 2] in definites.values() and board[i][len(board) - 2] != H:
+                                satisfactory = False
+                        if satisfactory == True:
+                            for i in range(len(board)):
+                                if (board[i][len(board) - 1] == LD) or (board[i][len(board) - 1] == RD):
+                                    while i < 0:
+                                        i -= 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == len(board) - 1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, len(board) - 1, board[i][len(board) - 1], 1))
+                                        board[i][len(board) - 1] = "X"
+                                        any_changes = True
+                                if (board[i][len(board) - 1] == LU) or (board[i][len(board) - 1] == RU):
+                                    while i < len(board):
+                                        i += 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == i) and (u[1] == len(board) - 1):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((i, len(board) - 1, board[i][len(board) - 1], 1))
+                                        board[i][len(board) - 1] = "X"
+                                        any_changes = True
+
+                            # if Xs in column[len(board) - 1] = len(board) - column_totals[len(board) - 1]
+                            # continue
+                            # else
+                            # find the first shape in column[len(board) - 1]
+                            # if the shape is a LD or RD
+                            # countercolumn = 1
+                            # while countercolumn < column_totals[len(board) - 1]
+                            # go down making each node a dot
+
+                            # if the shape is a LU or RU
+                            # countercolumn = 1
+                            # while countercolumn < column_totals[len(board) - 1]
+                            # go up making each node a dot
+
+                            # if the shape is a V
+                            #continue
+
+                            for i in range(len(board)):
+                                if board[i][len(board) - 1] == "X":
+                                    count += 1
+                            if count == len(board) - column_totals[len(board) - 1]:
+                                continue
+                            else:
+                                found = False
+                                for i in range(len(board)):
+                                    if board[i][len(board) - 1] in shapes.values():
+                                        found = True
+                                        if board[i][len(board) - 1] == LD or board[i][len(board) - 1] == RD:
+                                            counter = 2
+                                            k = i + 1
+                                            while counter <= column_totals[len(board) - 1]:
+                                                if k >= len(board):
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == k) and (u[1] == len(board) - 1):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((k, len(board) - 1, board[k][len(board) - 1], 1))
+                                                board[k][len(board) - 1] = "."
+                                                k += 1
+                                                counter += 1
+                                                any_changes = True
+                                        if board[i][len(board) - 1] == LU or board[i][len(board) - 1] == RU:
+                                            counter = 2
+                                            k = i - 1
+                                            while counter <= column_totals[len(board) - 1]:
+                                                if k < 0:
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == k) and (u[1] == len(board) - 1):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((k, len(board) - 1, board[k][len(board) - 1], 1))
+                                                board[k][len(board) - 1] = "."
+                                                k -= 1
+                                                counter += 1
+                                                any_changes = True
+
+            if row_totals[len(board) - 2] == 2:
+                if any_changes == False:
+                    satisfactory = False
+                    count = 0
+                    for j in range(len(board)):
+                        if board[len(board) - 2][j] == V:
+                            count += 1
+                    if count == 1:
+                        for j in range(len(board)):
+                            if board[len(board) - 2][j] in definites.values() and board[len(board) - 2][j] != V:
+                                satisfactory = False
+                        if satisfactory == True:
+                            for j in range(len(board)):
+                                if (board[len(board) - 1][j] == LD) or (board[len(board) - 1][j] == RD):
+                                    while j < 0:
+                                        j -= 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == len(board) - 1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((len(board) - 1, j, board[len(board) - 1][j], 1))
+                                        board[len(board) - 1][j] = "X"
+                                        any_changes = True
+                                if (board[len(board) - 1][j] == LU) or (board[len(board) - 1][j] == RU):
+                                    while j < len(board):
+                                        j += 1
+                                        if bruteforceneeded == True:
+                                            alreadyreplaced = False
+                                            for u in unsures:
+                                                if (u[0] == len(board) - 1) and (u[1] == j):
+                                                    alreadyreplaced = True
+                                            if alreadyreplaced == False:
+                                                unsures.append((len(board) - 1, j, board[len(board) - 1][j], 1))
+                                        board[len(board) - 1][j] = "X"
+                                        any_changes = True
+
+
+                            # if Xs in row[len(board) - 1] = len(board) - row_totals[len(board) - 1]
+                            # continue
+                            # else
+                            # find the first shape in row[len(board) - 1]
+                            # if the shape is a LD or RD
+                            # countercolumn = 1
+                            # while countercolumn < row_totals[len(board) - 1]
+                            # go down making each node a dot
+
+                            # if the shape is a LU or RU
+                            # countercolumn = 1
+                            # while countercolumn < row_totals[len(board) - 1]
+                            # go up making each node a dot
+
+                            # if the shape is a H
+                            #continue
+
+                            for j in range(len(board)):
+                                if board[len(board) - 1][j] == "X":
+                                    count += 1
+                            if count == len(board) - row_totals[len(board) - 1]:
+                                continue
+                            else:
+                                found = False
+                                for j in range(len(board)):
+                                    if board[len(board) - 1][j] in shapes.values():
+                                        found = True
+                                        if board[len(board) - 1][j] == LD or board[len(board) - 1][j] == RD:
+                                            counter = 2
+                                            k = j + 1
+                                            while counter <= row_totals[len(board) - 1]:
+                                                if k >= len(board):
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == len(board) - 1) and (u[1] == k):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((len(board) - 1, k, board[len(board) - 1][k], 1))
+                                                board[len(board) - 1][k] = "."
+                                                k += 1
+                                                counter += 1
+                                                any_changes = True
+                                        if board[len(board) - 1][j] == LU or board[len(board) - 1][j] == RU:
+                                            counter = 2
+                                            k = j - 1
+                                            while counter <= row_totals[len(board) - 1]:
+                                                if k < 0:
+                                                    break
+                                                if bruteforceneeded == True:
+                                                    alreadyreplaced = False
+                                                    for u in unsures:
+                                                        if (u[0] == len(board) - 1) and (u[1] == k):
+                                                            alreadyreplaced = True
+                                                    if alreadyreplaced == False:
+                                                        unsures.append((len(board) - 1, k, board[len(board) - 1][k], 1))
+                                                board[len(board) - 1][k] = "."
+                                                k -= 1
+                                                counter += 1
+                                                any_changes = True
+                                
+
+
+
+
 
 
 
@@ -2835,27 +3348,6 @@ class Solver:
                             if board[i][j] != "X":
                                 any_changes = True
                             board[i][j] = "X"
-
-
-
-            # for each column
-            # if number of definites in column = column total - 1
-            # for each node in column
-            # if the node to the left is an X, LU, LD, V or the node to the right is an X, RU, RD, V
-            # make the node an X
-
-            # for j in range(len(board)):
-            #     if column_totals[j] == sum([1 for i in range(len(board)) if board[i][j] in definites.values()]) + 1:
-            #         for i in range(len(board)):
-            #             if board[i][j] == 'N':
-            #                 # if
-                            
-
-            
-
-            # print("Unique rule used")###
-            # Solver.print_board(board)
-            # print()
 
 
 
