@@ -1,6 +1,7 @@
 import random
 
 # Box drawing characters: ┌ ┐ └ ┘ ─ │ ┬ ┴ ├ ┤ ┼
+# book 3 p175 has 2 possible other rules ####
 
 class StartNode:
     def start_node(board_size):
@@ -241,6 +242,7 @@ class Solver:
         trysecond = False
         dots_two = []
         dots_two_possibles = []
+        satisfactory = False
 
         definites = {
             'RD': RD,
@@ -430,8 +432,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [2,3,4,8,8,7,7,2,2,2]
-            row_totals = [2,6,6,4,2,4,2,5,7,7]
+            column_totals = [1,4,4,8,5,5,5,6,4,4]
+            row_totals = [5,3,5,7,4,6,9,3,3,1]
             changed = True
             while changed == True:
                 changed = False
@@ -1632,6 +1634,31 @@ class Solver:
             Solver.print_board(board)
 
 
+            # if a dot is surrounded by 4 nodes that it cant go into, set impossible
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == '.':
+                        directions = []
+                        if i - 1 >= 0:
+                            if (board[i-1][j] == RU) or (board[i-1][j] == LU) or (board[i-1][j] == H) or (board[i-1][j] == 'X'):
+                                directions.append('up')
+                        if i + 1 < len(board):
+                            if (board[i+1][j] == RD) or (board[i+1][j] == LD) or (board[i+1][j] == H) or (board[i+1][j] == 'X'):
+                                directions.append('down')
+                        if j - 1 >= 0:
+                            if (board[i][j-1] == LU) or (board[i][j-1] == LD) or (board[i][j-1] == V) or (board[i][j-1] == 'X'):
+                                directions.append('left')
+                        if j + 1 < len(board):
+                            if (board[i][j+1] == RU) or (board[i][j+1] == RD) or (board[i][j+1] == V) or (board[i][j+1] == 'X'):
+                                directions.append('right')
+                        if len(directions) == 4:
+                            #impossible
+                            flagimpossible = True
+
+
+
+
+
             i,j = start
             previ,prevj = start
             iend,jend = end
@@ -1828,6 +1855,228 @@ class Solver:
             if any_changes == False:
                 edgerulesneeded = True
             if edgerulesneeded == True:
+
+                # for top row
+                # if rowtotal = 3 and there is one 'V' and one '.' in the row
+                # if the node to the left of the dot is X, V, LU, LD
+                # change node to the right of the dot to a dot
+                # if the node to the right of the dot is X, V, RU, RD
+                # change node to the left of the dot to a dot
+
+                # for bottom row
+                # if rowtotal = 3 and there is one 'V' and one '.' in the row
+                # if the node to the left of the dot is X, V, LU, LD
+                # change node to the right of the dot to a dot
+                # if the node to the right of the dot is X, V, RU, RD
+                # change node to the left of the dot to a dot
+
+                # for left column
+                # if columntotal = 3 and there is one 'H' and one '.' in the column
+                # if the node above the dot is X, H, RU, LU
+                # change node below the dot to a dot
+                # if the node below the dot is X, H, RD, LD
+                # change node above the dot to a dot
+
+                # for right column
+                # if columntotal = 3 and there is one 'H' and one '.' in the column
+                # if the node above the dot is X, H, RU, LU
+                # change node below the dot to a dot
+                # if the node below the dot is X, H, RD, LD
+                # change node above the dot to a dot
+
+                if row_totals[0] == 3:
+                    # if there is one 'V' and one '.' in the row
+                    satisfactory = False
+                    count = 0
+                    for j in range(len(board)):
+                        if board[0][j] == "V":
+                            count += 1
+                    if count == 1:
+                        satisfactory = True
+
+                    if satisfactory == True:
+                        satisfactory = False
+                        count = 0
+                        dotposition = []
+                        for j in range(len(board)):
+                            if board[0][j] == ".":
+                                count += 1
+                                dotposition.append(j)
+                        if count == 1:
+                            satisfactory = True
+                    if satisfactory == True:
+                        if dotposition[0] - 1 >= 0:
+                            if board[0][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
+                                if board[0][dotposition[0] + 1] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == 0) and (u[1] == dotposition[0] + 1):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((0, dotposition[0] + 1, board[0][dotposition[0] + 1], 1))
+                                    board[0][dotposition[0] + 1] = "."
+                                    any_changes = True
+
+                        if dotposition[0] + 1 < len(board):
+                            if board[0][dotposition[0] + 1] in ["X", "V", "RU", "RD"]:
+                                if board[0][dotposition[0] - 1] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == 0) and (u[1] == dotposition[0] - 1):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((0, dotposition[0] - 1, board[0][dotposition[0] - 1], 1))
+                                    board[0][dotposition[0] - 1] = "."
+                                    any_changes = True
+
+                if row_totals[len(board) - 1] == 3:
+                    # if there is one 'V' and one '.' in the row
+                    satisfactory = False
+                    count = 0
+                    for j in range(len(board)):
+                        if board[len(board) - 1][j] == "V":
+                            count += 1
+                    if count == 1:
+                        satisfactory = True
+
+                    if satisfactory == True:
+                        satisfactory = False
+                        count = 0
+                        dotposition = []
+                        for j in range(len(board)):
+                            if board[len(board) - 1][j] == ".":
+                                count += 1
+                                dotposition.append(j)
+                        if count == 1:
+                            satisfactory = True
+                    if satisfactory == True:
+                        if dotposition[0] - 1 >= 0:
+                            if board[len(board) - 1][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
+                                if board[len(board) - 1][dotposition[0] + 1] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == len(board) - 1) and (u[1] == dotposition[0] + 1):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((len(board) - 1, dotposition[0] + 1, board[len(board) - 1][dotposition[0] + 1], 1))
+                                    board[len(board) - 1][dotposition[0] + 1] = "."
+                                    any_changes = True
+
+                        if dotposition[0] + 1 < len(board):
+                            if board[len(board) - 1][dotposition[0] + 1] in ["X", "V", "RU", "RD"]:
+                                if board[len(board) - 1][dotposition[0] - 1] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == len(board) - 1) and (u[1] == dotposition[0] - 1):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((len(board) - 1, dotposition[0] - 1, board[len(board) - 1][dotposition[0] - 1], 1))
+                                    board[len(board) - 1][dotposition[0] - 1] = "."
+                                    any_changes = True
+
+                if column_totals[0] == 3:
+                    # if there is one 'H' and one '.' in the column
+                    satisfactory = False
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][0] == "H":
+                            count += 1
+                    if count == 1:
+                        satisfactory = True
+
+                    if satisfactory == True:
+                        satisfactory = False
+                        count = 0
+                        dotposition = []
+                        for i in range(len(board)):
+                            if board[i][0] == ".":
+                                count += 1
+                                dotposition.append(i)
+                        if count == 1:
+                            satisfactory = True
+                    if satisfactory == True:
+                        if dotposition[0] - 1 >= 0:
+                            if board[dotposition[0] - 1][0] in ["X", "H", "RU", "LU"]:
+                                if board[dotposition[0] + 1][0] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == dotposition[0] + 1) and (u[1] == 0):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((dotposition[0] + 1, 0, board[dotposition[0] + 1][0], 1))
+                                    board[dotposition[0] + 1][0] = "."
+                                    any_changes = True
+
+                        if dotposition[0] + 1 < len(board):
+                            if board[dotposition[0] + 1][0] in ["X", "H", "RD", "LD"]:
+                                if board[dotposition[0] - 1][0] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == dotposition[0] - 1) and (u[1] == 0):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((dotposition[0] - 1, 0, board[dotposition[0] - 1][0], 1))
+                                    board[dotposition[0] - 1][0] = "."
+                                    any_changes = True
+
+                if column_totals[len(board) - 1] == 3:
+                    # if there is one 'H' and one '.' in the column
+                    satisfactory = False
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][len(board) - 1] == "H":
+                            count += 1
+                    if count == 1:
+                        satisfactory = True
+
+                    if satisfactory == True:
+                        satisfactory = False
+                        count = 0
+                        dotposition = []
+                        for i in range(len(board)):
+                            if board[i][len(board) - 1] == ".":
+                                count += 1
+                                dotposition.append(i)
+                        if count == 1:
+                            satisfactory = True
+                    if satisfactory == True:
+                        if dotposition[0] - 1 >= 0:
+                            if board[dotposition[0] - 1][len(board) - 1] in ["X", "H", "RU", "LU"]:
+                                if board[dotposition[0] + 1][len(board) - 1] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == dotposition[0] + 1) and (u[1] == len(board) - 1):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((dotposition[0] + 1, len(board) - 1, board[dotposition[0] + 1][len(board) - 1], 1))
+                                    board[dotposition[0] + 1][len(board) - 1] = "."
+                                    any_changes = True
+
+                        if dotposition[0] + 1 < len(board):
+                            if board[dotposition[0] + 1][len(board) - 1] in ["X", "H", "RD", "LD"]:
+                                if board[dotposition[0] - 1][len(board) - 1] == "N":
+                                    if bruteforceneeded == True:
+                                        alreadyreplaced = False
+                                        for u in unsures:
+                                            if (u[0] == dotposition[0] - 1) and (u[1] == len(board) - 1):
+                                                alreadyreplaced = True
+                                        if alreadyreplaced == False:
+                                            unsures.append((dotposition[0] - 1, len(board) - 1, board[dotposition[0] - 1][len(board) - 1], 1))
+                                    board[dotposition[0] - 1][len(board) - 1] = "."
+                                    any_changes = True
+
+
+
+
+
+
                 ##### STAGE 6 #####
                 # for each column
                 # if every square in the column is in knowns, add the column to edgecolumns
@@ -2708,13 +2957,6 @@ class Solver:
             if (bruteforceneeded == True and any_changes == False) or trynew == True:
                 print("Brute force needed")
 
-
-
-
-
-
-
-
                 # reverse unsures
 
                 unsures = unsures[::-1]
@@ -2741,8 +2983,12 @@ class Solver:
 
 
                 if len(unsureshapes) == 2:
-                    trysecond = True
-                    any_changes = True
+                    if trysecond == False:
+                        trysecond = True
+                        any_changes = True
+                    else:
+                        board[save_state[0]][save_state[1]] = save_state[2]
+                        trysecond = False
 
 
                 if trysecond == True:
@@ -2756,7 +3002,7 @@ class Solver:
                 # if only one possible shape, change the dot to that shape
                 # if two possible shapes, add a tuple to 'dots_two' in the form (i, j, shape1, shape2)
                 
-                if minicount < 1000 and trysecond == False:
+                if minicount == 0 and trysecond == False and any_changes == False:
                     minicount += 1
                     any_changes = False
                     for i in range(len(board)):
@@ -2919,6 +3165,7 @@ class Solver:
 
 
                 if any_changes == False:
+                    unsureshapes = []
                     ##### nodeguess = first node in dots_two
                     # change the board position designated by the first and second parts of nodeguess to the first shape in the third part of nodeguess
                     # add both shapes to 'unsureshapes'
