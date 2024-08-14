@@ -240,6 +240,7 @@ class Solver:
         minicount = 0
         trysecond = False
         dots_two = []
+        dots_two_possibles = []
 
         definites = {
             'RD': RD,
@@ -278,6 +279,17 @@ class Solver:
             edgerulesneeded = False
             flagimpossible = False
             alreadyreplaced = False
+
+
+            if bruteforceneeded == False:
+                # for i in dots_two
+                # if first and second parts of dots two are a character on the board, remove from dotstwo
+                # e.g. if a node of dotstwo is (1, 2, 3, 4) and board[1][2] is a character, remove from dotstwo
+                for d in dots_two:
+                    if board[d[0]][d[1]] in shapes.values():
+                        dots_two.remove(d)
+
+
             
 
             # First stage: change all 0s which connect to a start or end node to '.'
@@ -418,8 +430,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [3,3,3,4,5,9,6,3,2,2]
-            row_totals = [5,4,5,3,4,4,4,5,3,3]
+            column_totals = [2,3,4,8,8,7,7,2,2,2]
+            row_totals = [2,6,6,4,2,4,2,5,7,7]
             changed = True
             while changed == True:
                 changed = False
@@ -2696,6 +2708,13 @@ class Solver:
             if (bruteforceneeded == True and any_changes == False) or trynew == True:
                 print("Brute force needed")
 
+
+
+
+
+
+
+
                 # reverse unsures
 
                 unsures = unsures[::-1]
@@ -2718,6 +2737,7 @@ class Solver:
                     unsureshapes.pop(0)
                     trynew = False
                     any_changes = True
+                    bruteforceneeded = False
 
 
                 if len(unsureshapes) == 2:
@@ -2726,8 +2746,6 @@ class Solver:
 
 
                 if trysecond == True:
-                    board[save_state[0]][save_state[1]] = save_state[2]
-
                     board[nodeguess[0]][nodeguess[1]] = nodeguess[3]
 
 
@@ -2738,7 +2756,7 @@ class Solver:
                 # if only one possible shape, change the dot to that shape
                 # if two possible shapes, add a tuple to 'dots_two' in the form (i, j, shape1, shape2)
                 
-                if minicount == 0:
+                if minicount < 1000 and trysecond == False:
                     minicount += 1
                     any_changes = False
                     for i in range(len(board)):
@@ -2877,8 +2895,27 @@ class Solver:
 
 
                                 if len(possible) == 2:
-                                    dots_two.append((i, j, possible[0], possible[1]))
+                                    #if not already in dots_two, add to dots_two
+                                    if (i, j, possible[0], possible[1]) not in dots_two:
+                                        dots_two.append((i, j, possible[0], possible[1]))
 
+                #reverse dotstwo
+
+                dots_two = dots_two[::-1]
+
+                # for d in dots_two
+                # if d[0], d[1] not in dots_two_possibles
+                # add d[0], d[1] to dots_two_possibles
+                # else remove d from dots_two
+
+                dots_two_possibles = []
+                for d in dots_two:
+                    if (d[0], d[1]) not in dots_two_possibles:
+                        dots_two_possibles.append((d[0], d[1]))
+                    else:
+                        dots_two.remove(d)
+
+                print(dots_two)
 
 
                 if any_changes == False:
