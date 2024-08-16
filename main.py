@@ -216,9 +216,6 @@ class Solver:
 
     def Solve(board, start, end):
         bruteforceneeded = False
-        solved_wrongly = False
-        path_directions = []
-        guesscount = 0
         edgerulesneeded = False
         any_changes = True
         RD = "┌"
@@ -230,12 +227,9 @@ class Solver:
         DOT = "."
         NULL = "N"
         X = "X"
-        grid2 = []
         unsures = []
         flagimpossible = False
         trynew = False
-        firsttime = True
-        possibledirs = []
         dots = []
         unsureshapes = []
         minicount = 0
@@ -271,9 +265,7 @@ class Solver:
             'LU': LU,
             'H': H,
             'V': V
-        }###moved
-
-        # save the current grid to grid2
+        }
 
         while any_changes or bruteforceneeded:
                 
@@ -282,7 +274,6 @@ class Solver:
             flagimpossible = False
             alreadyreplaced = False
 
-
             if bruteforceneeded == False:
                 # for i in dots_two
                 # if first and second parts of dots two are a character on the board, remove from dotstwo
@@ -290,9 +281,6 @@ class Solver:
                 for d in dots_two:
                     if board[d[0]][d[1]] in shapes.values():
                         dots_two.remove(d)
-
-
-            
 
             # First stage: change all 0s which connect to a start or end node to '.'
             print("Initial board:")
@@ -432,8 +420,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [1,2,6,3,6,6,5,5,2,6]
-            row_totals = [6,3,3,4,3,5,6,3,3,6]
+            column_totals = [5,7,5,7,6,5,5,2,3,3]
+            row_totals = [5,3,8,10,4,6,6,2,3,1]
             changed = True
             while changed == True:
                 changed = False
@@ -452,13 +440,12 @@ class Solver:
                                             alreadyreplaced = True
                                     if alreadyreplaced == False:
                                         unsures.append((i, j, board[i][j], 1))
-
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
-
                     if count > column_totals[j]:
                         flagimpossible = True
+
                 for i in range(len(board)):
                     count = 0
                     for j in range(len(board)):
@@ -477,7 +464,6 @@ class Solver:
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
-
                     if count > row_totals[i]:
                         flagimpossible = True
 
@@ -956,8 +942,6 @@ class Solver:
                                     if outofrange == False and i == i1 and j-1 == j1 and change == True:
                                         if 'left' in directions:
                                             directions.remove('left')
-
-
 
                             if i + 1 < len(board):
                                 if (board[i+1][j] == LU) or (board[i+1][j] == RU) or (board[i+1][j] == V):
@@ -1633,7 +1617,6 @@ class Solver:
             print("Fifth stage:")
             Solver.print_board(board)
 
-
             # if a dot is surrounded by 4 nodes that it cant go into, set impossible
             for i in range(len(board)):
                 for j in range(len(board)):
@@ -1654,10 +1637,6 @@ class Solver:
                         if len(directions) == 4:
                             #impossible
                             flagimpossible = True
-
-
-
-
 
             i,j = start
             previ,prevj = start
@@ -1721,7 +1700,6 @@ class Solver:
                     j = j - 1
                     fromstartcount += 1
                     donestart = True
-
 
             if board[i][j] in shapes.values():
                 isashape = True
@@ -1848,14 +1826,10 @@ class Solver:
                     print("Solved succesfully")
                     break
 
-
-
-
             edgerulesneeded = False
             if any_changes == False:
                 edgerulesneeded = True
             if edgerulesneeded == True:
-
                 # for top row
                 # if rowtotal = 3 and there is one 'V' and one '.' in the row
                 # if the node to the left of the dot is X, V, LU, LD
@@ -2071,11 +2045,6 @@ class Solver:
                                             unsures.append((dotposition[0] - 1, len(board) - 1, board[dotposition[0] - 1][len(board) - 1], 1))
                                     board[dotposition[0] - 1][len(board) - 1] = "."
                                     any_changes = True
-
-
-
-
-
 
                 ##### STAGE 6 #####
                 # for each column
@@ -2506,9 +2475,6 @@ class Solver:
                 print("Unique rule used")###
                 print()
                 Solver.print_board(board)
-                
-
-
 
                 ##### other unique rule #####
                 # if column to the right has column total = 1
@@ -2672,13 +2638,11 @@ class Solver:
                                         board[i-1][j] = V
                                         any_changes = True
 
-                print("Unique rule used")###
-
+                print("Unique rule used")
                 print()
                 Solver.print_board(board)
 
                 # unique rule
-
                 # if 2nd column has column total = 2
                 # if start and end are not in column 2
                 # if there is exactly one dot in column 2
@@ -2816,64 +2780,6 @@ class Solver:
                                 board[len(board) - 2][dotpos[0]] = V
                                 any_changes = True
 
-
-
-            # if column total of 2nd column = 2
-            # if there is 1 H in the column and no other shapes or dots in the column
-            # if there is 1 dot in the 1st column and there is a V or LD above it
-            # make the dot an V until definites in column = column total
-            # if column_totals[1] == 2:
-            #     if any_changes == False:
-            #         satisfactory = False
-            #         count = 0
-            #         for i in range(len(board)):
-            #             if board[i][1] == H:
-            #                 count += 1
-            #         if count == 1:
-            #             for i in range(len(board)):
-            #                 if board[i][1] in definites.values() and board[i][1] != H:
-            #                     satisfactory = False
-            #             if satisfactory == True:
-            #                 count = 0
-            #                 dotpos = []
-            #                 for i in range(len(board)):
-            #                     if board[i][0] == ".":
-            #                         count += 1
-            #                         dotpos.append(i)
-            #                 if count == 1:
-            #                     if dotpos[0] - 1 >= 0 and (board[dotpos[0] - 1][0] == V or board[dotpos[0] - 1][0] == LD) or board[dotpos[0] - 1][0] == RD:
-
-
-            #                         #counter = number in column in definites
-            #                         counter = 0
-            #                         for i in range(len(board)):
-            #                             if board[i][0] in definites.values():
-            #                                 counter += 1
-
-            #                         k = dotpos[0]
-            #                         while counter < column_totals[1]:
-            #                             if bruteforceneeded == True:
-            #                                 alreadyreplaced = False
-            #                                 for u in unsures:
-            #                                     if (u[0] == k) and (u[1] == 1):
-            #                                         alreadyreplaced = True
-            #                                 if alreadyreplaced == False:
-            #                                     unsures.append((k, 1, board[k][1], 1))
-            #                             board[k][0] = V
-            #                             k += 1
-            #                             counter += 1
-            #                         any_changes = True
-
-            # # if row total of 2nd row = 2
-            # # if there is 1 V in the row and no other shapes or dots in the row
-            # # if there is 1 dot in the 1st row and there is a H or RD or RU to the left of it
-
-
-
-
-
-            #
-
             if column_totals[1] == 2:
                 if any_changes == False:
                     satisfactory = False
@@ -2929,8 +2835,6 @@ class Solver:
                             # countercolumn = 1
                             # while countercolumn < column_totals[0]
                             # go up making each node a dot
-
-
                             # if the shape is a V
                             #continue
 
@@ -2980,7 +2884,6 @@ class Solver:
                                                 counter += 1
                                                 any_changes = True
 
-
             if row_totals[1] == 2:
                 if any_changes == False:
                     satisfactory = False
@@ -3027,12 +2930,10 @@ class Solver:
                             # countercolumn = 1
                             # while countercolumn < row_totals[0]
                             # go right making each node a dot
-
                             # if the shape is a LD or LU
                             # countercolumn = 1
                             # while countercolumn < row_totals[0]
                             # go left making each node a dot
-
                             # if the shape is a H
                             #continue
 
@@ -3081,7 +2982,6 @@ class Solver:
                                                 counter += 1
                                                 any_changes = True
 
-
             if column_totals[len(board) - 2] == 2:
                 if any_changes == False:
                     satisfactory = True
@@ -3128,12 +3028,10 @@ class Solver:
                             # countercolumn = 1
                             # while countercolumn < column_totals[len(board) - 1]
                             # go down making each node a dot
-
                             # if the shape is a LU or RU
                             # countercolumn = 1
                             # while countercolumn < column_totals[len(board) - 1]
                             # go up making each node a dot
-
                             # if the shape is a V
                             #continue
 
@@ -3220,7 +3118,6 @@ class Solver:
                                         board[len(board) - 1][j] = "X"
                                         any_changes = True
 
-
                             # if Xs in row[len(board) - 1] = len(board) - row_totals[len(board) - 1]
                             # continue
                             # else
@@ -3229,12 +3126,10 @@ class Solver:
                             # countercolumn = 1
                             # while countercolumn < row_totals[len(board) - 1]
                             # go down making each node a dot
-
                             # if the shape is a LU or RU
                             # countercolumn = 1
                             # while countercolumn < row_totals[len(board) - 1]
                             # go up making each node a dot
-
                             # if the shape is a H
                             #continue
 
@@ -3282,13 +3177,6 @@ class Solver:
                                                 k -= 1
                                                 counter += 1
                                                 any_changes = True
-                                
-
-
-
-
-
-
 
             #for each column which has column total = 1
             # for each node in the column
@@ -3320,8 +3208,7 @@ class Solver:
                             if board[i][j] != "X":
                                 any_changes = True
                             board[i][j] = "X"
-                            
-            
+
             # do the same for rows
             for i in range(len(board)):
                 if row_totals[i] == 1:
