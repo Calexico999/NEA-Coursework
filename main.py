@@ -421,8 +421,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [9,7,6,1,4,5,3,1,3,5]
-            row_totals = [5,3,3,4,4,9,2,5,5,4]
+            column_totals = [5,5,4,7,5,3,1,4,5,4]
+            row_totals = [3,3,5,9,5,6,7,3,1,1]
             changed = True
             while changed == True:
                 changed = False
@@ -3379,6 +3379,162 @@ class Solver:
                             if board[i][j] != "X":
                                 any_changes = True
                             board[i][j] = "X"
+
+
+            # if the first row has row total = definites in row + 1
+            # if board[0][len(board)-4] is a V, LD, LU and board[0][len(board)-2] is a dot and board [0][len(board)-3] is a N and board [0][len(board)-1] is a N
+            # for i in range 0 to 4, if the node is a N, make the node an X
+            # if board[0][3] is a V, RD, RU and board[0][1] is a dot and board [0][2] is a N and board [0][0] is a N
+            # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+
+            count = 0
+            for j in range(len(board)):
+                if board[0][j] in definites.values():
+                    count += 1
+            if row_totals[0] == count + 1:
+                if board[0][len(board) - 4] in [V, LD, LU] and board[0][len(board) - 2] == "." and board[0][len(board) - 3] == 'N' and board[0][len(board) - 1] == 'N':
+                    for i in range(0,len(board)-4):
+                        if board[0][i] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == i):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, i, board[0][i], 1))
+                            if board[0][i] != "X":
+                                any_changes = True
+                            board[0][i] = "X"
+                if board[0][3] in [V, RD, RU] and board[0][1] == "." and board[0][2] == 'N' and board[0][0] == 'N':
+                    for i in range(5, len(board)):
+                        if board[0][i] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == i):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, i, board[0][i], 1))
+                            if board[0][i] != "X":
+                                any_changes = True
+                            board[0][i] = "X"
+
+            # if the first column has column total = definites in column + 1
+            # if board[len(board)-4][0] is a H, RU, LU and board[len(board)-2][0] is a dot and board [len(board)-3][0] is a 'N' and board [len(board)-1][0] is a 'N'
+            # for i in range 0 to 4, if the node is a N, make the node an X
+            # if board[3][0] is a H, RD, LD and board[1][0] is a dot and board [2][0] is a 'N' and board [0][0] is a 'N'
+            # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+
+            count = 0
+            for i in range(len(board)):
+                if board[i][0] in definites.values():
+                    count += 1
+            if column_totals[0] == count + 1:
+                if board[len(board) - 4][0] in [H, RU, LU] and board[len(board) - 2][0] == "." and board[len(board) - 3][0] == 'N' and board[len(board) - 1][0] == 'N':
+                    for i in range(0,len(board)-4):
+                        if board[i][0] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == i) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((i, 0, board[i][0], 1))
+                            if board[i][0] != "X":
+                                any_changes = True
+                            board[i][0] = "X"
+                if board[3][0] in [H, RD, LD] and board[1][0] == "." and board[2][0] == 'N' and board[0][0] == 'N':
+                    for i in range(5, len(board)):
+                        if board[i][0] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == i) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((i, 0, board[i][0], 1))
+                            if board[i][0] != "X":
+                                any_changes = True
+                            board[i][0] = "X"
+
+            # if the last row has row total = definites in row + 1
+            # if board[len(board)-1][len(board)-4] is a V, LD, LU and board[len(board)-1][len(board)-2] is a dot and board [len(board)-1][len(board)-3] is a N and board [len(board)-1][len(board)-1] is a N
+            # for i in range 0 to 4, if the node is a N, make the node an X
+            # if board[len(board)-1][3] is a V, RD, RU and board[len(board)-1][1] is a dot and board [len(board)-1][2] is a N and board [len(board)-1][0] is a N
+            # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+
+            count = 0
+            for j in range(len(board)):
+                if board[len(board) - 1][j] in definites.values():
+                    count += 1
+            if row_totals[len(board) - 1] == count + 1:
+                if board[len(board) - 1][len(board) - 4] in [V, LD, LU] and board[len(board) - 1][len(board) - 2] == "." and board[len(board) - 1][len(board) - 3] == 'N' and board[len(board) - 1][len(board) - 1] == 'N':
+                    for i in range(0,len(board)-4):
+                        if board[len(board) - 1][i] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == i):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, i, board[len(board) - 1][i], 1))
+                            if board[len(board) - 1][i] != "X":
+                                any_changes = True
+                            board[len(board) - 1][i] = "X"
+                if board[len(board) - 1][3] in [V, RD, RU] and board[len(board) - 1][1] == "." and board[len(board) - 1][2] == 'N' and board[len(board) - 1][0] == 'N':
+                    for i in range(5, len(board)):
+                        if board[len(board) - 1][i] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == i):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, i, board[len(board) - 1][i], 1))
+                            if board[len(board) - 1][i] != "X":
+                                any_changes = True
+                            board[len(board) - 1][i] = "X"
+
+            # if the last column has column total = definites in column + 1
+            # if board[len(board)-4][len(board)-1] is a H, RU, LU and board[len(board)-2][len(board)-1] is a dot and board [len(board)-3][len(board)-1] is a 'N' and board [len(board)-1][len(board)-1] is a 'N'
+            # for i in range 0 to 4, if the node is a N, make the node an X
+            # if board[3][len(board)-1] is a H, RD, LD and board[1][len(board)-1] is a dot and board [2][len(board)-1] is a 'N' and board [0][len(board)-1] is a 'N'
+            # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+
+            count = 0
+            for i in range(len(board)):
+                if board[i][len(board) - 1] in definites.values():
+                    count += 1
+            if column_totals[len(board) - 1] == count + 1:
+                if board[len(board) - 4][len(board) - 1] in [H, RU, LU] and board[len(board) - 2][len(board) - 1] == "." and board[len(board) - 3][len(board) - 1] == 'N' and board[len(board) - 1][len(board) - 1] == 'N':
+                    for i in range(0,len(board)-4):
+                        if board[i][len(board) - 1] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == i) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((i, len(board) - 1, board[i][len(board) - 1], 1))
+                            if board[i][len(board) - 1] != "X":
+                                any_changes = True
+                            board[i][len(board) - 1] = "X"
+                if board[3][len(board) - 1] in [H, RD, LD] and board[1][len(board) - 1] == "." and board[2][len(board) - 1] == 'N' and board[0][len(board) - 1] == 'N':
+                    for i in range(5, len(board)):
+                        if board[i][len(board) - 1] == 'N':
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == i) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((i, len(board) - 1, board[i][len(board) - 1], 1))
+                            if board[i][len(board) - 1] != "X":
+                                any_changes = True
+                            board[i][len(board) - 1] = "X"
+
+
+
 
 
 
