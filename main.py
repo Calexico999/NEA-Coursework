@@ -237,6 +237,7 @@ class Solver:
         dots_two = []
         dots_two_possibles = []
         satisfactory = False
+        minirules = True
 
         definites = {
             'RD': RD,
@@ -420,8 +421,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [2,3,2,7,8,8,3,5,2,2]
-            row_totals = [5,4,2,5,7,3,4,4,4,4]
+            column_totals = [9,7,6,1,4,5,3,1,3,5]
+            row_totals = [5,3,3,4,4,9,2,5,5,4]
             changed = True
             while changed == True:
                 changed = False
@@ -1830,6 +1831,157 @@ class Solver:
             if any_changes == False:
                 edgerulesneeded = True
             if edgerulesneeded == True:
+
+                if minirules == True:
+                    minirules = False
+
+                    if column_totals[0] == len(board) - 1:
+                        if (board[2][0] == H or board[2][0] == LD or board[2][0] == RD) and (board[0][0] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, 0, board[0][0], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, 1, board[0][1], 1))
+                            board[0][0] = "."
+                            board[1][0] = "."
+                            any_changes = True
+                        if ((board[len(board) - 3][0] == H) or (board[len(board) - 3][0] == LU) or (board[len(board) - 3][0] == RU)) and (board[len(board) - 1][0] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, 0, board[len(board) - 1][0], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, 1, board[len(board) - 1][1], 1))
+                            board[len(board) - 1][0] = "."
+                            board[len(board) - 2][0] = "."
+                            any_changes = True
+
+
+                    if column_totals[len(board) - 1] == len(board) - 1:
+                        if (board[2][len(board) - 1] == H or board[2][len(board) - 1] == LD or board[2][len(board) - 1] == RD) and (board[0][len(board) - 1] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, len(board) - 1, board[0][len(board) - 1], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == len(board) - 2):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, len(board) - 2, board[0][len(board) - 2], 1))
+                            board[0][len(board) - 1] = "."
+                            board[1][len(board) - 1] = "."
+                            any_changes = True
+                        if (board[len(board) - 3][len(board) - 1] == H or board[len(board) - 3][len(board) - 1] == LU or board[len(board) - 3][len(board) - 1] == RU) and (board[len(board) - 1][len(board) - 1] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, len(board) - 1, board[len(board) - 1][len(board) - 1], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == len(board) - 2):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, len(board) - 2, board[len(board) - 1][len(board) - 2], 1))
+                            board[len(board) - 1][len(board) - 1] = "."
+                            board[len(board) - 2][len(board) - 1] = "."
+                            any_changes = True
+
+
+                    if row_totals[0] == len(board) - 1:
+                        if (board[0][2] == V or board[0][2] == RU or board[0][2] == RD) and (board[0][0] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, 0, board[0][0], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 1) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((1, 0, board[1][0], 1))
+                            board[0][0] = "."
+                            board[0][1] = "."
+                            any_changes = True
+                        if (board[0][len(board) - 3] == V or board[0][len(board) - 3] == LU or board[0][len(board) - 3] == LD) and (board[0][len(board) - 1] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 0) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((0, len(board) - 1, board[0][len(board) - 1], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == 1) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((1, len(board) - 1, board[1][len(board) - 1], 1))
+                            board[0][len(board) - 1] = "."
+                            board[0][len(board) - 2] = "."
+                            any_changes = True
+
+                    if row_totals[len(board) - 1] == len(board) - 1:
+                        if (board[len(board) - 1][2] == V or board[len(board) - 1][2] == RU or board[len(board) - 1][2] == RD) and (board[len(board) - 1][0] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, 0, board[len(board) - 1][0], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 2) and (u[1] == 0):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 2, 0, board[len(board) - 2][0], 1))
+                            board[len(board) - 1][0] = "."
+                            board[len(board) - 1][1] = "."
+                            any_changes = True
+                        if (board[len(board) - 1][len(board) - 3] == V or board[len(board) - 1][len(board) - 3] == LU or board[len(board) - 1][len(board) - 3] == LD) and (board[len(board) - 1][len(board) - 1] == 'N'):
+                            if bruteforceneeded == True:
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 1) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 1, len(board) - 1, board[len(board) - 1][len(board) - 1], 1))
+                                alreadyreplaced = False
+                                for u in unsures:
+                                    if (u[0] == len(board) - 2) and (u[1] == len(board) - 1):
+                                        alreadyreplaced = True
+                                if alreadyreplaced == False:
+                                    unsures.append((len(board) - 2, len(board) - 1, board[len(board) - 2][len(board) - 1], 1))
+                            board[len(board) - 1][len(board) - 1] = "."
+                            board[len(board) - 1][len(board) - 2] = "."
+                            any_changes = True
+
+
                 # for top row
                 # if rowtotal = 3 and there is one 'V' and one '.' in the row
                 # if the node to the left of the dot is X, V, LU, LD
