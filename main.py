@@ -420,8 +420,8 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [5,7,5,7,6,5,5,2,3,3]
-            row_totals = [5,3,8,10,4,6,6,2,3,1]
+            column_totals = [2,3,2,7,8,8,3,5,2,2]
+            row_totals = [5,4,2,5,7,3,4,4,4,4]
             changed = True
             while changed == True:
                 changed = False
@@ -2841,9 +2841,7 @@ class Solver:
                             for i in range(len(board)):
                                 if board[i][0] == "X":
                                     count += 1
-                            if count == len(board) - column_totals[0]:
-                                continue
-                            else:
+                            if count != len(board) - column_totals[0]:
                                 found = False
                                 for i in range(len(board)):
                                     if board[i][0] in shapes.values():
@@ -2940,9 +2938,7 @@ class Solver:
                             for j in range(len(board)):
                                 if board[0][j] == "X":
                                     count += 1
-                            if count == len(board) - row_totals[0]:
-                                continue
-                            else:
+                            if count != len(board) - row_totals[0]:
                                 found = False
                                 for j in range(len(board)):
                                     if board[0][j] in shapes.values():
@@ -3038,9 +3034,7 @@ class Solver:
                             for i in range(len(board)):
                                 if board[i][len(board) - 1] == "X":
                                     count += 1
-                            if count == len(board) - column_totals[len(board) - 1]:
-                                continue
-                            else:
+                            if count != len(board) - column_totals[len(board) - 1]:
                                 found = False
                                 for i in range(len(board)):
                                     if board[i][len(board) - 1] in shapes.values():
@@ -3136,9 +3130,7 @@ class Solver:
                             for j in range(len(board)):
                                 if board[len(board) - 1][j] == "X":
                                     count += 1
-                            if count == len(board) - row_totals[len(board) - 1]:
-                                continue
-                            else:
+                            if count != len(board) - row_totals[len(board) - 1]:
                                 found = False
                                 for j in range(len(board)):
                                     if board[len(board) - 1][j] in shapes.values():
