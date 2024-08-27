@@ -1,7 +1,18 @@
 import random
 
-# Box drawing characters: ┌ ┐ └ ┘ ─ │ ┬ ┴ ├ ┤ ┼
+# Box drawing characters: ┌ ┐ └ ┘ ─ │ 
 # book 3 p175 has 2 possible other rules ####
+board_size = 0
+column_totals = []
+row_totals = []
+
+# ask user if they would like a generated puzzle or to input their own
+
+generation = "null"
+if generation != "y" or generation != "n":
+    generation = input("Would you like to generate a puzzle or input your own? (y/n): ")
+
+
 
 class StartNode:
     def start_node(board_size):
@@ -20,7 +31,6 @@ class Generate_Board:
         board = []
         for i in range(size):
             board.append([0] * size)
-                
         start = StartNode.start_node(size)
         board[start[0]][start[1]] = "S"
         return board, start
@@ -42,7 +52,7 @@ class GenerateRandomPath:
                 edge = True
         return startxnode, startynode
 
-    def dfs(start, board_size, min_length=30, max_length=40):
+    def dfs(start, board_size, min_length=(board_size ** 2)*0.4, max_length=(board_size ** 2)*0.6):
         visited = set()
         stack = [(start, [start])]
         
@@ -101,35 +111,272 @@ class GenerateRandomPath:
             print(' '.join(row))
 
 
-if __name__ == "__main__":
-    board_size = int(input("Enter the size of the board: "))
-    path = None
-    while path is None:
-        start = GenerateRandomPath.start_node(board_size)
-        path = GenerateRandomPath.dfs(start, board_size)
-    GenerateRandomPath.print_path(path, board_size)
+class Generator:
 
-class Solver:
-    # Box drawing characters
-    RD = "┌"
-    LD = "┐"
-    RU = "└"
-    LU = "┘"
-    H = "─"
-    V = "│"
-    DOT = "."
-    NULL = "0"
-    characters = {
-        'RD': RD,
-        'LD': LD,
-        'RU': RU,
-        'LU': LU,
-        'H': H,
-        'V': V
-    }
-    
+    def __init__(self, column_totals, row_totals, board_size):
+        self.column_totals = column_totals
+        self.row_totals = row_totals
+        self.board_size = board_size
 
-    def generate_board():
+    def buildaboard():
+
+        # global column_totals, row_totals, board_size
+        board_size = int(input("Enter the size of the board: "))
+        path = None
+        while path is None:
+            start = GenerateRandomPath.start_node(board_size)
+            path = GenerateRandomPath.dfs(start, board_size)
+
+        # build board with dimensions board_size x board_size
+        buildboard = [['X' for _ in range(board_size)] for _ in range(board_size)]
+
+
+        startnodegenerated = path[0]
+        generatedx = startnodegenerated[0]
+        generatedy = startnodegenerated[1]
+        startx = generatedx
+        starty = generatedy
+
+        currentnodegenerated = path[1]
+        currentx = currentnodegenerated[0]
+        currenty = currentnodegenerated[1]
+
+        if generatedx == currentx:
+            if generatedy < currenty:
+                directionpath = "right"
+            else:
+                directionpath = "left"
+
+        if generatedy == currenty:
+            if generatedx < currentx:
+                directionpath = "down"
+            else:
+                directionpath = "up"
+
+        if directionpath == "right":
+            done = False
+            if generatedx == 0:
+                buildboard[generatedx][generatedy] = "└"
+                done = True
+            if generatedx == board_size - 1 and done == False:
+                buildboard[generatedx][generatedy] = "┌"
+                done = True
+            if generatedy == 0 and done == False:
+                buildboard[generatedx][generatedy] = "─"
+                done = True
+
+            if done == False:
+                print("Error")
+
+        if directionpath == "left":
+            done = False
+            if generatedx == 0:
+                buildboard[generatedx][generatedy] = "┘"
+                done = True
+            if generatedx == board_size - 1 and done == False:
+                buildboard[generatedx][generatedy] = "┐"
+                done = True
+            if generatedy == board_size - 1 and done == False:
+                buildboard[generatedx][generatedy] = "─"
+                done = True
+
+            if done == False:
+                print("Error")
+
+        if directionpath == "up":
+            done = False
+            if generatedx == board_size - 1:
+                buildboard[generatedx][generatedy] = "│"
+                done = True
+            if generatedy == 0 and done == False:
+                buildboard[generatedx][generatedy] = "┘"
+                done = True
+            if generatedy == board_size - 1 and done == False:
+                buildboard[generatedx][generatedy] = "└"
+                done = True
+
+            if done == False:
+                print("Error")
+
+        if directionpath == "down":
+            done = False
+            if generatedx == 0:
+                buildboard[generatedx][generatedy] = "│"
+                done = True
+            if generatedy == 0 and done == False:
+                buildboard[generatedx][generatedy] = "┐"
+                done = True
+            if generatedy == board_size - 1 and done == False:
+                buildboard[generatedx][generatedy] = "┌"
+                done = True
+
+            if done == False:
+                print("Error")
+
+        while len(path) > 2 and (currentx != path[-1][0] or currenty != path[-1][1]):
+            previousx = path[0][0]
+            previousy = path[0][1]
+            path.pop(0)
+
+            currentx = path[0][0]
+            currenty = path[0][1]
+
+            nextx = path[1][0]
+            nexty = path[1][1]
+
+            if nextx + 2 == previousx:
+                buildboard[currentx][currenty] = "│"
+            if nextx - 2 == previousx:
+                buildboard[currentx][currenty] = "│"
+            if nexty + 2 == previousy:
+                buildboard[currentx][currenty] = "─"
+            if nexty - 2 == previousy:
+                buildboard[currentx][currenty] = "─"
+
+            #box drawing characters = ┌ ┐ └ ┘ ─ │
+
+            if nextx + 1 == previousx and nexty + 1 == previousy:
+                if currentx == previousx:
+                    buildboard[currentx][currenty] = "└"
+                if currenty == previousy:
+                    buildboard[currentx][currenty] = "┐"
+            if nextx - 1 == previousx and nexty - 1 == previousy:
+                if currentx == previousx:
+                    buildboard[currentx][currenty] = "┐"
+                if currenty == previousy:
+                    buildboard[currentx][currenty] = "└"
+
+            if nextx + 1 == previousx and nexty - 1 == previousy:
+                if currentx == previousx:
+                    buildboard[currentx][currenty] = "┘"
+                if currenty == previousy:
+                    buildboard[currentx][currenty] = "┌"
+            
+            if nextx - 1 == previousx and nexty + 1 == previousy:
+                if currentx == previousx:
+                    buildboard[currentx][currenty] = "┌"
+                if currenty == previousy:
+                    buildboard[currentx][currenty] = "┘"
+
+        path.pop(0)
+
+        endx = path[0][0]
+        endy = path[0][1]
+        changes = False
+        if currentx == endx:
+            if endy == len(buildboard) - 1 or endy == 0:
+                buildboard[path[0][0]][path[0][1]] = "─"
+                changes = True
+            else:
+                if endx == 0 and endy > currenty:
+                    buildboard[path[0][0]][path[0][1]] = "┘"
+                    changes = True
+                if endx == 0 and endy < currenty:
+                    buildboard[path[0][0]][path[0][1]] = "└"
+                    changes = True
+                if endx == len(buildboard) - 1 and endy > currenty:
+                    buildboard[path[0][0]][path[0][1]] = "┐"
+                    changes = True
+                if endx == len(buildboard) - 1 and endy < currenty:
+                    buildboard[path[0][0]][path[0][1]] = "┌"
+                    changes = True
+        if currenty == endy and changes == False:
+            if endx == len(buildboard) - 1 or endx == 0:
+                buildboard[path[0][0]][path[0][1]] = "│"
+            else:
+                if endy == 0 and endx > currentx:
+                    buildboard[path[0][0]][path[0][1]] = "┘"
+                if endy == 0 and endx < currentx:
+                    buildboard[path[0][0]][path[0][1]] = "┐"
+                if endy == len(buildboard) - 1 and endx > currentx:
+                    buildboard[path[0][0]][path[0][1]] = "└"
+                if endy == len(buildboard) - 1 and endx < currentx:
+                    buildboard[path[0][0]][path[0][1]] = "┌"
+
+
+        xshape = buildboard[start[0]][start[1]]
+        yshape = buildboard[path[0][0]][path[0][1]]
+
+        buildboard[path[0][0]][path[0][1]] = "E"
+        buildboard[startx][starty] = "S"
+
+
+        # list of box drawing characters and "E"
+        listofchars = ["┌", "┐", "└", "┘", "─", "│", "E", "S"]
+
+        column_totals = []
+        row_totals = []
+
+        for i in range(board_size):
+            column_total = 0
+            for j in range(board_size):
+                if buildboard[j][i] in listofchars:
+                    column_total += 1
+            column_totals.append(column_total)
+        
+        for i in range(board_size):
+            row_total = 0
+            for j in range(board_size):
+                if buildboard[i][j] in listofchars:
+                    row_total += 1
+            row_totals.append(row_total)
+
+        print(column_totals)
+        print(row_totals)
+
+        board = buildboard
+
+
+        # save state of board, which will not be overwritten
+        SAVEDBOARD = []
+        for i in range(len(board)):
+            SAVEDBOARD.append(board[i].copy())
+        
+        print(SAVEDBOARD)
+
+        # for i in range(len(board)):
+        #     for j in range(len(board)):
+        # if board[i][j] != "S" and board[i][j] != "E":
+        #     board[i][j] = "N"
+        # if board[i][j] == "S":
+        #     start = (i, j)
+        # if board[i][j] == "E":
+        #    endx = i
+        #    endy = j
+
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] != "S" and board[i][j] != "E":
+                    board[i][j] = "N"
+                if board[i][j] == "S":
+                    board[i][j] = xshape
+                if board[i][j] == "E":
+                    board[i][j] = yshape
+
+        print(board)
+        print()
+
+
+        startingshapes = []
+        # add start nodex, start nodey, and shape of start node to startingshapes
+        startingshapes.append((start[0], start[1], xshape))
+        # add end nodex, end nodey, and shape of end node to startingshapes
+        startingshapes.append((endx, endy, yshape))
+
+
+
+
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
+
+
+
+
+
+        # return column_totals, row_totals, board_size
+
+
+    def manualboard():
+        startingshapes = []
         size = int(input("Enter the edge length of the board, in range 4 <= length <= 10: "))
         if size < 4 or size > 10:
             print("Invalid size")
@@ -146,6 +393,8 @@ class Solver:
                 start = (int(start[0]), int(start[1]))
                 if 0 <= start[0] < size and 0 <= start[1] < size:
                     char_choice = input(f"Choose a character for the starting position {start} (RD, LD, RU, LU, H, V): ")
+                    xshape = char_choice
+                    startingshapes.append((start[0], start[1], Solver.characters[char_choice]))
                     if char_choice in Solver.characters:
                         board[start[0]][start[1]] = Solver.characters[char_choice]
                         break
@@ -164,6 +413,8 @@ class Solver:
                 if 0 <= end[0] < size and 0 <= end[1] < size:
                     if end != start:
                         char_choice = input(f"Choose a character for the ending position {end} (RD, LD, RU, LU, H, V): ")
+                        yshape = char_choice
+                        startingshapes.append((end[0], end[1], Solver.characters[char_choice]))
                         if char_choice in Solver.characters:
                             board[end[0]][end[1]] = Solver.characters[char_choice]
                             break
@@ -190,6 +441,8 @@ class Solver:
                                 char_choice = input(f"Choose a character for the position {node} (RD, LD, RU, LU, H, V): ")
                                 if char_choice in Solver.characters:
                                     board[node[0]][node[1]] = Solver.characters[char_choice]
+
+                                    startingshapes.append((node[0], node[1], Solver.characters[char_choice]))
                                     break
                                 else:
                                     print("Invalid character choice. Please choose from RD, LD, RU, LU, H, V.")
@@ -204,9 +457,51 @@ class Solver:
             else:
                 print("Invalid input. Please enter Y or N.")
 
-        
+        SAVEDBOARD = []
+        endx = end[0]
+        endy = end[1]
 
-        return board, start, end
+        
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
+
+
+    # return start, board, xshape, yshape, column_totals, row_totals
+
+
+
+# if __name__ == "__main__":
+#     board_size = int(input("Enter the size of the board: "))
+#     path = None
+#     while path is None:
+#         start = GenerateRandomPath.start_node(board_size)
+#         path = GenerateRandomPath.dfs(start, board_size)
+#     GenerateRandomPath.print_path(path, board_size)
+
+class Solver:
+
+    def __init__(self, column_totals, row_totals, board_size):
+        self.column_totals = column_totals
+        self.row_totals = row_totals
+        self.board_size = board_size
+
+
+    # Box drawing characters
+    RD = "┌"
+    LD = "┐"
+    RU = "└"
+    LU = "┘"
+    H = "─"
+    V = "│"
+    DOT = "."
+    NULL = "0"
+    characters = {
+        'RD': RD,
+        'LD': LD,
+        'RU': RU,
+        'LU': LU,
+        'H': H,
+        'V': V
+    }
 
 
     def print_board(board):
@@ -214,8 +509,23 @@ class Solver:
             print(' '.join(map(str, row)))
 
 
-    def Solve(board, start, end):
+    def Solve(board, board_size, column_totals, row_totals, savedboard, xshape, yshape, start, endx, endy, startingshapes):
         bruteforceneeded = False
+        # obtain column and row totals
+
+        # global column_totals, row_totals, board_size
+        print(board_size)
+
+        if len(column_totals) == 0:
+            #ask user for column and row totals
+            for i in range(len(board)):
+                column_totals.append(int(input(f"Enter the column total for column {i}: ")))
+            for i in range(len(board)):
+                row_totals.append(int(input(f"Enter the row total for row {i}: ")))
+
+
+
+
         edgerulesneeded = False
         any_changes = True
         RD = "┌"
@@ -421,8 +731,6 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            column_totals = [5,5,4,7,5,3,1,4,5,4]
-            row_totals = [3,3,5,9,5,6,7,3,1,1]
             changed = True
             while changed == True:
                 changed = False
@@ -1638,10 +1946,11 @@ class Solver:
                         if len(directions) == 4:
                             #impossible
                             flagimpossible = True
+            
 
             i,j = start
             previ,prevj = start
-            iend,jend = end
+            iend,jend = endx, endy
             isashape = True
             fromstartcount = 1
             donestart = False
@@ -1825,6 +2134,21 @@ class Solver:
                     flagimpossible = False
                     any_changes = False
                     print("Solved succesfully")
+                    Solver.print_board(board)
+                    print()
+                    # reset board to all "N"
+                    # add all nodes from startingshapes to board
+
+                    for i in range(len(board)):
+                        for j in range(len(board)):
+                            board[i][j] = 'N'
+                    # add all nodes from startingshapes to board
+                    for i in range(len(startingshapes)):
+                        board[startingshapes[i][0]][startingshapes[i][1]] = startingshapes[i][2]
+
+                    Solver.print_board(board)                    
+
+
                     break
 
             edgerulesneeded = False
@@ -3633,7 +3957,7 @@ class Solver:
                 print("No changes made, entering guessing stage")
                 bruteforceneeded = True
 
-            if (bruteforceneeded == True and any_changes == False) or trynew == True:
+            if (bruteforceneeded == True and any_changes == False and generation != "y") or trynew == True:
                 print("Brute force needed")
 
                 # reverse unsures
@@ -3843,7 +4167,9 @@ class Solver:
                 print(dots_two)
 
 
-                if any_changes == False:
+        
+
+                if any_changes == False and len(dots_two) > 0:
                     unsureshapes = []
                     ##### nodeguess = first node in dots_two
                     # change the board position designated by the first and second parts of nodeguess to the first shape in the third part of nodeguess
@@ -3858,12 +4184,282 @@ class Solver:
                     unsureshapes.append(nodeguess[2])
                     unsureshapes.append(nodeguess[3])
                     dots_two.pop(0)
+                    any_changes = True
+
+                # if len(dots_two) == 0:
+                #     board_size = int(input("Enter the size of the board: "))
+                #     path = None
+                #     while path is None:
+                #         start = GenerateRandomPath.start_node(board_size)
+                #         path = GenerateRandomPath.dfs(start, board_size)
 
 
-                print("Brute force used")
+                #     buildboard = [['X' for _ in range(board_size)] for _ in range(board_size)]
+
+                #     startnodegenerated = path[0]
+                #     generatedx = startnodegenerated[0]
+                #     generatedy = startnodegenerated[1]
+                #     startx = generatedx
+                #     starty = generatedy
+
+                #     currentnodegenerated = path[1]
+                #     currentx = currentnodegenerated[0]
+                #     currenty = currentnodegenerated[1]
+
+                #     if generatedx == currentx:
+                #         if generatedy < currenty:
+                #             directionpath = "right"
+                #         else:
+                #             directionpath = "left"
+
+                #     if generatedy == currenty:
+                #         if generatedx < currentx:
+                #             directionpath = "down"
+                #         else:
+                #             directionpath = "up"
+
+
+
+                #     if directionpath == "right":
+                #         done = False
+                #         if generatedx == 0:
+                #             buildboard[generatedx][generatedy] = "└"
+                #             done = True
+                #         if generatedx == board_size - 1 and done == False:
+                #             buildboard[generatedx][generatedy] = "┌"
+                #             done = True
+                #         if generatedy == 0 and done == False:
+                #             buildboard[generatedx][generatedy] = "─"
+                #             done = True
+
+                #         if done == False:
+                #             print("Error")
+
+                #     if directionpath == "left":
+                #         done = False
+                #         if generatedx == 0:
+                #             buildboard[generatedx][generatedy] = "┘"
+                #             done = True
+                #         if generatedx == board_size - 1 and done == False:
+                #             buildboard[generatedx][generatedy] = "┐"
+                #             done = True
+                #         if generatedy == board_size - 1 and done == False:
+                #             buildboard[generatedx][generatedy] = "─"
+                #             done = True
+
+                #         if done == False:
+                #             print("Error")
+
+                #     if directionpath == "up":
+                #         done = False
+                #         if generatedx == board_size - 1:
+                #             buildboard[generatedx][generatedy] = "│"
+                #             done = True
+                #         if generatedy == 0 and done == False:
+                #             buildboard[generatedx][generatedy] = "┘"
+                #             done = True
+                #         if generatedy == board_size - 1 and done == False:
+                #             buildboard[generatedx][generatedy] = "└"
+                #             done = True
+
+                #         if done == False:
+                #             print("Error")
+
+                #     if directionpath == "down":
+                #         done = False
+                #         if generatedx == 0:
+                #             buildboard[generatedx][generatedy] = "│"
+                #             done = True
+                #         if generatedy == 0 and done == False:
+                #             buildboard[generatedx][generatedy] = "┐"
+                #             done = True
+                #         if generatedy == board_size - 1 and done == False:
+                #             buildboard[generatedx][generatedy] = "┌"
+                #             done = True
+
+                #         if done == False:
+                #             print("Error")
+
+                #     while len(path) > 2 and (currentx != path[-1][0] or currenty != path[-1][1]):
+                #         previousx = path[0][0]
+                #         previousy = path[0][1]
+                #         path.pop(0)
+
+                #         currentx = path[0][0]
+                #         currenty = path[0][1]
+
+                #         nextx = path[1][0]
+                #         nexty = path[1][1]
+
+                #         if nextx + 2 == previousx:
+                #             buildboard[currentx][currenty] = "│"
+                #         if nextx - 2 == previousx:
+                #             buildboard[currentx][currenty] = "│"
+                #         if nexty + 2 == previousy:
+                #             buildboard[currentx][currenty] = "─"
+                #         if nexty - 2 == previousy:
+                #             buildboard[currentx][currenty] = "─"
+
+                #         #box drawing characters = ┌ ┐ └ ┘ ─ │
+
+                #         if nextx + 1 == previousx and nexty + 1 == previousy:
+                #             if currentx == previousx:
+                #                 buildboard[currentx][currenty] = "└"
+                #             if currenty == previousy:
+                #                 buildboard[currentx][currenty] = "┐"
+                #         if nextx - 1 == previousx and nexty - 1 == previousy:
+                #             if currentx == previousx:
+                #                 buildboard[currentx][currenty] = "┐"
+                #             if currenty == previousy:
+                #                 buildboard[currentx][currenty] = "└"
+
+                #         if nextx + 1 == previousx and nexty - 1 == previousy:
+                #             if currentx == previousx:
+                #                 buildboard[currentx][currenty] = "┘"
+                #             if currenty == previousy:
+                #                 buildboard[currentx][currenty] = "┌"
+                        
+                #         if nextx - 1 == previousx and nexty + 1 == previousy:
+                #             if currentx == previousx:
+                #                 buildboard[currentx][currenty] = "┌"
+                #             if currenty == previousy:
+                #                 buildboard[currentx][currenty] = "┘"
+
+
+
+                #     path.pop(0)
+
+                #     endx = path[0][0]
+                #     endy = path[0][1]
+                #     changes = False
+                #     if currentx == endx:
+                #         if endy == len(buildboard) - 1 or endy == 0:
+                #             buildboard[path[0][0]][path[0][1]] = "─"
+                #             changes = True
+                #         else:
+                #             if endx == 0 and endy > currenty:
+                #                 buildboard[path[0][0]][path[0][1]] = "┘"
+                #                 changes = True
+                #             if endx == 0 and endy < currenty:
+                #                 buildboard[path[0][0]][path[0][1]] = "└"
+                #                 changes = True
+                #             if endx == len(buildboard) - 1 and endy > currenty:
+                #                 buildboard[path[0][0]][path[0][1]] = "┐"
+                #                 changes = True
+                #             if endx == len(buildboard) - 1 and endy < currenty:
+                #                 buildboard[path[0][0]][path[0][1]] = "┌"
+                #                 changes = True
+                #     if currenty == endy and changes == False:
+                #         if endx == len(buildboard) - 1 or endx == 0:
+                #             buildboard[path[0][0]][path[0][1]] = "│"
+                #         else:
+                #             if endy == 0 and endx > currentx:
+                #                 buildboard[path[0][0]][path[0][1]] = "┘"
+                #             if endy == 0 and endx < currentx:
+                #                 buildboard[path[0][0]][path[0][1]] = "┐"
+                #             if endy == len(buildboard) - 1 and endx > currentx:
+                #                 buildboard[path[0][0]][path[0][1]] = "└"
+                #             if endy == len(buildboard) - 1 and endx < currentx:
+                #                 buildboard[path[0][0]][path[0][1]] = "┌"
+
+
+                #     xshape = buildboard[start[0]][start[1]]
+                #     yshape = buildboard[path[0][0]][path[0][1]]
+
+
+
+                #     buildboard[path[0][0]][path[0][1]] = "E"
+                #     buildboard[startx][starty] = "S"
+
+
+                #     # list of box drawing characters and "E"
+                #     listofchars = ["┌", "┐", "└", "┘", "─", "│", "E", "S"]
+
+                #     column_totals = []
+                #     row_totals = []
+
+                #     for i in range(board_size):
+                #         column_total = 0
+                #         for j in range(board_size):
+                #             if buildboard[j][i] in listofchars:
+                #                 column_total += 1
+                #         column_totals.append(column_total)
+                    
+                #     for i in range(board_size):
+                #         row_total = 0
+                #         for j in range(board_size):
+                #             if buildboard[i][j] in listofchars:
+                #                 row_total += 1
+                #         row_totals.append(row_total)
+
+                #     print(column_totals)
+                #     print(row_totals)
+
+                #     board = Solver.generate_board()
+                #     Solver.Solve(board)
+
+                                
+
+                #     board[startx][starty] = xshape
+                #     board[endx][endy] = yshape
+
+
+
+                # print("Brute force used")
+
+
+            if any_changes == False and generation == "y":
+                Solver.print_board(board)
+                print("adding hint")
+                # for shape in SAVEDBOARD
+                # if corresponding shape in board is not a shape
+                # add shape to board
+                # add to startingshapes
+                possibleadditions = []
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if SAVEDBOARD[i][j] in shapes.values():
+                            if board[i][j] not in shapes.values():
+                                possibleadditions.append((i, j, SAVEDBOARD[i][j]))
+
+                # chose a random shape from possibleadditions
+                # add shape to board
+                # add to startingshapes
+                if len(possibleadditions) > 0:
+                    chosen = random.choice(possibleadditions)
+                    board[chosen[0]][chosen[1]] = chosen[2]
+                    startingshapes.append(chosen)
+                    Solver.print_board(board)
+                    print("added a shape")
+
+                any_changes = True
 
 
 
 
-board, start, end = Solver.generate_board()
-Solver.Solve(board, start, end)
+# generator()
+# # board = Solver.generate_board()
+# Solver.Solve(board)
+
+#get board from generator then solve using solver.solve
+
+# board = generator()
+# Solver.Solve(board)
+
+
+##########
+
+# if generation = "y"
+# generate board using subroutine buildaboard
+# if generation = "n"
+# generate board using subroutine manualboard
+# then solve using solver.solve
+
+if generation == "y":
+    board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = Generator.buildaboard()
+    print(board)
+    Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
+
+if generation == "n":
+    board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = Generator.manualboard()
+    Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
