@@ -2016,16 +2016,25 @@ class Solver:
                     Solver.print_board(board)
                     print()
                     # reset board to all "N"
-                    # add all nodes from startingshapes to board
+                    # add board to editboard without changing board
+                    editboard = [['N' for i in range(len(board))] for j in range(len(board))]
 
-                    for i in range(len(board)):
-                        for j in range(len(board)):
-                            board[i][j] = 'N'
-                    # add all nodes from startingshapes to board
+
+
                     for i in range(len(startingshapes)):
-                        board[startingshapes[i][0]][startingshapes[i][1]] = startingshapes[i][2]
+                        editboard[startingshapes[i][0]][startingshapes[i][1]] = startingshapes[i][2]
 
-                    Solver.print_board(board)                    
+
+                    # for i in range(len(board)):
+                    #     for j in range(len(board)):
+                    #         board[i][j] = 'N'
+                    # # add all nodes from startingshapes to board
+                    # for i in range(len(startingshapes)):
+                    #     board[startingshapes[i][0]][startingshapes[i][1]] = startingshapes[i][2]
+                    print(editboard)
+                    Solver.print_board(board)
+
+                    return board, editboard, column_totals, row_totals
                     break
 
             edgerulesneeded = False
@@ -2544,7 +2553,7 @@ class Solver:
                 possiblementup = False
                 possibles = 0
                 for j in range(len(board)):
-                    if j - 1 in edgecolumns and j+1 < len(board) and j-1 >= 0:
+                    if j - 1 in edgecolumns and j+1 < len(board) and j not in edgecolumns and j-1 >= 0:
                         if (column_totals[j-1] == 1 or column_totals[j-1] == 0) and column_totals[j+1] == 1:
                             for i in range(len(board)):
                                 if (board[i][j-1] in shapes.values()):
@@ -2612,7 +2621,7 @@ class Solver:
                 possiblementleft = False
                 possibles = 0
                 for i in range(len(board)):
-                    if i - 1 in edgerows and i+1 < len(board) and i-1 >= 0:
+                    if i - 1 in edgerows and i+1 < len(board) and i-1 >= 0 and i not in edgerows:
                         if (row_totals[i-1] == 1 or row_totals[i-1] == 0) and row_totals[i+1] == 1:
                             for j in range(len(board)):
                                 if (board[i-1][j] == H) or (board[i-1][j] == RD) or (board[i-1][j] == RU) or (board[i-1][j] == LD) or (board[i-1][j] == LU) or (board[i-1][j] == V):
@@ -4073,11 +4082,129 @@ class Solver:
 # generate board using subroutine manualboard
 # then solve using solver.solve
 
+class EditBoard:
+    def manual_edit(board,editboard, column_totals, row_totals):
+
+        #dictionary changenode- 6 shapes, dot and X
+        
+        RD = "┌"
+        LD = "┐"
+        RU = "└"
+        LU = "┘"
+        H = "─"
+        V = "│"
+        DOT = "."
+        X = "X"
+
+        changenode = {
+        RD: "RD",
+        LD: "LD",
+        RU: "RU",
+        LU: "LU",
+        H: "H",
+        V: "V",
+        DOT: ".",
+        X: "X"
+        }
+
+        displayboard = []
+        #make a 9x9 board of Ns
+        displayboard = [['N' for i in range(9)] for j in range(9)]
+        displayboard[0][0] = "#"
+        for i in range(1,9):
+            displayboard[0][i] = column_totals[i-1]
+        for i in range(1,9):
+            displayboard[i][0] = row_totals[i-1]
+
+        # add editboard to the bottom right of displayboard
+        for i in range(0,8):
+            for j in range(0,8):
+                displayboard[i+1][j+1] = editboard[i][j]
+        
+        print()
+        #print the board
+        Solver.print_board(displayboard)
+
+
+        
+
+
+
+
+        while True:
+            # print enter row and column in form row, column or s to view solution
+            # print enter shape
+
+            # if row and column are in the form row, column
+            # if shape is a shape
+            # change the board position designated by row and column to shape
+            # print the board
+            # if the board is solved, print "solved"
+
+            # if s is entered
+            # print the solution
+            # print the board
+            # if the board is solved, print "solved"
+
+            print()
+
+            print("Edit the board: ")
+
+            Solver.print_board(displayboard)
+
+
+
+            rowcol = input("Enter row and column in the form row, column or s to view solution: ")
+            if rowcol == "s":
+                print("Solution: ")
+                Solver.print_board(board)
+
+            else:
+                rowcol = rowcol.split(",")
+                row = int(rowcol[0]) + 1
+                col = int(rowcol[1]) + 1
+                shape = input("Enter shape or dot: ")
+                if shape in changenode.values():
+                    if shape == "V":
+                        displayboard[row][col] = V
+                    if shape == "H":
+                        displayboard[row][col] = H
+                    if shape == "RD":
+                        displayboard[row][col] = RD
+                    if shape == "RU":
+                        displayboard[row][col] = RU
+                    if shape == "LD":
+                        displayboard[row][col] = LD
+                    if shape == "LU":
+                        displayboard[row][col] = LU
+                    if shape == ".":
+                        displayboard[row][col] = DOT
+                    if shape == "X":
+                        displayboard[row][col] = X
+                    Solver.print_board(displayboard)
+            success = True
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
+                        success = False
+            if success == True:
+                print("Solved")
+                for i in range(len(displayboard)):
+                    for j in range(len(displayboard)):
+                        if displayboard[i][j] == "N":
+                            displayboard[i][j] = "X"
+                Solver.print_board(displayboard)
+                break
+
+
+
+
 if generation == "y":
     board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = Generator.buildaboard()
-    print(board)
-    Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
+    board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
+    EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
 if generation == "n":
     board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = Generator.manualboard()
-    Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
+    board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
+    EditBoard.manual_edit(board,editboard,column_totals,row_totals)
