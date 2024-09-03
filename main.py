@@ -10,7 +10,7 @@ row_totals = []
 
 generation = "null"
 if generation != "y" or generation != "n":
-    generation = input("Would you like to generate a puzzle or input your own? (y/n): ")
+    generation = input("Would you like to generate a puzzle (y) or input your own (n)? ")
 
 class StartNode:
     def start_node(board_size):
@@ -4109,16 +4109,16 @@ class EditBoard:
 
         displayboard = []
         #make a 9x9 board of Ns
-        displayboard = [['N' for i in range(9)] for j in range(9)]
+        displayboard = [['N' for i in range(len(board)+ 1)] for j in range(len(board)+1)]
         displayboard[0][0] = "#"
-        for i in range(1,9):
+        for i in range(1,len(board)+1):
             displayboard[0][i] = column_totals[i-1]
-        for i in range(1,9):
+        for i in range(1,len(board)+1):
             displayboard[i][0] = row_totals[i-1]
 
         # add editboard to the bottom right of displayboard
-        for i in range(0,8):
-            for j in range(0,8):
+        for i in range(0,len(board)):
+            for j in range(0,len(board)):
                 displayboard[i+1][j+1] = editboard[i][j]
         
         print()
@@ -4188,6 +4188,7 @@ class EditBoard:
                     if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
                         success = False
             if success == True:
+                print()
                 print("Solved")
                 for i in range(len(displayboard)):
                     for j in range(len(displayboard)):
