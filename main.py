@@ -1,4 +1,9 @@
 import random
+import csv
+import time
+
+# File path to your CSV
+csv_file = 'accounts.csv'
 
 # Box drawing characters: ┌ ┐ └ ┘ ─ │ 
 # book 3 p175 has 2 possible other rules ####
@@ -8,9 +13,6 @@ row_totals = []
 
 # ask user if they would like a generated puzzle or to input their own
 
-generation = "null"
-if generation != "y" or generation != "n":
-    generation = input("Would you like to generate a puzzle (y) or input your own (n)? ")
 
 class StartNode:
     def start_node(board_size):
@@ -290,7 +292,7 @@ class Generator:
         startingshapes.append((start[0], start[1], xshape))
         startingshapes.append((endx, endy, yshape))
 
-        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation
 
     def manualboard():
         startingshapes = []
@@ -373,7 +375,7 @@ class Generator:
         SAVEDBOARD = []
         endx = end[0]
         endy = end[1]
-        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation
 
 
 class Solver:
@@ -397,7 +399,7 @@ class Solver:
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
-    def Solve(board, board_size, column_totals, row_totals, savedboard, xshape, yshape, start, endx, endy, startingshapes):
+    def Solve(board, board_size, column_totals, row_totals, savedboard, xshape, yshape, start, endx, endy, startingshapes, generation):
         bruteforceneeded = False
         end = (endx, endy)
 
@@ -2438,7 +2440,7 @@ class Solver:
                 # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
                 # if the length of list is 1, change the square to a dot, and change all other 'N's in the column to 'X'
                 for j in range(len(board)):
-                    if (j - 1 in edgecolumns) or (j + 1 in edgecolumns):
+                    if (j - 1 in edgecolumns) or (j + 1 in edgecolumns) and j not in edgecolumns:
                         count = 0
                         for i in range(len(board)):
                             if board[i][j] in definites.values():
@@ -2488,7 +2490,7 @@ class Solver:
                                         any_changes = True
                 # do the same for rows
                 for i in range(len(board)):
-                    if (i - 1 in edgerows) or (i + 1 in edgerows):
+                    if (i - 1 in edgerows) or (i + 1 in edgerows) and i not in edgerows:
                         count = 0
                         for j in range(len(board)):
                             if board[i][j] in definites.values():
@@ -4095,6 +4097,7 @@ class EditBoard:
         V = "│"
         DOT = "."
         X = "X"
+        N = "N"
 
         changenode = {
         RD: "RD",
@@ -4104,7 +4107,8 @@ class EditBoard:
         H: "H",
         V: "V",
         DOT: ".",
-        X: "X"
+        X: "X",
+        N: "N"
         }
 
         displayboard = []
@@ -4181,13 +4185,15 @@ class EditBoard:
                         displayboard[row][col] = DOT
                     if shape == "X":
                         displayboard[row][col] = X
+                    if shape == "N":
+                        displayboard[row][col] = N
                     Solver.print_board(displayboard)
             success = True
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
                         success = False
-            if success == True:
+            if success == True: 
                 print()
                 print("Solved")
                 for i in range(len(displayboard)):
@@ -4195,17 +4201,96 @@ class EditBoard:
                         if displayboard[i][j] == "N":
                             displayboard[i][j] = "X"
                 Solver.print_board(displayboard)
+                MainMenu(username, generation)
                 break
 
 
 
+def login():
+    print("login, register, or guest")
+    login_choice = input("Enter login, register, or guest: ").lower()
 
-if generation == "y":
-    board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = Generator.buildaboard()
-    board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
-    EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+    FILENAME = "accounts.csv"
 
-if generation == "n":
-    board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = Generator.manualboard()
-    board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes)
-    EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+    # Handle "login"
+    if login_choice == "login":
+
+        username = input("Enter username: ")
+        password = input("Enter password: ")
+
+        with open(csv_file, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                stored_username, stored_password = row[0], row[1]
+                if stored_username == username and stored_password == password:
+                    return True, username
+        return False
+
+
+
+    # Handle "register"
+    elif login_choice == "register":
+
+        username = input("Enter username: ")
+        password = input("Enter password: ")
+        while len(password) < 5:
+            print("Password must be at least 5 characters long.")
+            password = input("Enter password: ")
+
+        # Check if the username is already taken
+        # if it is, prompt the user to try again
+
+        with open(csv_file, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                stored_username, stored_password = row[0], row[1]
+                if stored_username == username:
+                    print("Username already taken. Please try again.")
+                    return login()
+                
+    
+
+        with open(csv_file, mode='a', newline='') as file:
+            writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)  # Ensure all fields are quoted
+            writer.writerow([f'{username}', f'{password}',0,0])  # Write username and password as new row
+
+        return True, username
+
+    
+    # Handle "guest"
+    elif login_choice == "guest":
+        print("Guest")
+        return True, "guest"
+
+    # If input is invalid, prompt the user again by re-calling login()
+    else:
+        print("Invalid choice. Please try again.")
+        return login()
+
+
+generation = "null"
+def MainMenu(username, generation):
+    print(f"Welcome, {username}")
+    if generation != "y" or generation != "n":
+        generation = input("Would you like to generate a puzzle (y) or input your own (n)? ")
+
+    if generation == "y":
+        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = Generator.buildaboard()
+        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+
+    if generation == "n":
+        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = Generator.manualboard()
+        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+
+
+# Call the login function
+loginstatus, username = login()
+if loginstatus:
+    MainMenu(username, generation)
+
+else:
+    print("Login failed. Please try again.")
+
+
