@@ -4201,78 +4201,18 @@ class EditBoard:
                         if displayboard[i][j] == "N":
                             displayboard[i][j] = "X"
                 Solver.print_board(displayboard)
-                MainMenu(username, generation)
+                MainMenu()
                 break
 
 
 
-def login():
-    print("login, register, or guest")
-    login_choice = input("Enter login, register, or guest: ").lower()
-
-    FILENAME = "accounts.csv"
-
-    # Handle "login"
-    if login_choice == "login":
-
-        username = input("Enter username: ")
-        password = input("Enter password: ")
-
-        with open(csv_file, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                stored_username, stored_password = row[0], row[1]
-                if stored_username == username and stored_password == password:
-                    return True, username
-        return False
-
-
-
-    # Handle "register"
-    elif login_choice == "register":
-
-        username = input("Enter username: ")
-        password = input("Enter password: ")
-        while len(password) < 5:
-            print("Password must be at least 5 characters long.")
-            password = input("Enter password: ")
-
-        # Check if the username is already taken
-        # if it is, prompt the user to try again
-
-        with open(csv_file, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                stored_username, stored_password = row[0], row[1]
-                if stored_username == username:
-                    print("Username already taken. Please try again.")
-                    return login()
-                
-    
-
-        with open(csv_file, mode='a', newline='') as file:
-            writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)  # Ensure all fields are quoted
-            writer.writerow([f'{username}', f'{password}',0,0])  # Write username and password as new row
-
-        return True, username
-
-    
-    # Handle "guest"
-    elif login_choice == "guest":
-        print("Guest")
-        return True, "guest"
-
-    # If input is invalid, prompt the user again by re-calling login()
-    else:
-        print("Invalid choice. Please try again.")
-        return login()
-
-
-generation = "null"
-def MainMenu(username, generation):
-    print(f"Welcome, {username}")
-    if generation != "y" or generation != "n":
+def MainMenu():
+    global generation
+    generation = ""
+    print("Welcome")
+    while generation !='y' and generation != 'n':
         generation = input("Would you like to generate a puzzle (y) or input your own (n)? ")
+
 
     if generation == "y":
         board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = Generator.buildaboard()
@@ -4284,13 +4224,4 @@ def MainMenu(username, generation):
         board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
-
-# Call the login function
-loginstatus, username = login()
-if loginstatus:
-    MainMenu(username, generation)
-
-else:
-    print("Login failed. Please try again.")
-
-
+MainMenu()
