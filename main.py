@@ -1,6 +1,7 @@
 import random
 import csv
 import time
+import datetime
 
 # File path to your CSV
 csv_file = 'accounts.csv'
@@ -399,7 +400,7 @@ class Solver:
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
-    def Solve(board, board_size, column_totals, row_totals, savedboard, xshape, yshape, start, endx, endy, startingshapes, generation):
+    def Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation):
         bruteforceneeded = False
         end = (endx, endy)
 
@@ -4111,6 +4112,15 @@ class EditBoard:
         N: "N"
         }
 
+        shapes = {
+        "RD": RD,
+        "LD": LD,
+        "RU": RU,
+        "LU": LU,
+        "H": H,
+        "V": V
+        }
+
         displayboard = []
         #make a 9x9 board of Ns
         displayboard = [['N' for i in range(len(board)+ 1)] for j in range(len(board)+1)]
@@ -4129,9 +4139,13 @@ class EditBoard:
         #print the board
         Solver.print_board(displayboard)
 
+        undostack = []
+
 
         
+        # start time
 
+        time = datetime.datetime.now()
 
 
 
@@ -4158,10 +4172,33 @@ class EditBoard:
 
 
 
-            rowcol = input("Enter row and column in the form row, column or s to view solution: ")
+            rowcol = input("Enter row and column in the form row, column or s to view solution or h to recieve a hint or u to undo previous addition: ")
+
+            if rowcol == "u":
+                if len(undostack) > 0:
+                    last = undostack.pop()
+                    displayboard[last[0] + 1][last[1] + 1] = last[2]
+                else:
+                    print("No moves to undo")
+                Solver.print_board(displayboard)
+                continue
+
             if rowcol == "s":
                 print("Solution: ")
                 Solver.print_board(board)
+        
+            elif rowcol == "h":
+                possibleadditions = []
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] in shapes.values():
+                            if displayboard[i+1][j+1] not in shapes.values():
+                                possibleadditions.append((i, j, board[i][j]))
+
+                chosen = random.choice(possibleadditions)
+                undostack.append((chosen[0], chosen[1], chosen[2]))
+                displayboard[chosen[0] + 1][chosen[1] + 1] = chosen[2]
+                
 
             else:
                 rowcol = rowcol.split(",")
@@ -4170,22 +4207,31 @@ class EditBoard:
                 shape = input("Enter shape or dot: ")
                 if shape in changenode.values():
                     if shape == "V":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = V
                     if shape == "H":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = H
                     if shape == "RD":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = RD
                     if shape == "RU":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = RU
                     if shape == "LD":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = LD
                     if shape == "LU":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = LU
                     if shape == ".":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = DOT
                     if shape == "X":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = X
                     if shape == "N":
+                        undostack.append((row - 1, col - 1, displayboard[row][col]))
                         displayboard[row][col] = N
                     Solver.print_board(displayboard)
             success = True
@@ -4194,6 +4240,25 @@ class EditBoard:
                     if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
                         success = False
             if success == True: 
+                #find time
+
+                time2 = datetime.datetime.now()
+                time = time2 - time
+
+                score = len(board)**2/ time.seconds
+
+                with open("account.csv", "r") as f:
+                    # read the number in account.csv
+                    score = score + float(f.readline())
+
+                with open("account.csv", "w") as f:
+                    # add score to the number in account.csv
+
+                    f.write(str(score) + "\n")
+
+                    
+
+                print("Time taken: ", time.seconds, " seconds")
                 print()
                 print("Solved")
                 for i in range(len(displayboard)):
@@ -4204,24 +4269,46 @@ class EditBoard:
                 MainMenu()
                 break
 
+def GetLevel(rank):
+    with open("account.csv", "r") as f:
+        # read the number in account.csv
+        levelscore = float(f.readline())
+
+    if levelscore < 1:
+        rank = "Beginner"
+    if levelscore >= 1 and levelscore < 5:
+        rank = "Intermediate solver"
+    if levelscore >= 5 and levelscore < 20:
+        rank = "Advanced solver"
+    if levelscore >= 20 and levelscore < 100:
+        rank = "Elite Challenger"
+    if levelscore >= 100:
+        rank = "Train Tracks Solver Elite"
+    
+    return rank
+
 
 
 def MainMenu():
     global generation
     generation = ""
-    print("Welcome")
+    rank = ""
+    x = GetLevel(rank)
+    print("Welcome", x)
+
+
+
     while generation !='y' and generation != 'n':
         generation = input("Would you like to generate a puzzle (y) or input your own (n)? ")
 
 
     if generation == "y":
         board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = Generator.buildaboard()
-        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
-        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
     if generation == "n":
         board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = Generator.manualboard()
-        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
-        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+        
+    board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+    EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
 MainMenu()
