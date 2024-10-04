@@ -4248,13 +4248,16 @@ class EditBoard:
                 score = len(board)**2/ time.seconds
 
                 with open("account.csv", "r") as f:
-                    # read the number in account.csv
-                    score = score + float(f.readline())
+                    #add score to the number in account.csv
+                    levelscore = f.readline()
+                    levelscore = levelscore.split(",")
+                    x = levelscore[1]
+                    levelscore = float(levelscore[0])
+                    levelscore += score
+                f.close()
 
                 with open("account.csv", "w") as f:
-                    # add score to the number in account.csv
-
-                    f.write(str(score) + "\n")
+                    f.write(f"{levelscore},{x}")
 
                     
 
@@ -4272,7 +4275,12 @@ class EditBoard:
 def GetLevel(rank):
     with open("account.csv", "r") as f:
         # read the number in account.csv
-        levelscore = float(f.readline())
+        levelscore = f.readline()
+        #split levelscore into a list
+        levelscore = levelscore.split(",")
+        levelscore = float(levelscore[0])
+    
+    f.close()
 
     if levelscore < 1:
         rank = "Beginner"
@@ -4287,6 +4295,29 @@ def GetLevel(rank):
     
     return rank
 
+def Settings():
+    with open("account.csv", "r") as f:
+        data = f.readline()
+        data = data.split(",")
+        score = float(data[0])
+        data = int(data[1])
+    
+    f.close()
+    if data == 0:
+        print("Hard mode disabled, type H to enable hard mode")
+        hardmode = input()
+        if hardmode == "H":
+            with open("account.csv", "w") as f:
+                f.write(f"{score},1")
+
+    if data == 1:
+        print("Hard mode enabled, type N to disable hard mode")
+        hardmode = input()
+        if hardmode == "N":
+            with open("account.csv", "w") as f:
+                f.write(f"{score},0")
+                
+
 
 
 def MainMenu():
@@ -4295,6 +4326,13 @@ def MainMenu():
     rank = ""
     x = GetLevel(rank)
     print("Welcome", x)
+
+
+    print("Enter S for settings, or any other key to continue")
+    settings = input()
+    if settings == "S":
+        Settings()
+        MainMenu()
 
 
 
