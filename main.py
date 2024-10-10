@@ -4172,9 +4172,30 @@ class EditBoard:
 
 
 
-            rowcol = input("Enter row and column in the form row, column or s to view solution or h to recieve a hint or u to undo previous addition: ")
+            rowcol = input("Enter row and column in the form row, column or s to view solution or h to recieve a hint or u to undo previous addition or p to pause the game: ")
 
-            if rowcol == "u":
+            if rowcol == "p":
+                # start a second timer, which will be subtracted from the first timer upon completion
+
+                time4 = datetime.datetime.now()
+                print("Game paused")
+                for i in range(50):
+                    print()
+
+                restart = input("Enter r to resume or q to quit: ")
+                if restart == "r":
+                    # subtract the time taken from the first timer
+                    #stop time2
+                    time3 = datetime.datetime.now()
+                    time4 = time3 - time4
+                    print("Game resumed")
+
+                if restart == "q":
+                    print("Game quit")
+                    MainMenu()
+                    break
+
+            elif rowcol == "u":
                 if len(undostack) > 0:
                     last = undostack.pop()
                     displayboard[last[0] + 1][last[1] + 1] = last[2]
@@ -4183,21 +4204,34 @@ class EditBoard:
                 Solver.print_board(displayboard)
                 continue
 
-            if rowcol == "s":
+            elif rowcol == "s":
                 print("Solution: ")
                 Solver.print_board(board)
         
             elif rowcol == "h":
-                possibleadditions = []
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] in shapes.values():
-                            if displayboard[i+1][j+1] not in shapes.values():
-                                possibleadditions.append((i, j, board[i][j]))
+                with open("account.csv", "r") as f:
+                    hintonoff = f.readline()
+                    hintonoff = hintonoff.split(",")
+                    hintonoff = int(hintonoff[1])
+                f.close()
+                if hintonoff == 0:
+                    print("Hints are enabled")
+                    print("Providing hint")
 
-                chosen = random.choice(possibleadditions)
-                undostack.append((chosen[0], chosen[1], chosen[2]))
-                displayboard[chosen[0] + 1][chosen[1] + 1] = chosen[2]
+
+                    possibleadditions = []
+                    for i in range(len(board)):
+                        for j in range(len(board)):
+                            if board[i][j] in shapes.values():
+                                if displayboard[i+1][j+1] not in shapes.values():
+                                    possibleadditions.append((i, j, board[i][j]))
+
+                    chosen = random.choice(possibleadditions)
+                    undostack.append((chosen[0], chosen[1], chosen[2]))
+                    displayboard[chosen[0] + 1][chosen[1] + 1] = chosen[2]
+                
+                else:
+                    print("Hints are disabled")
                 
 
             else:
@@ -4244,7 +4278,7 @@ class EditBoard:
 
                 time2 = datetime.datetime.now()
                 time = time2 - time
-
+                time = time - time4
                 score = len(board)**2/ time.seconds
 
                 with open("account.csv", "r") as f:
