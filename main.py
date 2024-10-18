@@ -847,7 +847,50 @@ class Solver:
                                 return a-1,b
                             if shapedir[0] == 'down':
                                 return a+1,b
+
+
+                        def removedirectionvisited(i2,j2):
+                            if 'left' in shapedir:
+                                i2 = i2
+                                j2 = j2-1
+                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
+                                    shapedir.remove('left')
+                                j2 = j2 + 1
+                            if 'right' in shapedir:
+                                i2 = i2
+                                j2 = j2+1
+                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
+                                    shapedir.remove('right')
+                                j2 = j2 - 1
+                            if 'up' in shapedir:
+                                i2 = i2-1
+                                j2 = j2
+                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
+                                    shapedir.remove('up')
+                                i2 = i2 + 1
+                            if 'down' in shapedir:
+                                i2 = i2+1
+                                j2 = j2
+                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
+                                    shapedir.remove('down')
+                                i2 = i2 - 1
                             
+                        def removedirthree(i1,j1):
+                            if outofrange == False and i == i1 and j+1 == j1 and change == True:
+                                if 'right' in directions:
+                                    directions.remove('right')
+                            if outofrange == False and i+1 == i1 and j == j1 and change == True:
+                                if 'down' in directions:
+                                    directions.remove('down')
+                            if outofrange == False and i-1 == i1 and j == j1 and change == True:
+                                if 'up' in directions:
+                                    directions.remove('up')
+                            if outofrange == False and i == i1 and j-1 == j1 and change == True:
+                                if 'left' in directions:
+                                    directions.remove('left')
+                            return i1,j1
+
+
 
                         if count == 3:
                             outofrange = False
@@ -874,30 +917,7 @@ class Solver:
                                         shapedir = []
                                         i1, j1 == findloopinboard(i1,j1)
                                         while len(shapedir) > 1:
-                                            if 'left' in shapedir:
-                                                i2 = i2
-                                                j2 = j2-1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('left')
-                                                j2 = j2 + 1
-                                            if 'right' in shapedir:
-                                                i2 = i2
-                                                j2 = j2+1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('right')
-                                                j2 = j2 - 1
-                                            if 'up' in shapedir:
-                                                i2 = i2-1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('up')
-                                                i2 = i2 + 1
-                                            if 'down' in shapedir:
-                                                i2 = i2+1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('down')
-                                                i2 = i2 - 1
+                                            removedirectionvisited(i2,j2)
                                         if len(shapedir) == 1:
                                             change = True
                                             prevsquare = i1,j1
@@ -931,83 +951,21 @@ class Solver:
                                                     shapedir = []
                                                     findloopinboard(i1,j1)
                                                     while len(shapedir) > 1:
-                                                        if 'left' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2-1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('left')
-                                                            j2 = j2 + 1
-                                                        if 'right' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2+1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('right')
-                                                            j2 = j2 - 1
-                                                        if 'up' in shapedir:
-                                                            i2 = i2-1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('up')
-                                                            i2 = i2 + 1
-                                                        if 'down' in shapedir:
-                                                            i2 = i2+1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('down')
-                                                            i2 = i2 - 1
+                                                        removedirectionvisited(i2,j2)
                                                         
                                                     if len(shapedir) == 1:
                                                         change = True
                                                         prevsquare = i1,j1
-                                                        if shapedir[0] == 'left':
-                                                            i1 = i1
-                                                            j1 = j1-1
-                                                        if shapedir[0] == 'right':
-                                                            i1 = i1
-                                                            j1 = j1+1
-                                                        if shapedir[0] == 'up':
-                                                            i1 = i1-1
-                                                            j1 = j1
-                                                        if shapedir[0] == 'down':
-                                                            i1 = i1+1
-                                                            j1 = j1
+                                                        i1,j1 = editi1j1(i1,j1)
                                                     outofrange = False
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
-                                    if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        if 'right' in directions:
-                                            directions.remove('right')
-                                    if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        if 'down' in directions:
-                                            directions.remove('down')
-                                    if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        if 'up' in directions:
-                                            directions.remove('up')
-                                    if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        if 'left' in directions:
-                                            directions.remove('left')
+                                    removedirthree(i1,j1)
 
                             if i + 1 < len(board):
                                 if (board[i+1][j] == LU) or (board[i+1][j] == RU) or (board[i+1][j] == V):
                                     shapedir = []
-                                    if board[i+1][j] == RD:
-                                        shapedir.append('right')
-                                        shapedir.append('down')
-                                    if board[i+1][j] == RU:
-                                        shapedir.append('up')
-                                        shapedir.append('right')
-                                    if board[i+1][j] == LD:
-                                        shapedir.append('left')
-                                        shapedir.append('down')
-                                    if board[i+1][j] == LU:
-                                        shapedir.append('left')
-                                        shapedir.append('up')
-                                    if board[i+1][j] == H:
-                                        shapedir.append('left')
-                                        shapedir.append('right')
-                                    if board[i+1][j] == V:
-                                        shapedir.append('up')
-                                        shapedir.append('down')
+                                    i+1, j == findloopinboard(i+1,j)
                                     prevsquare = i+1,j
                                     if shapedir[0] == 'left':
                                         i1 = i+1
@@ -1025,64 +983,13 @@ class Solver:
                                         i2 = i1
                                         j2 = j1
                                         shapedir = []
-                                        if board[i1][j1] == RD:
-                                            shapedir.append('right')
-                                            shapedir.append('down')
-                                        if board[i1][j1] == RU:
-                                            shapedir.append('up')
-                                            shapedir.append('right')
-                                        if board[i1][j1] == LD:
-                                            shapedir.append('left')
-                                            shapedir.append('down')
-                                        if board[i1][j1] == LU:
-                                            shapedir.append('left')
-                                            shapedir.append('up')
-                                        if board[i1][j1] == H:
-                                            shapedir.append('left')
-                                            shapedir.append('right')
-                                        if board[i1][j1] == V:
-                                            shapedir.append('up')
-                                            shapedir.append('down')
+                                        i1, j1 == findloopinboard(i1,j1)
                                         while len(shapedir) > 1:
-                                            if 'left' in shapedir:
-                                                i2 = i2
-                                                j2 = j2-1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('left')
-                                                j2 = j2 + 1
-                                            if 'right' in shapedir:
-                                                i2 = i2
-                                                j2 = j2+1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('right')
-                                                j2 = j2 - 1
-                                            if 'up' in shapedir:
-                                                i2 = i2-1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('up')
-                                                i2 = i2 + 1
-                                            if 'down' in shapedir:
-                                                i2 = i2+1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('down')
-                                                i2 = i2 - 1
+                                            removedirectionvisited(i2,j2)
                                         if len(shapedir) == 1:
                                             change = True
                                             prevsquare = i1,j1
-                                            if 'left' in shapedir:
-                                                i1 = i1
-                                                j1 = j1-1
-                                            if 'right' in shapedir:
-                                                i1 = i1
-                                                j1 = j1+1
-                                            if 'up' in shapedir:
-                                                i1 = i1-1
-                                                j1 = j1
-                                            if 'down' in shapedir:
-                                                i1 = i1+1
-                                                j1 = j1
+                                            i1,j1 = editi1j1(i1,j1)
                                         if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                             break
                                     outofrange = False
@@ -1092,24 +999,7 @@ class Solver:
                                         if i1 == i and j1 == j:
                                             if board[i+1][j] in shapes.values():
                                                 shapedir = []
-                                                if board[i+1][j] == RD:
-                                                    shapedir.append('down')
-                                                    shapedir.append('right')
-                                                if board[i+1][j] == RU:
-                                                    shapedir.append('right')
-                                                    shapedir.append('up')
-                                                if board[i+1][j] == LD:
-                                                    shapedir.append('down')
-                                                    shapedir.append('left')
-                                                if board[i+1][j] == LU:
-                                                    shapedir.append('up')
-                                                    shapedir.append('left')
-                                                if board[i+1][j] == H:
-                                                    shapedir.append('right')
-                                                    shapedir.append('left')
-                                                if board[i+1][j] == V:
-                                                    shapedir.append('down')
-                                                    shapedir.append('up')
+                                                findloopinboard(i+1,j)
                                                 prevsquare = i+1,j
                                                 if shapedir[0] == 'down':
                                                     i1 = i+2
@@ -1127,102 +1017,23 @@ class Solver:
                                                     i2 = i1
                                                     j2 = j1
                                                     shapedir = []
-                                                    if board[i1][j1] == RD:
-                                                        shapedir.append('right')
-                                                        shapedir.append('down')
-                                                    if board[i1][j1] == RU:
-                                                        shapedir.append('up')
-                                                        shapedir.append('right')
-                                                    if board[i1][j1] == LD:
-                                                        shapedir.append('left')
-                                                        shapedir.append('down')
-                                                    if board[i1][j1] == LU:
-                                                        shapedir.append('left')
-                                                        shapedir.append('up')
-                                                    if board[i1][j1] == H:
-                                                        shapedir.append('left')
-                                                        shapedir.append('right')
-                                                    if board[i1][j1] == V:
-                                                        shapedir.append('up')
-                                                        shapedir.append('down')
+                                                    findloopinboard(i1,j1)
                                                     while len(shapedir) > 1:
-                                                        if 'left' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2-1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('left')
-                                                            j2 = j2 + 1
-                                                        if 'right' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2+1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('right')
-                                                            j2 = j2 - 1
-                                                        if 'up' in shapedir:
-                                                            i2 = i2-1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('up')
-                                                            i2 = i2 + 1
-                                                        if 'down' in shapedir:
-                                                            i2 = i2+1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('down')
-                                                            i2 = i2 - 1
+                                                        removedirectionvisited(i2,j2)
                                                     if len(shapedir) == 1:
                                                         change = True
                                                         prevsquare = i1,j1
-                                                        if 'left' in shapedir:
-                                                            i1 = i1
-                                                            j1 = j1-1
-                                                        if 'right' in shapedir:
-                                                            i1 = i1
-                                                            j1 = j1+1
-                                                        if 'up' in shapedir:
-                                                            i1 = i1-1
-                                                            j1 = j1
-                                                        if 'down' in shapedir:
-                                                            i1 = i1+1
-                                                            j1 = j1
+                                                        i1,j1 = editi1j1(i1,j1)
                                                     outofrange = False
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
 
-                                    if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        if 'right' in directions:
-                                            directions.remove('right')
-                                    if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        if 'down' in directions:
-                                            directions.remove('down')
-                                    if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        if 'up' in directions:
-                                            directions.remove('up')
-                                    if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        if 'left' in directions:
-                                            directions.remove('left')
+                                    removedirthree(i1,j1)
                                 
                             if j - 1 >= 0:
                                 if (board[i][j-1] == RU) or (board[i][j-1] == RD) or (board[i][j-1] == H):
                                     shapedir = []
-                                    if board[i][j-1] == H:
-                                        shapedir.append('left')
-                                        shapedir.append('right')
-                                    if board[i][j-1] == RD:
-                                        shapedir.append('right')
-                                        shapedir.append('down')
-                                    if board[i][j-1] == RU:
-                                        shapedir.append('up')
-                                        shapedir.append('right')
-                                    if board[i][j-1] == LD:
-                                        shapedir.append('left')
-                                        shapedir.append('down')
-                                    if board[i][j-1] == LU:
-                                        shapedir.append('left')
-                                        shapedir.append('up')
-                                    if board[i][j-1] == V:
-                                        shapedir.append('up')
-                                        shapedir.append('down')
+                                    i, j-1 == findloopinboard(i,j-1)
                                     prevsquare = i,j-1
                                     if shapedir[0] == 'left':
                                         i1 = i
@@ -1240,64 +1051,13 @@ class Solver:
                                         i2 = i1
                                         j2 = j1
                                         shapedir = []
-                                        if board[i1][j1] == RD:
-                                            shapedir.append('right')
-                                            shapedir.append('down')
-                                        if board[i1][j1] == RU:
-                                            shapedir.append('up')
-                                            shapedir.append('right')
-                                        if board[i1][j1] == LD:
-                                            shapedir.append('left')
-                                            shapedir.append('down')
-                                        if board[i1][j1] == LU:
-                                            shapedir.append('left')
-                                            shapedir.append('up')
-                                        if board[i1][j1] == H:
-                                            shapedir.append('left')
-                                            shapedir.append('right')
-                                        if board[i1][j1] == V:
-                                            shapedir.append('up')
-                                            shapedir.append('down')
+                                        i1, j1 == findloopinboard(i1,j1)
                                         while len(shapedir) > 1:
-                                            if 'left' in shapedir:
-                                                i2 = i2
-                                                j2 = j2-1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('left')
-                                                j2 = j2 + 1
-                                            if 'right' in shapedir:
-                                                i2 = i2
-                                                j2 = j2+1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('right')
-                                                j2 = j2 - 1
-                                            if 'up' in shapedir:
-                                                i2 = i2-1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('up')
-                                                i2 = i2 + 1
-                                            if 'down' in shapedir:
-                                                i2 = i2+1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('down')
-                                                i2 = i2 - 1
+                                            removedirectionvisited(i2,j2)
                                         if len(shapedir) == 1:
                                             change = True
                                             prevsquare = i1,j1
-                                            if 'left' in shapedir:
-                                                i1 = i1
-                                                j1 = j1-1
-                                            if 'right' in shapedir:
-                                                i1 = i1
-                                                j1 = j1+1
-                                            if 'up' in shapedir:
-                                                i1 = i1-1
-                                                j1 = j1
-                                            if 'down' in shapedir:
-                                                i1 = i1+1
-                                                j1 = j1
+                                            i1,j1 = editi1j1(i1,j1)
                                         if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                             break
                                     outofrange = False
@@ -1307,24 +1067,7 @@ class Solver:
                                         if i1 == i and j1 == j:
                                             if board[i][j-1] in shapes.values():
                                                 shapedir = []
-                                                if board[i][j-1] == H:
-                                                    shapedir.append('right')
-                                                    shapedir.append('left')
-                                                if board[i][j-1] == RD:
-                                                    shapedir.append('down')
-                                                    shapedir.append('right')
-                                                if board[i][j-1] == RU:
-                                                    shapedir.append('right')
-                                                    shapedir.append('up')
-                                                if board[i][j-1] == LD:
-                                                    shapedir.append('down')
-                                                    shapedir.append('left')
-                                                if board[i][j-1] == LU:
-                                                    shapedir.append('up')
-                                                    shapedir.append('left')
-                                                if board[i][j-1] == V:
-                                                    shapedir.append('down')
-                                                    shapedir.append('up')
+                                                findloopinboard(i,j-1)
                                                 prevsquare = i,j-1
                                                 if shapedir[0] == 'down':
                                                     i1 = i+1
@@ -1342,101 +1085,22 @@ class Solver:
                                                     i2 = i1
                                                     j2 = j1
                                                     shapedir = []
-                                                    if board[i1][j1] == RD:
-                                                        shapedir.append('right')
-                                                        shapedir.append('down')
-                                                    if board[i1][j1] == RU:
-                                                        shapedir.append('up')
-                                                        shapedir.append('right')
-                                                    if board[i1][j1] == LD:
-                                                        shapedir.append('left')
-                                                        shapedir.append('down')
-                                                    if board[i1][j1] == LU:
-                                                        shapedir.append('left')
-                                                        shapedir.append('up')
-                                                    if board[i1][j1] == H:
-                                                        shapedir.append('left')
-                                                        shapedir.append('right')
-                                                    if board[i1][j1] == V:
-                                                        shapedir.append('up')
-                                                        shapedir.append('down')
+                                                    findloopinboard(i1,j1)
                                                     while len(shapedir) > 1:
-                                                        if 'left' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2-1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('left')
-                                                            j2 = j2 + 1
-                                                        if 'right' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2+1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('right')
-                                                            j2 = j2 - 1
-                                                        if 'up' in shapedir:
-                                                            i2 = i2-1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('up')
-                                                            i2 = i2 + 1
-                                                        if 'down' in shapedir:
-                                                            i2 = i2+1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('down')
-                                                            i2 = i2 - 1
+                                                        removedirectionvisited(i2,j2)
                                                     if len(shapedir) == 1:
                                                         change = True
                                                         prevsquare = i1,j1
-                                                        if 'left' in shapedir:
-                                                            i1 = i1
-                                                            j1 = j1-1
-                                                        if 'right' in shapedir:
-                                                            i1 = i1
-                                                            j1 = j1+1
-                                                        if 'up' in shapedir:
-                                                            i1 = i1-1
-                                                            j1 = j1
-                                                        if 'down' in shapedir:
-                                                            i1 = i1+1
-                                                            j1 = j1
+                                                        i1,j1 = editi1j1(i1,j1)
                                                     outofrange = False
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
-                                    if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        if 'right' in directions:
-                                            directions.remove('right')
-                                    if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        if 'down' in directions:
-                                            directions.remove('down')
-                                    if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        if 'up' in directions:
-                                            directions.remove('up')
-                                    if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        if 'left' in directions:
-                                            directions.remove('left')
+                                    removedirthree(i1,j1)
                             
                             if j + 1 < len(board):
                                 if (board[i][j+1] == LU) or (board[i][j+1] == LD) or (board[i][j+1] == H):
                                     shapedir = []
-                                    if board[i][j+1] == H:
-                                        shapedir.append('left')
-                                        shapedir.append('right')
-                                    if board[i][j+1] == RD:
-                                        shapedir.append('right')
-                                        shapedir.append('down')
-                                    if board[i][j+1] == RU:
-                                        shapedir.append('up')
-                                        shapedir.append('right')
-                                    if board[i][j+1] == LD:
-                                        shapedir.append('left')
-                                        shapedir.append('down')
-                                    if board[i][j+1] == LU:
-                                        shapedir.append('left')
-                                        shapedir.append('up')
-                                    if board[i][j+1] == V:
-                                        shapedir.append('up')
-                                        shapedir.append('down')
+                                    i, j+1 == findloopinboard(i,j+1)
                                     prevsquare = i,j+1
                                     if shapedir[0] == 'left':
                                         i1 = i
@@ -1454,64 +1118,13 @@ class Solver:
                                         i2 = i1
                                         j2 = j1
                                         shapedir = []
-                                        if board[i1][j1] == RD:
-                                            shapedir.append('right')
-                                            shapedir.append('down')
-                                        if board[i1][j1] == RU:
-                                            shapedir.append('up')
-                                            shapedir.append('right')
-                                        if board[i1][j1] == LD:
-                                            shapedir.append('left')
-                                            shapedir.append('down')
-                                        if board[i1][j1] == LU:
-                                            shapedir.append('left')
-                                            shapedir.append('up')
-                                        if board[i1][j1] == H:
-                                            shapedir.append('left')
-                                            shapedir.append('right')
-                                        if board[i1][j1] == V:
-                                            shapedir.append('up')
-                                            shapedir.append('down')
+                                        i1, j1 == findloopinboard(i1,j1)
                                         while len(shapedir) > 1:
-                                            if 'left' in shapedir:
-                                                i2 = i2
-                                                j2 = j2-1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('left')
-                                                j2 = j2 + 1
-                                            if 'right' in shapedir:
-                                                i2 = i2
-                                                j2 = j2+1
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('right')
-                                                j2 = j2 - 1
-                                            if 'up' in shapedir:
-                                                i2 = i2-1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('up')
-                                                i2 = i2 + 1
-                                            if 'down' in shapedir:
-                                                i2 = i2+1
-                                                j2 = j2
-                                                if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                    shapedir.remove('down')
-                                                i2 = i2 - 1
+                                            removedirectionvisited(i2,j2)
                                         if len(shapedir) == 1:
                                             change = True
                                             prevsquare = i1,j1
-                                            if 'left' in shapedir:
-                                                i1 = i1
-                                                j1 = j1-1
-                                            if 'right' in shapedir:
-                                                i1 = i1
-                                                j1 = j1+1
-                                            if 'up' in shapedir:
-                                                i1 = i1-1
-                                                j1 = j1
-                                            if 'down' in shapedir:
-                                                i1 = i1+1
-                                                j1 = j1
+                                            i1,j1 = editi1j1(i1,j1)
                                         if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                             break
                                     outofrange = False
@@ -1521,24 +1134,7 @@ class Solver:
                                         if i1 == i and j1 == j:
                                             if board[i][j+1] in shapes.values():
                                                 shapedir = []
-                                                if board[i][j+1] == H:
-                                                    shapedir.append('right')
-                                                    shapedir.append('left')
-                                                if board[i][j+1] == RD:
-                                                    shapedir.append('down')
-                                                    shapedir.append('right')
-                                                if board[i][j+1] == RU:
-                                                    shapedir.append('right')
-                                                    shapedir.append('up')
-                                                if board[i][j+1] == LD:
-                                                    shapedir.append('down')
-                                                    shapedir.append('left')
-                                                if board[i][j+1] == LU:
-                                                    shapedir.append('up')
-                                                    shapedir.append('left')
-                                                if board[i][j+1] == V:
-                                                    shapedir.append('down')
-                                                    shapedir.append('up')
+                                                findloopinboard(i,j+1)
                                                 prevsquare = i,j+1
                                                 if shapedir[0] == 'down':
                                                     i1 = i+1
@@ -1556,88 +1152,20 @@ class Solver:
                                                     i2 = i1
                                                     j2 = j1
                                                     shapedir = []
-                                                    if board[i1][j1] == RD:
-                                                        shapedir.append('right')
-                                                        shapedir.append('down')
-                                                    if board[i1][j1] == RU:
-                                                        shapedir.append('up')
-                                                        shapedir.append('right')
-                                                    if board[i1][j1] == LD:
-                                                        shapedir.append('left')
-                                                        shapedir.append('down')
-                                                    if board[i1][j1] == LU:
-                                                        shapedir.append('left')
-                                                        shapedir.append('up')
-                                                    if board[i1][j1] == H:
-                                                        shapedir.append('left')
-                                                        shapedir.append('right')
-                                                    if board[i1][j1] == V:
-                                                        shapedir.append('up')
-                                                        shapedir.append('down')
+                                                    findloopinboard(i1,j1)
                                                     while len(shapedir) > 1:
-                                                        if 'left' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2-1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('left')
-                                                            j2 = j2 + 1
-                                                        if 'right' in shapedir:
-                                                            i2 = i2
-                                                            j2 = j2+1
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('right')
-                                                            j2 = j2 - 1
-                                                        if 'up' in shapedir:
-                                                            i2 = i2-1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('up')
-                                                            i2 = i2 + 1
-                                                        if 'down' in shapedir:
-                                                            i2 = i2+1
-                                                            j2 = j2
-                                                            if (i2 == prevsquare[0]) and (j2 == prevsquare[1]):
-                                                                shapedir.remove('down')
-                                                            i2 = i2 - 1
+                                                        removedirectionvisited(i2,j2)
                                                     if len(shapedir) == 1:
                                                         change = True
                                                         prevsquare = i1,j1
-                                                        if 'left' in shapedir:
-                                                            i1 = i1
-                                                            j1 = j1-1
-                                                        if 'right' in shapedir:
-                                                            i1 = i1
-                                                            j1 = j1+1
-                                                        if 'up' in shapedir:
-                                                            i1 = i1-1
-                                                            j1 = j1
-                                                        if 'down' in shapedir:
-                                                            i1 = i1+1
-                                                            j1 = j1
+                                                        i1,j1 = editi1j1(i1,j1)
                                                     outofrange = False
                                                     if i1 < 0 or j1 < 0 or i1 >= len(board) or j1 >= len(board):
                                                         outofrange = True
-                                    if outofrange == False and i == i1 and j+1 == j1 and change == True:
-                                        if 'right' in directions:
-                                            directions.remove('right')
-                                    if outofrange == False and i+1 == i1 and j == j1 and change == True:
-                                        if 'down' in directions:
-                                            directions.remove('down')
-                                    if outofrange == False and i-1 == i1 and j == j1 and change == True:
-                                        if 'up' in directions:
-                                            directions.remove('up')
-                                    if outofrange == False and i == i1 and j-1 == j1 and change == True:
-                                        if 'left' in directions:
-                                            directions.remove('left')
+                                    removedirthree(i1,j1)
 
                             if len(directions) == 2:
-                                if bruteforceneeded == True:
-                                    alreadyreplaced = False
-                                    for u in unsures:
-                                        if (u[0] == i) and (u[1] == j):
-                                            alreadyreplaced = True
-                                    if alreadyreplaced == False:
-                                        unsures.append((i, j, board[i][j], 1))
+                                checkunsures(i, j)
                                 if directions[0] == 'left' and directions[1] == 'right':
                                     board[i][j] = H
                                     any_changes = True
