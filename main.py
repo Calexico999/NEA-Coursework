@@ -356,9 +356,7 @@ class Generator:
 
         return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation
 
-        
 
-    
     def manual_board(self):
         startingshapes = []
         size = int(input("Enter the edge length of the board, in range 4 <= length <= 10: "))
@@ -370,6 +368,10 @@ class Generator:
         start, xshape = self.get_starting_position(size)
         end, yshape = self.get_ending_position(size, start)
 
+
+        startingshapes.append((start[0], start[1], xshape))
+        startingshapes.append((end[0], end[1], yshape))
+
         other_nodes = True
         while other_nodes:
             morenodes = input("Are there any more nodes to add? (Y/N): ")
@@ -380,10 +382,12 @@ class Generator:
             else:
                 print("Invalid input. Please enter Y or N.")
 
-        # Assuming you have some mechanism to generate totals and save board state
-        column_totals, row_totals = self.calculate_totals(board, size)
-        saved_board = self.save_board_state(board)
-        return board, size, column_totals, row_totals, saved_board, xshape, yshape, start, end[0], end[1], startingshapes
+        SAVEDBOARD = []
+        endx = end[0]
+        endy = end[1]
+        board_size = size
+
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation
 
     def get_starting_position(self, size):
         while True:
@@ -425,8 +429,9 @@ class Generator:
                 node = input("Enter the node position in the format x,y: ").split(',')
                 node = (int(node[0]), int(node[1]))
                 if 0 <= node[0] < len(board) and 0 <= node[1] < len(board):
-                    startingshapes.append(node)
-                    board[node[0]][node[1]] = "N"  # Mark node position
+                    extrashape = input(f"Enter the shape at position {node[0]},{node[1]} (V, H, LD, LU, RD, RU): ")
+                    startingshapes.append((node[0], node[1], extrashape))
+                    # get out of try loop
                     break
                 else:
                     print("Node position out of bounds. Please try again.")
@@ -459,12 +464,11 @@ class Solver:
         bruteforceneeded = False
         end = (endx, endy)
 
-        if len(column_totals) == 0:
-            #ask user for column and row totals
-            for i in range(len(board)):
-                column_totals.append(int(input(f"Enter the column total for column {i}: ")))
-            for i in range(len(board)):
-                row_totals.append(int(input(f"Enter the row total for row {i}: ")))
+
+
+
+                
+            
 
         edgerulesneeded = False
         any_changes = True
@@ -488,6 +492,34 @@ class Solver:
         dots_two_possibles = []
         satisfactory = False
         minirules = True
+
+
+        if len(column_totals) == 0:
+            #ask user for column and row totals
+            for i in range(len(board)):
+                column_totals.append(int(input(f"Enter the column total for column {i}: ")))
+            for i in range(len(board)):
+                row_totals.append(int(input(f"Enter the row total for row {i}: ")))
+
+            for i in range(len(startingshapes)):
+                if startingshapes[i][2] == 'RD':
+                    startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], RD)
+                    board[startingshapes[i][0]][startingshapes[i][1]] = RD
+                elif startingshapes[i][2] == 'LD':
+                    startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], LD)
+                    board[startingshapes[i][0]][startingshapes[i][1]] = LD
+                elif startingshapes[i][2] == 'RU':
+                    startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], RU)
+                    board[startingshapes[i][0]][startingshapes[i][1]] = RU
+                elif startingshapes[i][2] == 'LU':
+                    startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], LU)
+                    board[startingshapes[i][0]][startingshapes[i][1]] = LU
+                elif startingshapes[i][2] == 'H':
+                    startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], H)
+                    board[startingshapes[i][0]][startingshapes[i][1]] = H
+                elif startingshapes[i][2] == 'V':
+                    startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], V)
+                    board[startingshapes[i][0]][startingshapes[i][1]] = V
 
         definites = {
             'RD': RD,
@@ -1176,22 +1208,17 @@ class Solver:
                                 checkunsures(i, j)
                                 if directions[0] == 'left' and directions[1] == 'right':
                                     board[i][j] = H
-                                    any_changes = True
                                 elif directions[0] == 'left' and directions[1] == 'up':
                                     board[i][j] = LU
-                                    any_changes = True
                                 elif directions[0] == 'left' and directions[1] == 'down':
                                     board[i][j] = LD
-                                    any_changes = True
                                 elif directions[0] == 'up' and directions[1] == 'down':
                                     board[i][j] = V
-                                    any_changes = True
                                 elif directions[0] == 'right' and directions[1] == 'up':
                                     board[i][j] = RU
-                                    any_changes = True
                                 elif directions[0] == 'right' and directions[1] == 'down':
                                     board[i][j] = RD
-                                    any_changes = True
+                                any_changes = True
                                 
             print()
             print("Fifth stage:")
@@ -1289,8 +1316,6 @@ class Solver:
                     j = j - 1
                     fromstartcount += 1
                     isashape = True
-
-                    
                 #if node is a V and prevnode was above
                 # move down
                 elif board[i][j] == V and previ < i:
@@ -1387,9 +1412,6 @@ class Solver:
                     editboard = [['N' for i in range(len(board))] for j in range(len(board))]
                     for i in range(len(startingshapes)):
                         editboard[startingshapes[i][0]][startingshapes[i][1]] = startingshapes[i][2]
-
-
-                    print(editboard)
                     Solver.print_board(board)
 
                     return board, editboard, column_totals, row_totals
@@ -1485,6 +1507,23 @@ class Solver:
                 # if the node below the dot is X, H, RD, LD
                 # change node above the dot to a dot
 
+                def checksatisfactory(a,b,c,d):
+                    satisfactory = False
+                    count = 0
+                    for a in range(len(board)):
+                        if board[b][c] == d:
+                            count += 1
+                    if count == 1:
+                        count = 0
+                        dotposition = []
+                        for a in range(len(board)):
+                            if board[b][c] == ".":
+                                count += 1
+                                dotposition.append(a)
+                        if count == 1:
+                            satisfactory = True
+
+
                 if row_totals[0] == 3:
                     # if there is one 'V' and one '.' in the row
                     satisfactory = False
@@ -1524,10 +1563,6 @@ class Solver:
                         if board[len(board) - 1][j] == "V":
                             count += 1
                     if count == 1:
-                        satisfactory = True
-
-                    if satisfactory == True:
-                        satisfactory = False
                         count = 0
                         dotposition = []
                         for j in range(len(board)):
@@ -3372,7 +3407,6 @@ class EditBoard:
         }
 
         displayboard = []
-        #make a 9x9 board of Ns
         displayboard = [['N' for i in range(len(board)+ 1)] for j in range(len(board)+1)]
         displayboard[0][0] = "#"
         for i in range(1,len(board)+1):
