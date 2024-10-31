@@ -11,21 +11,14 @@ board_size = 0
 column_totals = []
 row_totals = []
 
-# ask user if they would like a generated puzzle or to input their own
-
 
 class StartNode:
     def __init__(self, board_size):
-        """
-        Initializes a StartNode and generates a valid node on the edge of the board.
-        """
         self.board_size = board_size
         self.x, self.y = self.generate_start_node()
 
     def generate_start_node(self):
-        """
-        Generates a start node at the edge of the board.
-        """
+        #Generates a start node at the edge of the board
         edge = False
         while not edge:
             x = random.randint(0, self.board_size - 1)
@@ -35,48 +28,32 @@ class StartNode:
         return x, y
 
     def get_position(self):
-        """
-        Returns the start node's position as a tuple (x, y).
-        """
+        #Returns the start node's position as a tuple
         return self.x, self.y
 
 class GenerateBoard:
     def __init__(self, size):
-        """
-        Initializes the board with the given size and generates the starting node.
-        """
+        #Initializes the board with the given size and generates the starting node
         self.size = size
         self.board = self.generate_board()
 
     def generate_board(self):
-        """
-        Creates an empty board of the specified size and places the starting node.
-        """
+        #Creates an empty board of the specified size and places the starting node
         board = [[0] * self.size for _ in range(self.size)]
         start_node = StartNode(self.size)  # Use the StartNode class to generate the node
         start_position = start_node.get_position()
         board[start_position[0]][start_position[1]] = "S"
         return board
 
-    def print_board(self):
-        """
-        Prints the current state of the board.
-        """
-        for row in self.board:
-            print(' '.join(map(str, row)))
+
 
 class GenerateRandomPath:
     def __init__(self, board_size):
-        """
-        Initializes the path generator with the given board size.
-        """
+        #Initializes the path generator with the given board size
         self.board_size = board_size
         self.visited = set()
 
     def generate_start_node(self):
-        """
-        Generates a random start node on the edge of the board.
-        """
         edge = False
         while not edge:
             startxnode = random.randint(0, self.board_size - 1)
@@ -86,9 +63,7 @@ class GenerateRandomPath:
         return startxnode, startynode
 
     def dfs(self, start):
-        """
-        Performs a depth-first search (DFS) to generate a random path on the board.
-        """
+        #Performs a depth-first search to generate a random path on the board
         min_length = (self.board_size ** 2) * 0.4
         max_length = (self.board_size ** 2) * 0.6
         stack = [(start, [start])]
@@ -134,9 +109,6 @@ class GenerateRandomPath:
         return None  # If no valid path is found
 
     def print_path(self, path):
-        """
-        Prints the board with the path marked.
-        """
         board = [['0' for _ in range(self.board_size)] for _ in range(self.board_size)]
         
         if path:
@@ -155,7 +127,7 @@ class GenerateRandomPath:
 class Generator:
     def __init__(self):
         self.starting_shapes = []
-        self.generation = None  # Define it to avoid reference errors
+        self.generation = None
 
     def build_board(self):
         board_size = int(input("Enter the size of the board: "))
