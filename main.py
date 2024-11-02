@@ -1,6 +1,6 @@
 import random
 import csv
-import time
+# import time
 import datetime
 
 
@@ -436,11 +436,6 @@ class Solver:
         bruteforceneeded = False
         end = (endx, endy)
 
-
-
-
-                
-            
 
         edgerulesneeded = False
         any_changes = True
@@ -890,8 +885,6 @@ class Solver:
                                     directions.remove('left')
                             return i1,j1
 
-
-
                         if count == 3:
                             outofrange = False
                             change = False
@@ -1196,26 +1189,27 @@ class Solver:
             print("Fifth stage:")
             Solver.print_board(board)
 
-            # if a dot is surrounded by 4 nodes that it cant go into, set impossible
-            for i in range(len(board)):
-                for j in range(len(board)):
-                    if board[i][j] == '.':
-                        directions = []
-                        if i - 1 >= 0:
-                            if (board[i-1][j] == RU) or (board[i-1][j] == LU) or (board[i-1][j] == H) or (board[i-1][j] == 'X'):
-                                directions.append('up')
-                        if i + 1 < len(board):
-                            if (board[i+1][j] == RD) or (board[i+1][j] == LD) or (board[i+1][j] == H) or (board[i+1][j] == 'X'):
-                                directions.append('down')
-                        if j - 1 >= 0:
-                            if (board[i][j-1] == LU) or (board[i][j-1] == LD) or (board[i][j-1] == V) or (board[i][j-1] == 'X'):
-                                directions.append('left')
-                        if j + 1 < len(board):
-                            if (board[i][j+1] == RU) or (board[i][j+1] == RD) or (board[i][j+1] == V) or (board[i][j+1] == 'X'):
-                                directions.append('right')
-                        if len(directions) == 4:
-                            #impossible
-                            flagimpossible = True
+            if bruteforceneeded == True:
+                # if a dot is surrounded by 4 nodes that it cant go into, set impossible
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] == '.':
+                            directions = []
+                            if i - 1 >= 0:
+                                if (board[i-1][j] == RU) or (board[i-1][j] == LU) or (board[i-1][j] == H) or (board[i-1][j] == 'X'):
+                                    directions.append('up')
+                            if i + 1 < len(board):
+                                if (board[i+1][j] == RD) or (board[i+1][j] == LD) or (board[i+1][j] == H) or (board[i+1][j] == 'X'):
+                                    directions.append('down')
+                            if j - 1 >= 0:
+                                if (board[i][j-1] == LU) or (board[i][j-1] == LD) or (board[i][j-1] == V) or (board[i][j-1] == 'X'):
+                                    directions.append('left')
+                            if j + 1 < len(board):
+                                if (board[i][j+1] == RU) or (board[i][j+1] == RD) or (board[i][j+1] == V) or (board[i][j+1] == 'X'):
+                                    directions.append('right')
+                            if len(directions) == 4:
+                                #impossible
+                                flagimpossible = True
             
             i,j = start
             previ,prevj = start
@@ -1593,8 +1587,6 @@ class Solver:
                             count += 1
                     if count == len(board):
                         edgerows.append(i)
-                print("Edge columns:", edgecolumns)
-                print("Edge rows:", edgerows)
 
                 # for each column
                 # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
@@ -2548,88 +2540,74 @@ class Solver:
                                     any_changes = True
                                 board[i][len(board) - 1] = "X"
 
-                # for each shape in grid
-                # determine what directions the shape goes in
-                # check if the shape in each direction is a compatible shape
 
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] in shapes.values():
-                            shapedirections = []
-                            if board[i][j] == H:
-                                shapedirections.append('left')
-                                shapedirections.append('right')
-                            elif board[i][j] == V:
-                                shapedirections.append('up')
-                                shapedirections.append('down')
-                            elif board[i][j] == RD:
-                                shapedirections.append('right')
-                                shapedirections.append('down')
-                            elif board[i][j] == RU:
-                                shapedirections.append('right')
-                                shapedirections.append('up')
-                            elif board[i][j] == LD:
-                                shapedirections.append('left')
-                                shapedirections.append('down')
-                            if board[i][j] == LU:
-                                shapedirections.append('left')
-                                shapedirections.append('up')
-                            for direction in shapedirections:
-                                if direction == 'left' and j - 1 >= 0:
-                                    if board[i][j-1] == V or board[i][j-1] == LU or board[i][j-1] == LD:
-                                        flagimpossible = True
-                                if direction == 'right' and j + 1 < len(board):
-                                    if board[i][j+1] == V or board[i][j+1] == RU or board[i][j+1] == RD:
-                                        flagimpossible = True
-                                if direction == 'up' and i - 1 >= 0:
-                                    if board[i-1][j] == H or board[i-1][j] == RU or board[i-1][j] == LU:
-                                        flagimpossible = True
-                                if direction == 'down' and i + 1 < len(board):
-                                    if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
-                                        flagimpossible = True
+                if bruteforceneeded == True:
+                    
+                    # for each shape in grid
+                    # determine what directions the shape goes in
+                    # check if the shape in each direction is a compatible shape
 
-                #### for each dot in the grid
-                # if the dot is surrounded by 3 'X's, flag as impossible
+                    for i in range(len(board)):
+                        for j in range(len(board)):
+                            if board[i][j] in shapes.values():
+                                shapedir = []
+                                findloopinboard(i, j)
+                                for direction in shapedir:
+                                    if direction == 'left' and j - 1 >= 0:
+                                        if board[i][j-1] == V or board[i][j-1] == LU or board[i][j-1] == LD:
+                                            flagimpossible = True
+                                    if direction == 'right' and j + 1 < len(board):
+                                        if board[i][j+1] == V or board[i][j+1] == RU or board[i][j+1] == RD:
+                                            flagimpossible = True
+                                    if direction == 'up' and i - 1 >= 0:
+                                        if board[i-1][j] == H or board[i-1][j] == RU or board[i-1][j] == LU:
+                                            flagimpossible = True
+                                    if direction == 'down' and i + 1 < len(board):
+                                        if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
+                                            flagimpossible = True
 
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] == ".":
-                            count = 0
-                            if i - 1 >= 0 and board[i-1][j] == "X":
-                                count += 1
-                            if i + 1 < len(board) and board[i+1][j] == "X":
-                                count += 1
-                            if j - 1 >= 0 and board[i][j-1] == "X":
-                                count += 1
-                            if j + 1 < len(board) and board[i][j+1] == "X":
-                                count += 1
-                            if count >= 3:
-                                flagimpossible = True
+                    #### for each dot in the grid
+                    # if the dot is surrounded by 3 'X's, flag as impossible
 
-                # for dot in grid
-                # if the dot is surrounded by 3 shapes which go into it, flag as impossible
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] == ".":
-                            count = 0
-                            # if the shape to the left is a shape that goes right
-                            if j - 1 >= 0 and board[i][j-1] in shapes.values():
-                                if board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU:
+                    for i in range(len(board)):
+                        for j in range(len(board)):
+                            if board[i][j] == ".":
+                                count = 0
+                                if i - 1 >= 0 and board[i-1][j] == "X":
                                     count += 1
-                            # if the shape to the right is a shape that goes left
-                            if j + 1 < len(board) and board[i][j+1] in shapes.values():
-                                if board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU:
+                                if i + 1 < len(board) and board[i+1][j] == "X":
                                     count += 1
-                            # if the shape above is a shape that goes down
-                            if i - 1 >= 0 and board[i-1][j] in shapes.values():
-                                if board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD:
+                                if j - 1 >= 0 and board[i][j-1] == "X":
                                     count += 1
-                            # if the shape below is a shape that goes up
-                            if i + 1 < len(board) and board[i+1][j] in shapes.values():
-                                if board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU:
+                                if j + 1 < len(board) and board[i][j+1] == "X":
                                     count += 1
-                            if count >= 3:
-                                flagimpossible = True
+                                if count >= 3:
+                                    flagimpossible = True
+
+                    # for dot in grid
+                    # if the dot is surrounded by 3 shapes which go into it, flag as impossible
+                    for i in range(len(board)):
+                        for j in range(len(board)):
+                            if board[i][j] == ".":
+                                count = 0
+                                # if the shape to the left is a shape that goes right
+                                if j - 1 >= 0 and board[i][j-1] in shapes.values():
+                                    if board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU:
+                                        count += 1
+                                # if the shape to the right is a shape that goes left
+                                if j + 1 < len(board) and board[i][j+1] in shapes.values():
+                                    if board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU:
+                                        count += 1
+                                # if the shape above is a shape that goes down
+                                if i - 1 >= 0 and board[i-1][j] in shapes.values():
+                                    if board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD:
+                                        count += 1
+                                # if the shape below is a shape that goes up
+                                if i + 1 < len(board) and board[i+1][j] in shapes.values():
+                                    if board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU:
+                                        count += 1
+                                if count >= 3:
+                                    flagimpossible = True
 
 
             if flagimpossible == True:
@@ -2894,8 +2872,6 @@ class Solver:
 class EditBoard:
     def manual_edit(board,editboard, column_totals, row_totals):
 
-        #dictionary changenode- 6 shapes, dot and X
-        
         RD = "┌"
         LD = "┐"
         RU = "└"
@@ -2945,9 +2921,6 @@ class EditBoard:
         Solver.print_board(displayboard)
 
         undostack = []
-
-
-        
         # start time
 
         time = datetime.datetime.now()
