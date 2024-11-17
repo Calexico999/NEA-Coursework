@@ -1,50 +1,12 @@
 import random
 import csv
-# import time
 import datetime
-
-
 
 # Box drawing characters: ┌ ┐ └ ┘ ─ │ 
 # book 3 p175 has 2 possible other rules ####
 board_size = 0
 column_totals = []
 row_totals = []
-
-
-class StartNode:
-    def __init__(self, board_size):
-        self.board_size = board_size
-        self.x, self.y = self.generate_start_node()
-
-    def generate_start_node(self):
-        #Generates a start node at the edge of the board
-        edge = False
-        while not edge:
-            x = random.randint(0, self.board_size - 1)
-            y = random.randint(0, self.board_size - 1)
-            if x == 0 or x == self.board_size - 1 or y == 0 or y == self.board_size - 1:
-                edge = True
-        return x, y
-
-    def get_position(self):
-        #Returns the start node's position as a tuple
-        return self.x, self.y
-
-class GenerateBoard:
-    def __init__(self, size):
-        #Initializes the board with the given size and generates the starting node
-        self.size = size
-        self.board = self.generate_board()
-
-    def generate_board(self):
-        #Creates an empty board of the specified size and places the starting node
-        board = [[0] * self.size for _ in range(self.size)]
-        start_node = StartNode(self.size)  # Use the StartNode class to generate the node
-        start_position = start_node.get_position()
-        board[start_position[0]][start_position[1]] = "S"
-        return board
-
 
 
 class GenerateRandomPath:
@@ -108,21 +70,6 @@ class GenerateRandomPath:
 
         return None  # If no valid path is found
 
-    def print_path(self, path):
-        board = [['0' for _ in range(self.board_size)] for _ in range(self.board_size)]
-        
-        if path:
-            start = path[0]
-            end = path[-1]
-            board[start[0]][start[1]] = 'S'  # Start node
-            board[end[0]][end[1]] = 'E'      # End node
-            
-            for (x, y) in path[1:-1]:
-                board[x][y] = '1'  # Path nodes
-
-        for row in board:
-            print(' '.join(row))
-
 
 class Generator:
     def __init__(self):
@@ -132,14 +79,11 @@ class Generator:
     def build_board(self):
         board_size = int(input("Enter the size of the board: "))
         path = None
-
         path_generator = GenerateRandomPath(board_size)  # Instance of path generator
-
         # Generate a valid path
         while path is None:
-            start = path_generator.generate_start_node()  # Use the instance method
-            path = path_generator.dfs(start)  # Use the instance method
-
+            start = path_generator.generate_start_node()
+            path = path_generator.dfs(start)
         # Build the board with dimensions board_size x board_size
         build_board = [['X' for _ in range(board_size)] for _ in range(board_size)]
         start_node_generated = path[0]
@@ -1171,18 +1115,7 @@ class Solver:
 
                             if len(directions) == 2:
                                 checkunsures(i, j)
-                                if directions[0] == 'left' and directions[1] == 'right':
-                                    board[i][j] = H
-                                elif directions[0] == 'left' and directions[1] == 'up':
-                                    board[i][j] = LU
-                                elif directions[0] == 'left' and directions[1] == 'down':
-                                    board[i][j] = LD
-                                elif directions[0] == 'up' and directions[1] == 'down':
-                                    board[i][j] = V
-                                elif directions[0] == 'right' and directions[1] == 'up':
-                                    board[i][j] = RU
-                                elif directions[0] == 'right' and directions[1] == 'down':
-                                    board[i][j] = RD
+                                board[i][j] = findshape(directions[0], directions[1])
                                 any_changes = True
                                 
             print()
