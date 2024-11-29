@@ -51,7 +51,6 @@ class GenerateRandomPath:
 
             if v in self.visited:
                 continue
-
             self.visited.add(v)
             x, y = v
             all_next = []
@@ -460,7 +459,7 @@ class Solver:
             'H': H,
             'V': V
         }
-        
+
         def findshape(a,b):
             if a == 'left':
                 if b == 'up':
@@ -515,7 +514,7 @@ class Solver:
                     if board[d[0]][d[1]] in shapes.values():
                         dots_two.remove(d)
 
-            # First stage: change all Xs which connect to a start or end node to '.'
+            # First stage: change all Ns which connect to a start or end node to '.'
             print("Initial board:")
             Solver.print_board(board)
             print("\nFirst stage:")
@@ -644,50 +643,50 @@ class Solver:
             print("Second stage:")
             Solver.print_board(board)
 
-            ###### THIRD STAGE
-            # for each dot in the grid
-            # if it is adjacent to 2 from 'characters', change it the character which fits the pattern
-            for i in range(len(board)):
-                for j in range(len(board)):
-                    if board[i][j] == '.':
-                        directions = []
-                        count = 0
-                        if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU)):
-                            directions.append('left')
-                            count += 1
-                        if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD)):
-                            directions.append('up')
-                            count += 1
-                        if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU)):
-                            directions.append('down')
-                            count += 1
-                        if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU)):
-                            directions.append('right')
-                            count += 1
+            # ###### THIRD STAGE
+            # # for each dot in the grid
+            # # if it is adjacent to 2 from 'characters', change it the character which fits the pattern
+            # for i in range(len(board)):
+            #     for j in range(len(board)):
+            #         if board[i][j] == '.':
+            #             directions = []
+            #             count = 0
+            #             if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU)):
+            #                 directions.append('left')
+            #                 count += 1
+            #             if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD)):
+            #                 directions.append('up')
+            #                 count += 1
+            #             if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU)):
+            #                 directions.append('down')
+            #                 count += 1
+            #             if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU)):
+            #                 directions.append('right')
+            #                 count += 1
                         
-                        if count == 2:
-                            checkunsures(i, j)
-                            calc = findshape(directions[0], directions[1])
-                            if calc == LU:
-                                board[i][j] = LU
-                            elif calc == LD:
-                                board[i][j] = LD
-                            elif calc == RU:
-                                board[i][j] = RU
-                            elif calc == RD:
-                                board[i][j] = RD
-                            elif calc == H:
-                                board[i][j] = H
-                            elif calc == V:
-                                board[i][j] = V
-                            any_changes = True
+            #             if count == 2:
+            #                 checkunsures(i, j)
+            #                 calc = findshape(directions[0], directions[1])
+            #                 if calc == LU:
+            #                     board[i][j] = LU
+            #                 elif calc == LD:
+            #                     board[i][j] = LD
+            #                 elif calc == RU:
+            #                     board[i][j] = RU
+            #                 elif calc == RD:
+            #                     board[i][j] = RD
+            #                 elif calc == H:
+            #                     board[i][j] = H
+            #                 elif calc == V:
+            #                     board[i][j] = V
+            #                 any_changes = True
                             
 
 
 
-            print()
-            print("Third stage:")
-            Solver.print_board(board)
+            # print()
+            # print("Third stage:")
+            # Solver.print_board(board)
 
             indefinites = {
                 'RD': RD,
@@ -700,7 +699,7 @@ class Solver:
                 'N': NULL
             }
             
-            ###### FOURTH STAGE
+            ###### THIRD STAGE
             # for each empty square in the grid
             # if it is adjacent to 0 or 1 squares from 'indefinites', change it to 'X'
 
@@ -724,11 +723,11 @@ class Solver:
                                 board[i][j] = 'X'
                                 changed = True
                                 any_changes = True
-            print("Fourth stage:")
+            print("Third stage:")
             Solver.print_board(board)
             print()
 
-            ##### STAGE 5
+            ##### STAGE 4
             # for each dot in the grid
             # if it is adjacent to exactly 2 from 'characters', change it the character which fits the pattern
             for i in range(len(board)):
@@ -1119,11 +1118,11 @@ class Solver:
                                 any_changes = True
                                 
             print()
-            print("Fifth stage:")
+            print("Fourth stage:")
             Solver.print_board(board)
 
             if bruteforceneeded == True:
-                # if a dot is surrounded by 4 nodes that it cant go into, set impossible
+                # if a dot is surrounded by 3 or 4 nodes that it cant go into, set impossible
                 for i in range(len(board)):
                     for j in range(len(board)):
                         if board[i][j] == '.':
@@ -1140,7 +1139,7 @@ class Solver:
                             if j + 1 < len(board):
                                 if (board[i][j+1] == RU) or (board[i][j+1] == RD) or (board[i][j+1] == V) or (board[i][j+1] == 'X'):
                                     directions.append('right')
-                            if len(directions) == 4:
+                            if len(directions) >= 3:
                                 #impossible
                                 flagimpossible = True
             
@@ -1404,19 +1403,33 @@ class Solver:
                 # if the node below the dot is X, H, RD, LD
                 # change node above the dot to a dot
 
-                def checksatisfactory(a,b,c,d):
+                def checksatisfactory(a,b,c): # a for row/col, b for 0/len board - 1, c for shape
                     satisfactory = False
                     count = 0
                     dotposition = []
-                    for a in range(len(board)):
-                        if board[b][c] == d:
-                            count += 1
+                    q = 0
+                    if a == 'j':
+                        for q in range(len(board)):
+                            if board[b][q] == c:
+                                count += 1
+                    else:
+                        for q in range(len(board)):
+                            if board[q][b] == c:
+                                count += 1
                     if count == 1:
                         count = 0
-                        for a in range(len(board)):
-                            if board[b][c] == ".":
-                                count += 1
-                                dotposition.append(a)
+                        if a == 'j':
+                            for q in range(len(board)):
+                                if board[b][q] == ".":
+                                    count += 1
+                                    dotposition.append(q)
+                        else:
+                            for q in range(len(board)):
+                                if board[q][b] == ".":
+                                    count += 1
+                                    dotposition.append(q)
+
+
                         if count == 1:
                             satisfactory = True
                     
@@ -1424,7 +1437,7 @@ class Solver:
 
                 if row_totals[0] == 3:
                     # if there is one 'V' and one '.' in the row
-                    dotposition, satisfactory = checksatisfactory(0, 0, 0, "V")
+                    dotposition, satisfactory = checksatisfactory('j', 0, "V")
                     if satisfactory == True:
                         if dotposition[0] - 1 >= 0:
                             if board[0][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
@@ -1442,7 +1455,7 @@ class Solver:
 
                 if row_totals[len(board) - 1] == 3:
                     # if there is one 'V' and one '.' in the row
-                    dotposition, satisfactory = checksatisfactory(j, len(board) - 1, j, "V")
+                    dotposition, satisfactory = checksatisfactory('j', len(board) - 1,"V")
                     if satisfactory == True:
                         if dotposition[0] - 1 >= 0:
                             if board[len(board) - 1][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
@@ -1460,7 +1473,7 @@ class Solver:
 
                 if column_totals[0] == 3:
                     # if there is one 'H' and one '.' in the column
-                    dotposition, satisfactory = checksatisfactory(i, i, 0, "H")
+                    dotposition, satisfactory = checksatisfactory('i', 0, "H")
                     if satisfactory == True:
                         if dotposition[0] - 1 >= 0:
                             if board[dotposition[0] - 1][0] in ["X", "H", "RU", "LU"]:
@@ -1478,7 +1491,7 @@ class Solver:
 
                 if column_totals[len(board) - 1] == 3:
                     # if there is one 'H' and one '.' in the column
-                    dotposition, satisfactory = checksatisfactory(i, i, len(board) - 1, "H")
+                    dotposition, satisfactory = checksatisfactory('i', len(board) - 1, "H")
                     if satisfactory == True:
                         if dotposition[0] - 1 >= 0:
                             if board[dotposition[0] - 1][len(board) - 1] in ["X", "H", "RU", "LU"]:
