@@ -1121,6 +1121,50 @@ class Solver:
             print("Fourth stage:")
             Solver.print_board(board)
 
+            ###### FIFTH STAGE
+            # for each dot in the grid
+            # if it is adjacent to 2 from 'characters', change it the character which fits the pattern
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if board[i][j] == '.':
+                        directions = []
+                        count = 0
+                        if j - 1 >= 0 and ((board[i][j-1] == H) or (board[i][j-1] == RD) or (board[i][j-1] == RU)):
+                            directions.append('left')
+                            count += 1
+                        if i - 1 >= 0 and ((board[i-1][j] == V) or (board[i-1][j] == RD) or (board[i-1][j] == LD)):
+                            directions.append('up')
+                            count += 1
+                        if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU)):
+                            directions.append('down')
+                            count += 1
+                        if j + 1 < len(board) and ((board[i][j+1] == H) or (board[i][j+1] == LD) or (board[i][j+1] == LU)):
+                            directions.append('right')
+                            count += 1
+                        
+                        if count == 2:
+                            checkunsures(i, j)
+                            calc = findshape(directions[0], directions[1])
+                            if calc == LU:
+                                board[i][j] = LU
+                            elif calc == LD:
+                                board[i][j] = LD
+                            elif calc == RU:
+                                board[i][j] = RU
+                            elif calc == RD:
+                                board[i][j] = RD
+                            elif calc == H:
+                                board[i][j] = H
+                            elif calc == V:
+                                board[i][j] = V
+                            any_changes = True
+                            
+
+            print()
+            print("Fifth stage:")
+            Solver.print_board(board)
+
+
             if bruteforceneeded == True:
                 # if a dot is surrounded by 3 or 4 nodes that it cant go into, set impossible
                 for i in range(len(board)):
@@ -1318,17 +1362,17 @@ class Solver:
             if any_changes == False:
                 edgerulesneeded = True
             if edgerulesneeded == True:
-
+                # check if board 0 and board 1 are not shape already??????
                 if column_totals[0] == len(board) - 1:
                     if (board[2][0] == H or board[2][0] == LD or board[2][0] == RD) and (board[0][0] == 'N'):
                         checkunsures(0, 0)
-                        checkunsures(0,1)
+                        checkunsures(1,0)
                         board[0][0] = "."
                         board[1][0] = "."
                         any_changes = True
                     if ((board[len(board) - 3][0] == H) or (board[len(board) - 3][0] == LU) or (board[len(board) - 3][0] == RU)) and (board[len(board) - 1][0] == 'N'):
                         checkunsures(len(board) - 1, 0)
-                        checkunsures(len(board) - 1, 1)
+                        checkunsures(len(board) - 2, 0)
                         board[len(board) - 1][0] = "."
                         board[len(board) - 2][0] = "."
                         any_changes = True
@@ -1336,13 +1380,13 @@ class Solver:
                 if column_totals[len(board) - 1] == len(board) - 1:
                     if (board[2][len(board) - 1] == H or board[2][len(board) - 1] == LD or board[2][len(board) - 1] == RD) and (board[0][len(board) - 1] == 'N'):
                         checkunsures(0, len(board) - 1)
-                        checkunsures(0, len(board) - 2)
+                        checkunsures(1, len(board) - 1)
                         board[0][len(board) - 1] = "."
                         board[1][len(board) - 1] = "."
                         any_changes = True
                     if (board[len(board) - 3][len(board) - 1] == H or board[len(board) - 3][len(board) - 1] == LU or board[len(board) - 3][len(board) - 1] == RU) and (board[len(board) - 1][len(board) - 1] == 'N'):
                         checkunsures(len(board) - 1, len(board) - 1)
-                        checkunsures(len(board) - 1, len(board) - 2)
+                        checkunsures(len(board) - 2, len(board) - 1)
                         board[len(board) - 1][len(board) - 1] = "."
                         board[len(board) - 2][len(board) - 1] = "."
                         any_changes = True
@@ -1350,13 +1394,13 @@ class Solver:
                 if row_totals[0] == len(board) - 1:
                     if (board[0][2] == V or board[0][2] == RU or board[0][2] == RD) and (board[0][0] == 'N'):
                         checkunsures(0, 0)
-                        checkunsures(1, 0)
+                        checkunsures(0,1)
                         board[0][0] = "."
                         board[0][1] = "."
                         any_changes = True
                     if (board[0][len(board) - 3] == V or board[0][len(board) - 3] == LU or board[0][len(board) - 3] == LD) and (board[0][len(board) - 1] == 'N'):
                         checkunsures(0, len(board) - 1)
-                        checkunsures(1, len(board) - 1)
+                        checkunsures(0, len(board) - 2)
                         board[0][len(board) - 1] = "."
                         board[0][len(board) - 2] = "."
                         any_changes = True
@@ -1364,13 +1408,13 @@ class Solver:
                 if row_totals[len(board) - 1] == len(board) - 1:
                     if (board[len(board) - 1][2] == V or board[len(board) - 1][2] == RU or board[len(board) - 1][2] == RD) and (board[len(board) - 1][0] == 'N'):
                         checkunsures(len(board) - 1, 0)
-                        checkunsures(len(board) - 2, 0)
+                        checkunsures(len(board) - 1, 1)
                         board[len(board) - 1][0] = "."
                         board[len(board) - 1][1] = "."
                         any_changes = True
                     if (board[len(board) - 1][len(board) - 3] == V or board[len(board) - 1][len(board) - 3] == LU or board[len(board) - 1][len(board) - 3] == LD) and (board[len(board) - 1][len(board) - 1] == 'N'):
                         checkunsures(len(board) - 1, len(board) - 1)
-                        checkunsures(len(board) - 2, len(board) - 1)
+                        checkunsures(len(board) - 1, len(board) - 2)
                         board[len(board) - 1][len(board) - 1] = "."
                         board[len(board) - 1][len(board) - 2] = "."
                         any_changes = True
@@ -1403,109 +1447,109 @@ class Solver:
                 # if the node below the dot is X, H, RD, LD
                 # change node above the dot to a dot
 
-                def checksatisfactory(a,b,c): # a for row/col, b for 0/len board - 1, c for shape
-                    satisfactory = False
-                    count = 0
-                    dotposition = []
-                    q = 0
-                    if a == 'j':
-                        for q in range(len(board)):
-                            if board[b][q] == c:
-                                count += 1
-                    else:
-                        for q in range(len(board)):
-                            if board[q][b] == c:
-                                count += 1
-                    if count == 1:
-                        count = 0
-                        if a == 'j':
-                            for q in range(len(board)):
-                                if board[b][q] == ".":
-                                    count += 1
-                                    dotposition.append(q)
-                        else:
-                            for q in range(len(board)):
-                                if board[q][b] == ".":
-                                    count += 1
-                                    dotposition.append(q)
+                # def checksatisfactory(a,b,c): # a for row/col, b for 0/len board - 1, c for shape
+                #     satisfactory = False
+                #     count = 0
+                #     dotposition = []
+                #     q = 0
+                #     if a == 'j':
+                #         for q in range(len(board)):
+                #             if board[b][q] == c:
+                #                 count += 1
+                #     else:
+                #         for q in range(len(board)):
+                #             if board[q][b] == c:
+                #                 count += 1
+                #     if count == 1:
+                #         count = 0
+                #         if a == 'j':
+                #             for q in range(len(board)):
+                #                 if board[b][q] == ".":
+                #                     count += 1
+                #                     dotposition.append(q)
+                #         else:
+                #             for q in range(len(board)):
+                #                 if board[q][b] == ".":
+                #                     count += 1
+                #                     dotposition.append(q)
 
 
-                        if count == 1:
-                            satisfactory = True
+                #         if count == 1:
+                #             satisfactory = True
                     
-                    return dotposition, satisfactory
+                #     return dotposition, satisfactory
 
-                if row_totals[0] == 3:
-                    # if there is one 'V' and one '.' in the row
-                    dotposition, satisfactory = checksatisfactory('j', 0, "V")
-                    if satisfactory == True:
-                        if dotposition[0] - 1 >= 0:
-                            if board[0][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
-                                if board[0][dotposition[0] + 1] == "N":
-                                    checkunsures(0, dotposition[0] + 1)
-                                    board[0][dotposition[0] + 1] = "."
-                                    any_changes = True
+                # if row_totals[0] == 3:
+                #     # if there is one 'V' and one '.' in the row
+                #     dotposition, satisfactory = checksatisfactory('j', 0, "V")
+                #     if satisfactory == True:
+                #         if dotposition[0] - 1 >= 0:
+                #             if board[0][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
+                #                 if board[0][dotposition[0] + 1] == "N":
+                #                     checkunsures(0, dotposition[0] + 1)
+                #                     board[0][dotposition[0] + 1] = "."
+                #                     any_changes = True
 
-                        if dotposition[0] + 1 < len(board):
-                            if board[0][dotposition[0] + 1] in ["X", "V", "RU", "RD"]:
-                                if board[0][dotposition[0] - 1] == "N":
-                                    checkunsures(0, dotposition[0] - 1)
-                                    board[0][dotposition[0] - 1] = "."
-                                    any_changes = True
+                #         if dotposition[0] + 1 < len(board):
+                #             if board[0][dotposition[0] + 1] in ["X", "V", "RU", "RD"]:
+                #                 if board[0][dotposition[0] - 1] == "N":
+                #                     checkunsures(0, dotposition[0] - 1)
+                #                     board[0][dotposition[0] - 1] = "."
+                #                     any_changes = True
 
-                if row_totals[len(board) - 1] == 3:
-                    # if there is one 'V' and one '.' in the row
-                    dotposition, satisfactory = checksatisfactory('j', len(board) - 1,"V")
-                    if satisfactory == True:
-                        if dotposition[0] - 1 >= 0:
-                            if board[len(board) - 1][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
-                                if board[len(board) - 1][dotposition[0] + 1] == "N":
-                                    checkunsures(len(board) - 1, dotposition[0] + 1)
-                                    board[len(board) - 1][dotposition[0] + 1] = "."
-                                    any_changes = True
+                # if row_totals[len(board) - 1] == 3:
+                #     # if there is one 'V' and one '.' in the row
+                #     dotposition, satisfactory = checksatisfactory('j', len(board) - 1,"V")
+                #     if satisfactory == True:
+                #         if dotposition[0] - 1 >= 0:
+                #             if board[len(board) - 1][dotposition[0] - 1] in ["X", "V", "LU", "LD"]:
+                #                 if board[len(board) - 1][dotposition[0] + 1] == "N":
+                #                     checkunsures(len(board) - 1, dotposition[0] + 1)
+                #                     board[len(board) - 1][dotposition[0] + 1] = "."
+                #                     any_changes = True
 
-                        if dotposition[0] + 1 < len(board):
-                            if board[len(board) - 1][dotposition[0] + 1] in ["X", "V", "RU", "RD"]:
-                                if board[len(board) - 1][dotposition[0] - 1] == "N":
-                                    checkunsures(len(board) - 1, dotposition[0] - 1)
-                                    board[len(board) - 1][dotposition[0] - 1] = "."
-                                    any_changes = True
+                #         if dotposition[0] + 1 < len(board):
+                #             if board[len(board) - 1][dotposition[0] + 1] in ["X", "V", "RU", "RD"]:
+                #                 if board[len(board) - 1][dotposition[0] - 1] == "N":
+                #                     checkunsures(len(board) - 1, dotposition[0] - 1)
+                #                     board[len(board) - 1][dotposition[0] - 1] = "."
+                #                     any_changes = True
 
-                if column_totals[0] == 3:
-                    # if there is one 'H' and one '.' in the column
-                    dotposition, satisfactory = checksatisfactory('i', 0, "H")
-                    if satisfactory == True:
-                        if dotposition[0] - 1 >= 0:
-                            if board[dotposition[0] - 1][0] in ["X", "H", "RU", "LU"]:
-                                if board[dotposition[0] + 1][0] == "N":
-                                    checkunsures(dotposition[0] + 1, 0)
-                                    board[dotposition[0] + 1][0] = "."
-                                    any_changes = True
+                # if column_totals[0] == 3:
+                #     # if there is one 'H' and one '.' in the column
+                #     dotposition, satisfactory = checksatisfactory('i', 0, "H")
+                #     if satisfactory == True:
+                #         if dotposition[0] - 1 >= 0:
+                #             if board[dotposition[0] - 1][0] in ["X", "H", "RU", "LU"]:
+                #                 if board[dotposition[0] + 1][0] == "N":
+                #                     checkunsures(dotposition[0] + 1, 0)
+                #                     board[dotposition[0] + 1][0] = "."
+                #                     any_changes = True
 
-                        if dotposition[0] + 1 < len(board):
-                            if board[dotposition[0] + 1][0] in ["X", "H", "RD", "LD"]:
-                                if board[dotposition[0] - 1][0] == "N":
-                                    checkunsures(dotposition[0] - 1, 0)
-                                    board[dotposition[0] - 1][0] = "."
-                                    any_changes = True
+                #         if dotposition[0] + 1 < len(board):
+                #             if board[dotposition[0] + 1][0] in ["X", "H", "RD", "LD"]:
+                #                 if board[dotposition[0] - 1][0] == "N":
+                #                     checkunsures(dotposition[0] - 1, 0)
+                #                     board[dotposition[0] - 1][0] = "."
+                #                     any_changes = True
 
-                if column_totals[len(board) - 1] == 3:
-                    # if there is one 'H' and one '.' in the column
-                    dotposition, satisfactory = checksatisfactory('i', len(board) - 1, "H")
-                    if satisfactory == True:
-                        if dotposition[0] - 1 >= 0:
-                            if board[dotposition[0] - 1][len(board) - 1] in ["X", "H", "RU", "LU"]:
-                                if board[dotposition[0] + 1][len(board) - 1] == "N":
-                                    checkunsures(dotposition[0] + 1, len(board) - 1)
-                                    board[dotposition[0] + 1][len(board) - 1] = "."
-                                    any_changes = True
+                # if column_totals[len(board) - 1] == 3:
+                #     # if there is one 'H' and one '.' in the column
+                #     dotposition, satisfactory = checksatisfactory('i', len(board) - 1, "H")
+                #     if satisfactory == True:
+                #         if dotposition[0] - 1 >= 0:
+                #             if board[dotposition[0] - 1][len(board) - 1] in ["X", "H", "RU", "LU"]:
+                #                 if board[dotposition[0] + 1][len(board) - 1] == "N":
+                #                     checkunsures(dotposition[0] + 1, len(board) - 1)
+                #                     board[dotposition[0] + 1][len(board) - 1] = "."
+                #                     any_changes = True
 
-                        if dotposition[0] + 1 < len(board):
-                            if board[dotposition[0] + 1][len(board) - 1] in ["X", "H", "RD", "LD"]:
-                                if board[dotposition[0] - 1][len(board) - 1] == "N":
-                                    checkunsures(dotposition[0] - 1, len(board) - 1)
-                                    board[dotposition[0] - 1][len(board) - 1] = "."
-                                    any_changes = True
+                #         if dotposition[0] + 1 < len(board):
+                #             if board[dotposition[0] + 1][len(board) - 1] in ["X", "H", "RD", "LD"]:
+                #                 if board[dotposition[0] - 1][len(board) - 1] == "N":
+                #                     checkunsures(dotposition[0] - 1, len(board) - 1)
+                #                     board[dotposition[0] - 1][len(board) - 1] = "."
+                #                     any_changes = True
 
                 ##### STAGE 6 #####
                 # for each column
@@ -1538,6 +1582,9 @@ class Solver:
                 # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
                 # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
                 # if the length of list is 1, change the square to a dot, and change all other 'N's in the column to 'X'
+
+                ##### RE LOOK AT THIS ONE
+
                 for j in range(len(board)):
                     if (j - 1 in edgecolumns) or (j + 1 in edgecolumns) and j not in edgecolumns:
                         count = 0
@@ -1581,7 +1628,7 @@ class Solver:
                             for j in range(len(board)):
                                 if board[i][j] == "N":
                                     possible = False
-                                    if j - 1 >= 0 and board[i][j-1] == ".":
+                                    if j - 1 >= 0 and board[i][j-1] == ".": ###### add some shapes to the dot?
                                         dots.append((i, j))
                                         possible = True
                                     if j + 1 < len(board) and board[i][j+1] == ".":
@@ -1633,7 +1680,7 @@ class Solver:
                                             break
                                         k += 1
                                         counter += 1
-                                    if counter == column_totals[j]:
+                                    if counter == column_totals[j] and k < len(board): ###changed
                                         possiblementdown = True
                                         possibles += 1
                                     counter = 1
@@ -1645,7 +1692,7 @@ class Solver:
                                             break
                                         k -= 1
                                         counter += 1
-                                    if counter == column_totals[j]:
+                                    if counter == column_totals[j] and k >= 0: ###changed
                                         possiblementup = True
                                         possibles += 1
 
@@ -1654,19 +1701,21 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
-                                        checkunsures(k, j)
-                                        board[k][j] = "."
+                                        if board[k][j] == "N":
+                                            checkunsures(k, j)
+                                            board[k][j] = "."
+                                            counter += 1
                                         k += 1
-                                        counter += 1
                                     any_changes = True
                                 if possiblementup == True:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
-                                        checkunsures(k, j)
-                                        board[k][j] = "."
+                                        if board[k][j] == "N":
+                                            checkunsures(k, j)
+                                            board[k][j] = "."
+                                            counter += 1
                                         k -= 1
-                                        counter += 1
                                     any_changes = True
                                                            
                 # do the same for rows
@@ -1689,7 +1738,7 @@ class Solver:
                                             break
                                         k += 1
                                         counter += 1
-                                    if counter == row_totals[i]:
+                                    if counter == row_totals[i] and k < len(board): ###changed
                                         possiblementright = True
                                         possibles += 1
                                     counter = 1
@@ -1701,7 +1750,7 @@ class Solver:
                                             break
                                         k -= 1
                                         counter += 1
-                                    if counter == row_totals[i]:
+                                    if counter == row_totals[i] and k >= 0: ###changed
                                         possiblementleft = True
                                         possibles += 1
 
@@ -1710,19 +1759,21 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
-                                        checkunsures(i, k)
-                                        board[i][k] = "."
+                                        if board[i][k] == "N":
+                                            checkunsures(i, k)
+                                            board[i][k] = "."
+                                            counter += 1
                                         k += 1
-                                        counter += 1
                                     any_changes = True
                                 if possiblementleft == True:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
-                                        checkunsures(i, k)
-                                        board[i][k] = "."
+                                        if board[i][k] == "N":
+                                            checkunsures(i, k)
+                                            board[i][k] = "."
+                                            counter += 1
                                         k -= 1
-                                        counter += 1
                                     any_changes = True
                 
                 # do the same but swap left and right
@@ -1740,7 +1791,7 @@ class Solver:
                 possiblementup = False
                 possibles = 0
                 for j in range(len(board)):
-                    if j + 1 in edgecolumns and j-1 >= 0 and j+1 < len(board):
+                    if j + 1 in edgecolumns and j-1 >= 0 and j+1 < len(board) and j not in edgecolumns:
                         if (column_totals[j+1] == 1 or column_totals[j+1] == 0) and column_totals[j-1] == 1:
                             for i in range(len(board)):
                                 if (board[i][j+1] in shapes.values()):
@@ -1755,7 +1806,7 @@ class Solver:
                                             break
                                         k += 1
                                         counter += 1
-                                    if counter == column_totals[j]:
+                                    if counter == column_totals[j] and k < len(board):
                                         possiblementdown = True
                                         possibles += 1
                                     counter = 1
@@ -1767,7 +1818,7 @@ class Solver:
                                             break
                                         k -= 1
                                         counter += 1
-                                    if counter == column_totals[j]:
+                                    if counter == column_totals[j] and k >= 0:
                                         possiblementup = True
                                         possibles += 1
 
@@ -1776,19 +1827,21 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
-                                        checkunsures(k, j)
-                                        board[k][j] = "."
+                                        if board[k][j] == "N":
+                                            checkunsures(k, j)
+                                            board[k][j] = "."
+                                            counter += 1
                                         k += 1
-                                        counter += 1
                                     any_changes = True
                                 if possiblementup == True:
                                     counter = 1
                                     k = place
                                     while counter < column_totals[j]:
-                                        checkunsures(k, j)
-                                        board[k][j] = "."
+                                        if board[k][j] == "N":
+                                            checkunsures(k, j)
+                                            board[k][j] = "."
+                                            counter += 1
                                         k -= 1
-                                        counter += 1
                                     any_changes = True
                 
                 # do the same for rows
@@ -1796,7 +1849,7 @@ class Solver:
                 possiblementleft = False
                 possibles = 0
                 for i in range(len(board)):
-                    if i + 1 in edgerows and i-1 >= 0 and i + 1 < len(board):
+                    if i + 1 in edgerows and i-1 >= 0 and i + 1 < len(board) and i not in edgerows:
                         if (row_totals[i+1] == 1 or row_totals[i+1] == 0) and row_totals[i-1] == 1:
                             for j in range(len(board)):
                                 if (board[i+1][j] == H) or (board[i+1][j] == RD) or (board[i+1][j] == RU) or (board[i+1][j] == LD) or (board[i+1][j] == LU) or (board[i+1][j] == V):
@@ -1811,7 +1864,7 @@ class Solver:
                                             break
                                         k += 1
                                         counter += 1
-                                    if counter == row_totals[i]:
+                                    if counter == row_totals[i] and k < len(board):
                                         possiblementright = True
                                         possibles += 1
                                     counter = 1
@@ -1823,7 +1876,7 @@ class Solver:
                                             break
                                         k -= 1
                                         counter += 1
-                                    if counter == row_totals[i]:
+                                    if counter == row_totals[i] and k >= 0:
                                         possiblementleft = True
                                         possibles += 1
 
@@ -1832,19 +1885,21 @@ class Solver:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
-                                        checkunsures(i, k)
-                                        board[i][k] = "."
+                                        if board[i][k] == "N":
+                                            checkunsures(i, k)
+                                            board[i][k] = "."
+                                            counter += 1
                                         k += 1
-                                        counter += 1
                                     any_changes = True
                                 if possiblementleft == True:
                                     counter = 1
                                     k = place
                                     while counter < row_totals[i]:
-                                        checkunsures(i, k)
-                                        board[i][k] = "."
+                                        if board[i][k] == "N":
+                                            checkunsures(i, k)
+                                            board[i][k] = "."
+                                            counter += 1
                                         k -= 1
-                                        counter += 1
                                     any_changes = True
                 
                 print("Unique rule used")###
@@ -1856,94 +1911,99 @@ class Solver:
                 # if one of the nodes in column is a H, RD, RU
                 # make the corresponding node in the column to the right an H
 
-                for j in range(len(board)):
-                    if j + 1 < len(board):
-                        if column_totals[j+1] == 1:
-                            for i in range(len(board)):
-                                if board[i][j] == H:
-                                    if board[i][j+1] != H:
-                                        checkunsures(i, j+1)
-                                        board[i][j+1] = H
-                                        any_changes = True
-                                elif board[i][j] == RD:
-                                    if board[i][j+1] != H:
-                                        checkunsures(i, j+1)
-                                        board[i][j+1] = H
-                                        any_changes = True
-                                elif board[i][j] == RU:
-                                    if board[i][j+1] != H:
-                                        checkunsures(i, j+1)
-                                        board[i][j+1] = H
-                                        any_changes = True
+                # for j in range(len(board)):
+                #     if j + 1 < len(board):
+                #         if column_totals[j+1] == 1:
+                #             for i in range(len(board)):
+                #                 if board[i][j] == H:
+                #                     if board[i][j+1] != H:
+                #                         checkunsures(i, j+1)
+                #                         board[i][j+1] = H
+                #                         any_changes = True
+                #                 elif board[i][j] == RD:
+                #                     if board[i][j+1] != H:
+                #                         checkunsures(i, j+1)
+                #                         board[i][j+1] = H
+                #                         any_changes = True
+                #                 elif board[i][j] == RU:
+                #                     if board[i][j+1] != H:
+                #                         checkunsures(i, j+1)
+                #                         board[i][j+1] = H
+                #                         any_changes = True
                 
-                # do the same for rows
-                for i in range(len(board)):
-                    if i + 1 < len(board):
-                        if row_totals[i+1] == 1:
-                            for j in range(len(board)):
-                                if board[i][j] == V:
-                                    if board[i+1][j] != V:
-                                        checkunsures(i+1, j)
-                                        board[i+1][j] = V
-                                        any_changes = True
-                                elif board[i][j] == RD:
-                                    if board[i+1][j] != V:
-                                        checkunsures(i+1, j)
-                                        board[i+1][j] = V
-                                        any_changes = True
-                                elif board[i][j] == LD:
-                                    if board[i+1][j] != V:
-                                        checkunsures(i+1, j)
-                                        board[i+1][j] = V
-                                        any_changes = True
-                # do the same but swap left and right
-                # if column to the left has column total = 1
-                # if one of the nodes in column is a H, LD, LU
-                # make the corresponding node in the column to the left an H
-                for j in range(len(board)):
-                    if j - 1 >= 0:
-                        if column_totals[j-1] == 1:
-                            for i in range(len(board)):
-                                if board[i][j] == H:
-                                    if board[i][j-1] != H:
-                                        checkunsures(i, j-1)
-                                        board[i][j-1] = H
-                                        any_changes = True
-                                elif board[i][j] == LD:
-                                    if board[i][j-1] != H:
-                                        checkunsures(i, j-1)
-                                        board[i][j-1] = H
-                                        any_changes = True
-                                elif board[i][j] == LU:
-                                    if board[i][j-1] != H:
-                                        checkunsures(i, j-1)
-                                        board[i][j-1] = H
-                                        any_changes = True
+                # # do the same for rows
+                # for i in range(len(board)):
+                #     if i + 1 < len(board):
+                #         if row_totals[i+1] == 1:
+                #             for j in range(len(board)):
+                #                 if board[i][j] == V:
+                #                     if board[i+1][j] != V:
+                #                         checkunsures(i+1, j)
+                #                         board[i+1][j] = V
+                #                         any_changes = True
+                #                 elif board[i][j] == RD:
+                #                     if board[i+1][j] != V:
+                #                         checkunsures(i+1, j)
+                #                         board[i+1][j] = V
+                #                         any_changes = True
+                #                 elif board[i][j] == LD:
+                #                     if board[i+1][j] != V:
+                #                         checkunsures(i+1, j)
+                #                         board[i+1][j] = V
+                #                         any_changes = True
+                # # do the same but swap left and right
+                # # if column to the left has column total = 1
+                # # if one of the nodes in column is a H, LD, LU
+                # # make the corresponding node in the column to the left an H
+                # for j in range(len(board)):
+                #     if j - 1 >= 0:
+                #         if column_totals[j-1] == 1:
+                #             for i in range(len(board)):
+                #                 if board[i][j] == H:
+                #                     if board[i][j-1] != H:
+                #                         checkunsures(i, j-1)
+                #                         board[i][j-1] = H
+                #                         any_changes = True
+                #                 elif board[i][j] == LD:
+                #                     if board[i][j-1] != H:
+                #                         checkunsures(i, j-1)
+                #                         board[i][j-1] = H
+                #                         any_changes = True
+                #                 elif board[i][j] == LU:
+                #                     if board[i][j-1] != H:
+                #                         checkunsures(i, j-1)
+                #                         board[i][j-1] = H
+                #                         any_changes = True
                 
-                # do the same for rows
-                for i in range(len(board)):
-                    if i - 1 >= 0:
-                        if row_totals[i-1] == 1:
-                            for j in range(len(board)):
-                                if board[i][j] == V:
-                                    if board[i-1][j] != V:
-                                        checkunsures(i-1, j)
-                                        board[i-1][j] = V
-                                        any_changes = True
-                                elif board[i][j] == RU:
-                                    if board[i-1][j] != V:
-                                        checkunsures(i-1, j)
-                                        board[i-1][j] = V
-                                        any_changes = True
-                                elif board[i][j] == LU:
-                                    if board[i-1][j] != V:
-                                        checkunsures(i-1, j)
-                                        board[i-1][j] = V
-                                        any_changes = True
+                # # do the same for rows
+                # for i in range(len(board)):
+                #     if i - 1 >= 0:
+                #         if row_totals[i-1] == 1:
+                #             for j in range(len(board)):
+                #                 if board[i][j] == V:
+                #                     if board[i-1][j] != V:
+                #                         checkunsures(i-1, j)
+                #                         board[i-1][j] = V
+                #                         any_changes = True
+                #                 elif board[i][j] == RU:
+                #                     if board[i-1][j] != V:
+                #                         checkunsures(i-1, j)
+                #                         board[i-1][j] = V
+                #                         any_changes = True
+                #                 elif board[i][j] == LU:
+                #                     if board[i-1][j] != V:
+                #                         checkunsures(i-1, j)
+                #                         board[i-1][j] = V
+                #                         any_changes = True
 
-                print("Unique rule used")
-                print()
-                Solver.print_board(board)
+                # print("Unique rule used")
+                # print()
+                # Solver.print_board(board)
+
+
+
+                ##### to be changed #####
+
 
                 # unique rule
                 # if 2nd column has column total = 2
@@ -2054,10 +2114,13 @@ class Solver:
                                 board[len(board) - 2][dotpos[0]] = V
                                 any_changes = True
 
+
+                ### possibly useless rule?
+
                 ### diff rule
 
                 if column_totals[1] == 2:
-                    if any_changes == False:
+                    if any_changes == False or any_changes == True: ###changed
                         satisfactory = False
                         count = 0
                         for i in range(len(board)):
@@ -2217,7 +2280,7 @@ class Solver:
                             if satisfactory == True:
                                 for i in range(len(board)):
                                     if (board[i][len(board) - 1] == LD) or (board[i][len(board) - 1] == RD):
-                                        while i < 0:
+                                        while i < 0: ####### errrr what is this
                                             i -= 1
                                             checkunsures(i, len(board) - 1)
                                             board[i][len(board) - 1] = "X"
@@ -2347,13 +2410,17 @@ class Solver:
                                                     counter += 1
                                                     any_changes = True
 
+
+
+                #REWRITE
+
                 #for each column which has column total = 1
                 # for each node in the column
                 # if the node to the left is an X, LU,LD,V or the node to the right is an X, RU, RD, V
                 # make the node an X
 
                 for j in range(len(board)):
-                    if column_totals[j] == 1:
+                    if column_totals[j] == 1: ##### and not in edgecolumns surely????? ######
                         for i in range(len(board)):
                             if j - 1 >= 0 and (board[i][j-1] == "X" or board[i][j-1] == LU or board[i][j-1] == LD or board[i][j-1] == V):
                                 checkunsures(i, j)
@@ -2380,6 +2447,9 @@ class Solver:
                                 if board[i][j] != "X":
                                     any_changes = True
                                 board[i][j] = "X"
+
+
+
 
 
                 # if the first row has row total = definites in row + 1
@@ -2487,6 +2557,9 @@ class Solver:
                                 board[i][len(board) - 1] = "X"
 
 
+
+
+
                 if bruteforceneeded == True:
                     
                     # for each shape in grid
@@ -2529,6 +2602,9 @@ class Solver:
                                     count += 1
                                 if count >= 3:
                                     flagimpossible = True
+
+
+                    ##### following rule not necessarily working
 
                     # for dot in grid
                     # if the dot is surrounded by 3 shapes which go into it, flag as impossible
