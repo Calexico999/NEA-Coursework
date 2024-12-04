@@ -85,15 +85,15 @@ class Generator:
             path = path_generator.dfs(start)
         # Build the board with dimensions board_size x board_size
         build_board = [['X' for _ in range(board_size)] for _ in range(board_size)]
-        start_node_generated = path[0]
-        generated_x = start_node_generated[0]
-        generated_y = start_node_generated[1]
+        generated_x = path[0][0]
+        generated_y = path[0][1]
+
         start_x = generated_x
         start_y = generated_y
         
-        currentnodegenerated = path[1]
-        currentx = currentnodegenerated[0]
-        currenty = currentnodegenerated[1]
+        currentx = path[1][0]
+        currenty = path[1][1]
+
         if generated_x == currentx:
             if generated_y < currenty:
                 directionpath = "right"
@@ -106,57 +106,33 @@ class Generator:
                 directionpath = "up"
 
         if directionpath == "right":
-            done = False
             if generated_x == 0:
                 build_board[generated_x][generated_y] = "└"
-                done = True
-            if generated_x == board_size - 1 and done == False:
+            elif generated_x == board_size - 1:
                 build_board[generated_x][generated_y] = "┌"
-                done = True
-            if generated_y == 0 and done == False:
+            elif generated_y == 0:
                 build_board[generated_x][generated_y] = "─"
-                done = True
-            if done == False:
-                print("Error")
-        if directionpath == "left":
-            done = False
+        elif directionpath == "left":
             if generated_x == 0:
                 build_board[generated_x][generated_y] = "┘"
-                done = True
-            if generated_x == board_size - 1 and done == False:
+            elif generated_x == board_size - 1:
                 build_board[generated_x][generated_y] = "┐"
-                done = True
-            if generated_y == board_size - 1 and done == False:
+            elif generated_y == board_size - 1:
                 build_board[generated_x][generated_y] = "─"
-                done = True
-            if done == False:
-                print("Error")
-        if directionpath == "up":
-            done = False
+        elif directionpath == "up":
             if generated_x == board_size - 1:
                 build_board[generated_x][generated_y] = "│"
-                done = True
-            if generated_y == 0 and done == False:
+            elif generated_y == 0:
                 build_board[generated_x][generated_y] = "┘"
-                done = True
-            if generated_y == board_size - 1 and done == False:
+            elif generated_y == board_size - 1:
                 build_board[generated_x][generated_y] = "└"
-                done = True
-            if done == False:
-                print("Error")
-        if directionpath == "down":
-            done = False
+        elif directionpath == "down":
             if generated_x == 0:
                 build_board[generated_x][generated_y] = "│"
-                done = True
-            if generated_y == 0 and done == False:
+            elif generated_y == 0:
                 build_board[generated_x][generated_y] = "┐"
-                done = True
-            if generated_y == board_size - 1 and done == False:
+            elif generated_y == board_size - 1:
                 build_board[generated_x][generated_y] = "┌"
-                done = True
-            if done == False:
-                print("Error")
         
         while len(path) > 2 and (currentx != path[-1][0] or currenty != path[-1][1]):
             previousx = path[0][0]
@@ -168,31 +144,32 @@ class Generator:
             nexty = path[1][1]
             if nextx + 2 == previousx:
                 build_board[currentx][currenty] = "│"
-            if nextx - 2 == previousx:
+            elif nextx - 2 == previousx:
                 build_board[currentx][currenty] = "│"
-            if nexty + 2 == previousy:
+            elif nexty + 2 == previousy:
                 build_board[currentx][currenty] = "─"
-            if nexty - 2 == previousy:
+            elif nexty - 2 == previousy:
                 build_board[currentx][currenty] = "─"
+
             if nextx + 1 == previousx and nexty + 1 == previousy:
                 if currentx == previousx:
                     build_board[currentx][currenty] = "└"
-                if currenty == previousy:
+                else:
                     build_board[currentx][currenty] = "┐"
-            if nextx - 1 == previousx and nexty - 1 == previousy:
+            elif nextx - 1 == previousx and nexty - 1 == previousy:
                 if currentx == previousx:
                     build_board[currentx][currenty] = "┐"
-                if currenty == previousy:
+                else:
                     build_board[currentx][currenty] = "└"
-            if nextx + 1 == previousx and nexty - 1 == previousy:
+            elif nextx + 1 == previousx and nexty - 1 == previousy:
                 if currentx == previousx:
                     build_board[currentx][currenty] = "┘"
-                if currenty == previousy:
+                else:
                     build_board[currentx][currenty] = "┌"
-            if nextx - 1 == previousx and nexty + 1 == previousy:
+            elif nextx - 1 == previousx and nexty + 1 == previousy:
                 if currentx == previousx:
                     build_board[currentx][currenty] = "┌"
-                if currenty == previousy:
+                else:
                     build_board[currentx][currenty] = "┘"
         
         path.pop(0)
@@ -269,7 +246,7 @@ class Generator:
         startingshapes.append((start[0], start[1], xshape))
         startingshapes.append((endx, endy, yshape))
 
-        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
 
 
     def manual_board(self):
@@ -302,7 +279,7 @@ class Generator:
         endy = end[1]
         board_size = size
 
-        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation
+        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
 
     def get_starting_position(self, size):
         while True:
@@ -378,8 +355,6 @@ class Solver:
     def Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation):
         bruteforceneeded = False
         end = (endx, endy)
-
-
         edgerulesneeded = False
         any_changes = True
         RD = "┌"
@@ -2885,11 +2860,7 @@ class Solver:
 
                 any_changes = True
 
-# if generation = "y"
-# generate board using subroutine buildaboard
-# if generation = "n"
-# generate board using subroutine manualboard
-# then solve using solver.solve
+
 
 class EditBoard:
     def manual_edit(board,editboard, column_totals, row_totals):
@@ -2950,19 +2921,6 @@ class EditBoard:
         time4 = None
 
         while True:
-            # print enter row and column in form row, column or s to view solution
-            # print enter shape
-
-            # if row and column are in the form row, column
-            # if shape is a shape
-            # change the board position designated by row and column to shape
-            # print the board
-            # if the board is solved, print "solved"
-
-            # if s is entered
-            # print the solution
-            # print the board
-            # if the board is solved, print "solved"
 
             print()
 
@@ -3072,7 +3030,7 @@ class EditBoard:
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
-                        success = False
+                        success = False #####break?????????
             if success == True: 
                 #find time
 
@@ -3135,54 +3093,243 @@ def Settings():
         data = f.readline()
         data = data.split(",")
         score = float(data[0])
-        data = int(data[1])
+        onofftimetaken = int(data[1])
+        onoffpercent = int(data[2])
+        onoffhints = int(data[3])
+        onoffsolution = int(data[4])
+        maxstartingshapes = int(data[5])
+        gamesplayed = int(data[6])
     
     f.close()
-    if data == 0:
-        print("Hard mode disabled, type H to enable hard mode")
-        hardmode = input()
-        if hardmode == "H":
-            with open("account.csv", "w") as f:
-                f.write(f"{score},1")
+    print()
+    print("Current Settings")
+    print()
 
-    if data == 1:
-        print("Hard mode enabled, type N to disable hard mode")
-        hardmode = input()
-        if hardmode == "N":
-            with open("account.csv", "w") as f:
-                f.write(f"{score},0")
-                
+    if onofftimetaken == 0:
+        print("Time taken viewing is off")
+    else:
+        print("Time taken viewing is on")
 
+    if onoffpercent == 0:
+        print("Percent complete viewing is off")
+    else:
+        print("Percent complete viewing is on")
+
+    if onoffhints == 0:
+        print("Hints are off- this is the recommended setting")
+
+    else:
+        print("Hints are on- this is not the recommended setting")
+
+    if onoffsolution == 0:
+        print("Solution viewing is off- this is the recommended setting")
+    else:
+        print("Solution viewing is on- to discourage cheating, we recommend turning this off")
+
+    print("Maximum starting shapes: ", maxstartingshapes)
+
+    print()
+
+    print("Enter 1 to turn time taken viewing on or off")
+    print("Enter 2 to turn percent complete viewing on or off")
+    print("Enter 3 to turn hints on or off")
+    print("Enter 4 to turn solution viewing on or off")
+    print("Enter 5 to change the maximum starting shapes")
+    print("Enter 6 to turn on hard mode")
+    print("Enter 7 to return settings to default")
+    print("Enter 8 to return to the main menu")
+    print("Enter 9 to reset account")
+
+    choice = input()
+    while choice not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+        choice = input("Enter a valid choice: ")
+    
+    if choice == "1":
+        if onofftimetaken == 0:
+            print("Time taken viewing is off, type y to turn on or n to keep off: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onofftimetaken = 1
+        else:
+            print("Time taken viewing is on, type y to turn off or n to keep on: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onofftimetaken = 0
+    
+    if choice == "2":
+        if onoffpercent == 0:
+            print("Percent complete viewing is off, type y to turn on or n to keep off: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onoffpercent = 1
+        else:
+            print("Percent complete viewing is on, type y to turn off or n to keep on: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onoffpercent = 0
+        
+    if choice == "3":
+        if onoffhints == 0:
+            print("Hints are off, type y to turn on or n to keep off: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onoffhints = 1
+        else:
+            print("Hints are on, type y to turn off or n to keep on: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onoffhints = 0
+
+    if choice == "4":
+        if onoffsolution == 0:
+            print("Solution viewing is off, type y to turn on or n to keep off: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onoffsolution = 1
+        else:
+            print("Solution viewing is on, type y to turn off or n to keep on: ")
+            choice = input()
+            while choice not in ["y", "n"]:
+                choice = input("Enter a valid choice: ")
+            if choice == "y":
+                onoffsolution = 0
+
+    if choice == "5":
+        print("Enter the maximum starting shapes (minimum of 2): ")
+        print("Current maximum: ", maxstartingshapes)
+        choice = input()
+        while not choice.isdigit() or int(choice) < 2:
+            choice = input("Enter a valid number: ")
+        maxstartingshapes = int(choice)
+        print("Maximum starting shapes changed to: ", maxstartingshapes)
+
+    if choice == "6":
+        # hard mode resets onoffhints to 0, onoffsolution to 0, and maxstartingshapes to 4
+        print("Type h to confirm hard mode")
+        print("This disables hints, solution viewing and makes maximum starting shapes 4")
+
+        choice = input()
+        if choice.upper() == "H":
+            onoffhints = 0
+            onoffsolution = 0
+            maxstartingshapes = 4
+            print("Hard mode enabled")
+
+    if choice == "7":
+        # return settings to default
+        onofftimetaken = 1
+        onoffpercent = 0
+        onoffhints = 0
+        onoffsolution = 0
+        maxstartingshapes = 7
+        print("Settings returned to default")
+    
+    if choice == "8":
+        # return to main menu
+        MainMenu()
+
+    if choice == "9":
+        print("Are you sure you want to reset your account? Type y to confirm. This cannot be redone. This will reset your score and settings to default")
+        choice = input()
+        if choice.upper() == "Y":
+            score = 0
+            onofftimetaken = 1
+            onoffpercent = 0
+            onoffhints = 0
+            onoffsolution = 0
+            maxstartingshapes = 7
+            gamesplayed = 0
+            print("Account reset")
+
+    with open("account.csv", "w") as f:
+        f.write(f"{score},{onofftimetaken},{onoffpercent},{onoffhints},{onoffsolution},{maxstartingshapes},{gamesplayed}")
+
+    f.close()
+    Settings()
 
 
 def MainMenu():
-    global generation
-    generation = ""
     rank = ""
     x = GetLevel(rank)
     print("Welcome", x)
-    print("Enter S for settings, or any other key to continue")
-    settings = input()
-    if settings == "S":
-        Settings()
+    
+    while True:
+        print("Main Menu")
+        print("Enter 1 to play a game")
+        print("Enter 2 to view your rank") ###stats?
+        print("Enter 3 to view settings")
+        print("Enter 4 to quit")
+        print()
+        choice = input()
+        if choice == "1":
+            PlayGame()
+        elif choice == "2":
+            print("Your rank is: ", x)
+        elif choice == "3":
+            Settings()
+        elif choice == "4":
+            quit()
+
+        print()
+
+
+
+def PlayGame():
+    generation = ""
+    gamechoice = ""
+    while gamechoice not in ["G", "M", "F", "Q", "g", "m", "f", "q"]:
+        gamechoice = input("Enter G to generate a board, M to manually input a board, F to read from a file and Q to return to the main menu: ")
+
+    if gamechoice.upper() == "G":
+        generation = "y"
+        generator = Generator()
+        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = generator.build_board()
+        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+    
+    elif gamechoice.upper() == "M":
+        generation = "n"
+        generator = Generator()
+        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = generator.manual_board()
+        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+    
+    elif gamechoice.upper() == "F":
+        # read from csv
+        # board is first item in csv
+        # editboard is second item in csv
+        # column_totals is third item in csv
+        # row_totals is fourth item in csv
+
+        csvfile = input("Enter the name of the file: ")
+        with open(csvfile, "r") as f:
+            csv = f.readline()
+            csv = csv.split(",")
+            board = csv[0]
+            editboard = csv[1]
+            column_totals = csv[2]
+            row_totals = csv[3]
+
+        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
+
+    elif gamechoice.upper() == "Q":
         MainMenu()
 
-    while generation !='y' and generation != 'n':
-        generation = input("Would you like to generate a puzzle (y) or input your own (n)? ")
 
-    if generation == "y":
-        generator = Generator()
-        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = generator.build_board()#boardsize
 
-    if generation == "n":
-        generator = Generator()
-        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation = generator.manual_board()
-        
-    board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
-    EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
 MainMenu()
-
-
-#class Board
-# def __init__(self, board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation):
