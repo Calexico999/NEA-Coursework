@@ -503,7 +503,7 @@ class Solver:
                     return RD
 
         def checkunsures(a,b):
-            if bruteforceneeded == True:
+            if bruteforceneeded == True and generation == "n":
                 alreadyreplaced = False
                 for u in unsures:
                     if (u[0] == a) and (u[1] == b):
@@ -2945,18 +2945,14 @@ class EditBoard:
 
 
 def GetStats():
-    # use GetLevel to get the level
-    # use account.csv to get the number of games played
-    # find the average score
-
     print(GetLevel())
     with open("account.csv", "r") as f:
         data = f.readline()
         data = data.split(",")
         score = float(data[0])
         gamesplayed = int(data[6])
-
     f.close()
+
     if gamesplayed == 0:
         print("No games played")
     else:
@@ -2970,18 +2966,17 @@ def GetLevel():
         #split levelscore into a list
         levelscore = levelscore.split(",")
         levelscore = float(levelscore[0])
-    
     f.close()
 
     if levelscore < 1:
         rank = "Beginner"
-    if levelscore >= 1 and levelscore < 5:
+    elif levelscore >= 1 and levelscore < 5:
         rank = "Intermediate solver"
-    if levelscore >= 5 and levelscore < 20:
+    elif levelscore >= 5 and levelscore < 20:
         rank = "Advanced solver"
-    if levelscore >= 20 and levelscore < 100:
+    elif levelscore >= 20 and levelscore < 100:
         rank = "Elite Challenger"
-    if levelscore >= 100:
+    elif levelscore >= 100:
         rank = "Train Tracks Solver Elite"
     
     return rank
@@ -3178,7 +3173,7 @@ def MainMenu():
     while True:
         print("Main Menu")
         print("Enter 1 to play a game")
-        print("Enter 2 to view your stats") ###stats?
+        print("Enter 2 to view your stats")
         print("Enter 3 to view settings")
         print("Enter 4 to quit")
         print()
@@ -3201,13 +3196,11 @@ def PlayGame():
         gamechoice = input("Enter G to generate a board, M to manually input a board, F to read from a file and Q to return to the main menu: ")
 
     if gamechoice.upper() == "G":
-        # read max starting shapes from account.csv
         with open("account.csv", "r") as f:
             data = f.readline()
             data = data.split(",")
             maxstartingshapes = int(data[5])
         f.close()
-
 
         board_size = 0
         generation = "y"
@@ -3227,16 +3220,13 @@ def PlayGame():
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
     
     elif gamechoice.upper() == "F":
-
         files = find_pkl_files()
         print()
         print("Files available: ")
         print()
         for file in files:
             print(file)
-
         print()
-
         picklefile = input("Enter the name of the file (Dont include file type) ")
         picklefile = picklefile + ".pkl"
 
@@ -3244,22 +3234,17 @@ def PlayGame():
             print("File not found")
             PlayGame()
 
-
         with open(picklefile, "rb") as f:
             pick = pickle.load(f)
-
         print(pick)
-
         board = pick[0]
         editboard = pick[1]
         column_totals = pick[2]
         row_totals = pick[3]
-
-        #close file
         f.close()
         generation = "n"
-        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
+        EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
     elif gamechoice.upper() == "Q":
         MainMenu()
