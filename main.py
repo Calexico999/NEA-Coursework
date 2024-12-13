@@ -3,14 +3,13 @@ import datetime
 import pickle
 import os
 
-# Box drawing characters: ┌ ┐ └ ┘ ─ │ 
 # book 3 p175 has 2 possible other rules ####
 
 class GenerateRandomPath:
     def __init__(self, board_size):
         #Initializes the path generator with the given board size
         self.board_size = board_size
-        self.visited = set()
+        # self.visited = set()
 
     def generate_start_node(self):
         edge = False
@@ -207,8 +206,8 @@ class Generator:
 
         xshape = build_board[start[0]][start[1]]
         yshape = build_board[path[0][0]][path[0][1]]
-        build_board[path[0][0]][path[0][1]] = "E"
-        build_board[start_x][start_y] = "S"
+        # build_board[path[0][0]][path[0][1]] = "E"
+        # build_board[start_x][start_y] = "S"
         # list of box drawing characters and "E"
         listofchars = ["┌", "┐", "└", "┘", "─", "│", "E", "S"]
         column_totals = []
@@ -232,20 +231,22 @@ class Generator:
         SAVEDBOARD = []
         for i in range(len(board)):
             SAVEDBOARD.append(board[i].copy())
-        for i in range(len(board)):
-            for j in range(len(board)):
-                if board[i][j] != "S" and board[i][j] != "E":
-                    board[i][j] = "N"
-                if board[i][j] == "S":
-                    board[i][j] = xshape
-                if board[i][j] == "E":
-                    board[i][j] = yshape
+        # for i in range(len(board)):
+        #     for j in range(len(board)):
+        #         if board[i][j] != "S" and board[i][j] != "E":
+        #             board[i][j] = "N"
+        #         if board[i][j] == "S":
+        #             board[i][j] = xshape
+        #         if board[i][j] == "E":
+        #             board[i][j] = yshape
 
         startingshapes = []
         startingshapes.append((start[0], start[1], xshape))
         startingshapes.append((endx, endy, yshape))
 
-        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
+        # end = (endx, endy)
+
+        return board, column_totals, row_totals, SAVEDBOARD, startingshapes
 
 
     def manual_board(self):
@@ -255,8 +256,6 @@ class Generator:
             size = input("Enter the size of the board (edge length in range 4-10): ")
         
         size = int(size)
-
-
 
         board = [["N"] * size for _ in range(size)]
         start, xshape = self.get_starting_position(size)
@@ -277,13 +276,13 @@ class Generator:
                 print("Invalid input. Please enter Y or N.")
 
         SAVEDBOARD = []
-        endx = end[0]
-        endy = end[1]
-        board_size = size
+        # endx = end[0]
+        # endy = end[1]
+        # board_size = size
         column_totals = []
         row_totals = []
 
-        return board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes
+        return board, column_totals, row_totals, SAVEDBOARD, startingshapes
 
     def get_starting_position(self, size):
         while True:
@@ -336,31 +335,17 @@ class Generator:
 
 
 class Solver:
-    # Box drawing characters
-    RD = "┌"
-    LD = "┐"
-    RU = "└"
-    LU = "┘"
-    H = "─"
-    V = "│"
-    DOT = "."
-    NULL = "0"
-    characters = {
-        'RD': RD,
-        'LD': LD,
-        'RU': RU,
-        'LU': LU,
-        'H': H,
-        'V': V
-    }
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
-    def Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation):
+    def Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation):
+
+        start = (startingshapes[0][0], startingshapes[0][1])
+        end = (startingshapes[1][0], startingshapes[1][1])
         bruteforceneeded = False
-        end = (endx, endy)
         edgerulesneeded = False
         any_changes = True
+        # Box drawing characters: ┌ ┐ └ ┘ ─ │
         RD = "┌"
         LD = "┐"
         RU = "└"
@@ -382,13 +367,19 @@ class Solver:
         satisfactory = False
         minirules = True
 
+
+        # board size is the length of the first list in board
+        if len(column_totals) == 0:
+            board_size = len(board[0])
+
+
         if len(column_totals) == 0:
             #ask user for column and row totals
             # give option for user to re-input all column and row totals
 
             print()
             print("First column is column 0, first row is row 0.")
-            print("If you make a mistake, enter any invalid input (e.g. nothing) and you will be prompted to re-enter all column/row totals.")
+            print("If you make a mistake, enter any invalid input (e.g. nothing) and you will be prompted to re-enter all column or row totals.")
 
             while len(column_totals) < board_size:
                 i = 0
@@ -405,6 +396,8 @@ class Solver:
                     if column_totals[i] > board_size:
                         print("No column total cannot be greater than the board size. Re-enter all column totals.")
                         column_totals = []
+
+
 
             while len(row_totals) < board_size:
                 i = 0
@@ -443,6 +436,19 @@ class Solver:
                     startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], V)
                     board[startingshapes[i][0]][startingshapes[i][1]] = V
 
+        nodenumber = 0
+        for i in range(len(column_totals)):
+            nodenumber += column_totals[i]
+
+        characters = {
+            'RD': RD,
+            'LD': LD,
+            'RU': RU,
+            'LU': LU,
+            'H': H,
+            'V': V
+        }
+        
         definites = {
             'RD': RD,
             'LD': LD,
@@ -532,8 +538,8 @@ class Solver:
             print("\nFirst stage:")
             for i in range(len(board)):
                 for j in range(len(board)):
-                    if board[i][j] in Solver.characters.values():
-                        if board[i][j] == Solver.RD:
+                    if board[i][j] in characters.values():
+                        if board[i][j] == RD:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
                                 checkunsures(i + 1, j)
                                 board[i + 1][j] = '.'
@@ -542,7 +548,7 @@ class Solver:
                                 checkunsures(i, j + 1)
                                 board[i][j + 1] = '.'
                                 any_changes = True
-                        elif board[i][j] == Solver.LD:
+                        elif board[i][j] == LD:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
                                 checkunsures(i + 1, j)
                                 board[i + 1][j] = '.'
@@ -551,7 +557,7 @@ class Solver:
                                 checkunsures(i, j - 1)
                                 board[i][j - 1] = '.'
                                 any_changes = True
-                        elif board[i][j] == Solver.RU:
+                        elif board[i][j] == RU:
                             if i - 1 >= 0 and board[i - 1][j] == "N":
                                 checkunsures(i - 1, j)
                                 board[i - 1][j] = '.'
@@ -560,7 +566,7 @@ class Solver:
                                 checkunsures(i, j + 1)
                                 board[i][j + 1] = '.'
                                 any_changes = True
-                        elif board[i][j] == Solver.LU:
+                        elif board[i][j] == LU:
                             if i - 1 >= 0 and board[i - 1][j] == "N":
                                 checkunsures(i - 1, j)
                                 board[i - 1][j] = '.'
@@ -569,7 +575,7 @@ class Solver:
                                 checkunsures(i, j - 1)
                                 board[i][j - 1] = '.'
                                 any_changes = True
-                        elif board[i][j] == Solver.H:
+                        elif board[i][j] == H:
                             if j + 1 < len(board) and board[i][j + 1] == "N":
                                 checkunsures(i, j + 1)
                                 board[i][j + 1] = '.'
@@ -578,7 +584,7 @@ class Solver:
                                 checkunsures(i, j - 1)
                                 board[i][j - 1] = '.'
                                 any_changes = True
-                        elif board[i][j] == Solver.V:
+                        elif board[i][j] == V:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
                                 checkunsures(i + 1, j)
                                 board[i + 1][j] = '.'
@@ -1158,7 +1164,7 @@ class Solver:
             
             i,j = start
             previ,prevj = start
-            iend,jend = endx, endy
+            iend,jend = end[0], end[1]
             isashape = True
             fromstartcount = 1
 
@@ -1303,18 +1309,10 @@ class Solver:
                     isashape = True
 
             if iend == i and jend == j:
-                nodenumber = 0
-                # for i in column_totals
-                # add to nodenumber
-
-                for i in range(len(column_totals)):
-                    nodenumber += column_totals[i]
 
                 if fromstartcount != nodenumber:
                     flagimpossible = True
                 else:
-                    flagimpossible = False
-                    any_changes = False
                     print("Solved succesfully")
                     Solver.print_board(board)
                     print()
@@ -2637,10 +2635,9 @@ class Solver:
                 any_changes = True
 
 
+
 class EditBoard:
-
     def manual_edit(board,editboard, column_totals, row_totals):
-
         timeshow = False
         percshow = False
         hintson = False
@@ -3205,18 +3202,18 @@ def PlayGame():
         board_size = 0
         generation = "y"
         generator = Generator()
-        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = generator.build_board(board_size)
-        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+        board, column_totals, row_totals, SAVEDBOARD, startingshapes = generator.build_board(board_size)
+        board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation)
         while len(startingshapes) > maxstartingshapes:
-            board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = generator.build_board(board_size)
-            board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+            board, column_totals, row_totals, SAVEDBOARD, startingshapes = generator.build_board(board_size)
+            board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation)
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
     
     elif gamechoice.upper() == "M":
         generation = "n"
         generator = Generator()
-        board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes = generator.manual_board()
-        board, editboard, column_totals, row_totals = Solver.Solve(board, board_size, column_totals, row_totals, SAVEDBOARD, xshape, yshape, start, endx, endy, startingshapes, generation)
+        board, column_totals, row_totals, SAVEDBOARD, startingshapes = generator.manual_board()
+        board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation)
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
     
     elif gamechoice.upper() == "F":
