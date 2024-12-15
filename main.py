@@ -965,7 +965,6 @@ class Solver:
                                 if (board[i][j+1] == RU) or (board[i][j+1] == RD) or (board[i][j+1] == V) or (board[i][j+1] == 'X'):
                                     directions.append('right')
                             if len(directions) >= 3:
-                                #impossible
                                 flagimpossible = True
             
             i,j = start
@@ -1138,8 +1137,10 @@ class Solver:
             edgerulesneeded = False
             if any_changes == False:
                 edgerulesneeded = True
+
+
+
             if edgerulesneeded == True:
-                # check if board 0 and board 1 are not shape already??????
                 if column_totals[0] == len(board) - 1:
                     if (board[2][0] == H or board[2][0] == LD or board[2][0] == RD) and (board[0][0] == 'N'):
                         add_to_unsures(0, 0)
@@ -1219,12 +1220,12 @@ class Solver:
                     if count == len(board):
                         edgerows.append(i)
 
+
+
                 # for each column
                 # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
                 # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
                 # if the length of list is 1, change the square to a dot, and change all other 'N's in the column to 'X'
-
-                ##### RE LOOK AT THIS ONE
 
                 for j in range(len(board)):
                     if (j - 1 in edgecolumns) or (j + 1 in edgecolumns) and j not in edgecolumns:
@@ -1290,6 +1291,10 @@ class Solver:
                                         board[i][j] = "X"
                                         any_changes = True
                 
+
+
+
+
                 ###### edge rules part 2 ######
                 # for each column
                 # if column to the left is an edge
@@ -1301,6 +1306,8 @@ class Solver:
                 # including this node, go up until nodes in column = column total
                 # if any of these nodes are 'X', this direction is considered invalid
                 # if one of the directions is valid, change all of these nodes to '.'
+
+                #TRACE
 
                 possiblementdown = False
                 possiblementup = False
@@ -1317,7 +1324,7 @@ class Solver:
                                         if k > len(board):
                                             break
                                         if board[k][j] == "X":
-                                            counter = -10000
+                                            counter = -100
                                             break
                                         k += 1
                                         counter += 1
@@ -1339,26 +1346,26 @@ class Solver:
 
                             if possibles == 1:
                                 if possiblementdown == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < column_totals[j]:
+                                        if board[k][j] in definites.values():
+                                            counter += 1
                                         if board[k][j] == "N":
                                             add_to_unsures(k, j)
                                             board[k][j] = "."
-                                            counter += 1
-                                        if board[k][j] in definites.values():
                                             counter += 1
                                         k += 1
                                     any_changes = True
                                 if possiblementup == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < column_totals[j]:
+                                        if board[k][j] in definites.values():
+                                            counter += 1
                                         if board[k][j] == "N":
                                             add_to_unsures(k, j)
                                             board[k][j] = "."
-                                            counter += 1
-                                        if board[k][j] in definites.values():
                                             counter += 1
                                         k -= 1
                                     any_changes = True
@@ -1379,7 +1386,7 @@ class Solver:
                                         if k > len(board):
                                             break
                                         if board[i][k] == "X":
-                                            counter = -10000
+                                            counter = -100
                                             break
                                         k += 1
                                         counter += 1
@@ -1401,26 +1408,26 @@ class Solver:
 
                             if possibles == 1:
                                 if possiblementright == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < row_totals[i]:
+                                        if board[i][k] in definites.values():
+                                            counter += 1
                                         if board[i][k] == "N":
                                             add_to_unsures(i, k)
                                             board[i][k] = "."
                                             counter += 1
-                                        if board[i][k] in definites.values():
-                                            counter += 1
                                         k += 1
                                     any_changes = True
                                 if possiblementleft == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < row_totals[i]:
+                                        if board[i][k] in definites.values():
+                                            counter += 1
                                         if board[i][k] == "N": ###outofrange
                                             add_to_unsures(i, k)
                                             board[i][k] = "."
-                                            counter += 1
-                                        if board[i][k] in definites.values():
                                             counter += 1
                                         k -= 1
                                     any_changes = True
@@ -1451,7 +1458,7 @@ class Solver:
                                         if k > len(board):
                                             break
                                         if board[k][j] == "X":
-                                            counter = -10000
+                                            counter = -100
                                             break
                                         k += 1
                                         counter += 1
@@ -1473,26 +1480,26 @@ class Solver:
 
                             if possibles == 1:
                                 if possiblementdown == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < column_totals[j]:
+                                        if board[k][j] in definites.values():
+                                            counter += 1
                                         if board[k][j] == "N":
                                             add_to_unsures(k, j)
                                             board[k][j] = "."
-                                            counter += 1
-                                        if board[k][j] in definites.values():
                                             counter += 1
                                         k += 1
                                     any_changes = True
                                 if possiblementup == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < column_totals[j]:
+                                        if board[k][j] in definites.values():
+                                            counter += 1
                                         if board[k][j] == "N":
                                             add_to_unsures(k, j)
                                             board[k][j] = "."
-                                            counter += 1
-                                        if board[k][j] in definites.values(): ###changed
                                             counter += 1
                                         k -= 1
                                     any_changes = True
@@ -1513,7 +1520,7 @@ class Solver:
                                         if k > len(board):
                                             break
                                         if board[i][k] == "X":
-                                            counter = -10000
+                                            counter = -100
                                             break
                                         k += 1
                                         counter += 1
@@ -1535,31 +1542,31 @@ class Solver:
 
                             if possibles == 1:
                                 if possiblementright == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < row_totals[i]:
+                                        if board[i][k] in definites.values():
+                                            counter += 1
                                         if board[i][k] == "N":
                                             add_to_unsures(i, k)
                                             board[i][k] = "."
-                                            counter += 1
-                                        if board[i][k] in definites.values():
                                             counter += 1
                                         k += 1
                                     any_changes = True
                                 if possiblementleft == True:
-                                    counter = 1
+                                    counter = 0
                                     k = place
                                     while counter < row_totals[i]:
+                                        if board[i][k] in definites.values():
+                                            counter += 1
                                         if board[i][k] == "N":
                                             add_to_unsures(i, k)
                                             board[i][k] = "."
                                             counter += 1
-                                        if board[i][k] in definites.values():
-                                            counter += 1
                                         k -= 1
                                     any_changes = True
                 
-                print("Unique rule used")###
+                print("Unique rule used")
                 print()
                 Solver.print_board(board)
 
