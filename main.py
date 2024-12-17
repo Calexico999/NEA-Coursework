@@ -69,6 +69,7 @@ class GenerateRandomPath:
 
 
 class Generator:
+
     def build_board(self, board_size):
         while str(board_size).isnumeric() == False or int(board_size) < 4 or int(board_size) > 10:
             board_size = input("Enter the size of the board (edge length in range 4-10): ")
@@ -124,80 +125,56 @@ class Generator:
             elif previousy == board_size - 1:
                 build_board[previousx][previousy] = "┌"
         
-        while len(path) > 2 and (currentx != path[-1][0] or currenty != path[-1][1]):
-            previousx = path[0][0]
-            previousy = path[0][1]
-            path.pop(0)
-            currentx = path[0][0]
-            currenty = path[0][1]
-            nextx = path[1][0]
-            nexty = path[1][1]
-            if nextx + 2 == previousx:
-                build_board[currentx][currenty] = "│"
-            elif nextx - 2 == previousx:
-                build_board[currentx][currenty] = "│"
-            elif nexty + 2 == previousy:
-                build_board[currentx][currenty] = "─"
-            elif nexty - 2 == previousy:
-                build_board[currentx][currenty] = "─"
-            elif nextx + 1 == previousx and nexty + 1 == previousy:
-                if currentx == previousx:
-                    build_board[currentx][currenty] = "└"
-                else:
-                    build_board[currentx][currenty] = "┐"
-            elif nextx - 1 == previousx and nexty - 1 == previousy:
-                if currentx == previousx:
-                    build_board[currentx][currenty] = "┐"
-                else:
-                    build_board[currentx][currenty] = "└"
-            elif nextx + 1 == previousx and nexty - 1 == previousy:
-                if currentx == previousx:
-                    build_board[currentx][currenty] = "┘"
-                else:
-                    build_board[currentx][currenty] = "┌"
-            else:
-                if currentx == previousx:
-                    build_board[currentx][currenty] = "┌"
-                else:
-                    build_board[currentx][currenty] = "┘"
-        
-        path.pop(0)
-        endx = path[0][0]
-        endy = path[0][1]
-        changes = False
+        Generator.make_board(path, build_board)
+
+        currentx = path[-2][0]
+        currenty = path[-2][1]
+        endx = path[-1][0]
+        endy = path[-1][1]
         if currentx == endx:
-            if endy == len(build_board) - 1 or endy == 0:
-                build_board[path[0][0]][path[0][1]] = "─"
-                changes = True
+            if currenty < endy:
+                directionpath = "right"
             else:
-                if endx == 0 and endy > currenty:
-                    build_board[path[0][0]][path[0][1]] = "┘"
-                    changes = True
-                if endx == 0 and endy < currenty:
-                    build_board[path[0][0]][path[0][1]] = "└"
-                    changes = True
-                if endx == len(build_board) - 1 and endy > currenty:
-                    build_board[path[0][0]][path[0][1]] = "┐"
-                    changes = True
-                if endx == len(build_board) - 1 and endy < currenty:
-                    build_board[path[0][0]][path[0][1]] = "┌"
-                    changes = True
-        if currenty == endy and changes == False:
-            if endx == len(build_board) - 1 or endx == 0:
-                build_board[path[0][0]][path[0][1]] = "│"
+                directionpath = "left"
+        else:
+            if currentx < endx:
+                directionpath = "down"
             else:
-                if endy == 0 and endx > currentx:
-                    build_board[path[0][0]][path[0][1]] = "┘"
-                if endy == 0 and endx < currentx:
-                    build_board[path[0][0]][path[0][1]] = "┐"
-                if endy == len(build_board) - 1 and endx > currentx:
-                    build_board[path[0][0]][path[0][1]] = "└"
-                if endy == len(build_board) - 1 and endx < currentx:
-                    build_board[path[0][0]][path[0][1]] = "┌"
+                directionpath = "up"
+
+        if endx == 0:
+            if directionpath == "right":
+                build_board[endx][endy] = "┘"
+            elif directionpath == "up":
+                build_board[endx][endy] = "│"
+            elif directionpath == "left":
+                build_board[endx][endy] = "└"
+        elif endx == board_size - 1:
+            if directionpath == "right":
+                build_board[endx][endy] = "┐"
+            elif directionpath == "down":
+                build_board[endx][endy] = "│"
+            elif directionpath == "left":
+                build_board[endx][endy] = "┌"
+        elif endy == 0:
+            if directionpath == "left":
+                build_board[endx][endy] = "─"
+            elif directionpath == "down":
+                build_board[endx][endy] = "┘"
+            elif directionpath == "up":
+                build_board[endx][endy] = "┐"
+        elif endy == board_size - 1:
+            if directionpath == "right":
+                build_board[endx][endy] = "─"
+            elif directionpath == "down":
+                build_board[endx][endy] = "└"
+            elif directionpath == "up":
+                build_board[endx][endy] = "┌"
+
 
         xshape = build_board[start[0]][start[1]]
-        yshape = build_board[path[0][0]][path[0][1]]
-        listofchars = ["┌", "┐", "└", "┘", "─", "│", "E", "S"]
+        yshape = build_board[path[-1][0]][path[-1][1]]
+        listofchars = ["┌", "┐", "└", "┘", "─", "│"]
         column_totals = []
         row_totals = []
         for i in range(board_size):
@@ -213,31 +190,34 @@ class Generator:
                     row_total += 1
             row_totals.append(row_total)
 
-        board = build_board
 
         # save state of board, which will not be overwritten
         SAVEDBOARD = []
-        for i in range(len(board)):
-            SAVEDBOARD.append(board[i].copy())
+        for i in range(len(build_board)):
+            SAVEDBOARD.append(build_board[i].copy())
 
         startingshapes = []
         startingshapes.append((start[0], start[1], xshape))
         startingshapes.append((endx, endy, yshape))
 
-        return board, column_totals, row_totals, SAVEDBOARD, startingshapes
+        board = [['N' for _ in range(board_size)] for _ in range(board_size)]
+        board[start[0]][start[1]] = xshape
+        board[endx][endy] = yshape
 
+
+        return board, column_totals, row_totals, SAVEDBOARD, startingshapes, board_size
 
     def manual_board(self):
         startingshapes = []
-        size = input("Enter the size of the board (edge length in range 4-10): ")
-        while size.isnumeric() == False or int(size) < 4 or int(size) > 10:
-            size = input("Enter the size of the board (edge length in range 4-10): ")
+        board_size = input("Enter the size of the board (edge length in range 4-10): ")
+        while board_size.isnumeric() == False or int(board_size) < 4 or int(board_size) > 10:
+            board_size = input("Enter the size of the board (edge length in range 4-10): ")
         
-        size = int(size)
+        board_size = int(board_size)
 
-        board = [["N"] * size for _ in range(size)]
-        start, xshape = self.get_starting_position(size)
-        end, yshape = self.get_ending_position(size, start)
+        board = [["N"] * board_size for _ in range(board_size)]
+        start, xshape = self.get_starting_position(board_size)
+        end, yshape = self.get_ending_position(board_size, start)
 
 
         startingshapes.append((start[0], start[1], xshape))
@@ -247,7 +227,7 @@ class Generator:
         while other_nodes:
             morenodes = input("Are there any more nodes to add? (Y/N): ")
             if morenodes.lower() == 'y':
-                self.add_more_nodes(board, start, end, startingshapes)
+                self.add_more_nodes(board, startingshapes)
             elif morenodes.lower() == 'n':
                 other_nodes = False
             else:
@@ -257,7 +237,7 @@ class Generator:
         column_totals = []
         row_totals = []
 
-        return board, column_totals, row_totals, SAVEDBOARD, startingshapes
+        return board, column_totals, row_totals, SAVEDBOARD, startingshapes, board_size
 
     def get_starting_position(self, size):
         while True:
@@ -293,27 +273,71 @@ class Generator:
             except (ValueError, IndexError):
                 print("Invalid input. Please enter coordinates in the format x,y.")
 
-    def add_more_nodes(self, board, start, end, startingshapes):
+    def add_more_nodes(self, board, startingshapes):
         while True:
             try:
                 node = input("Enter the node position in the format x,y: ").split(',')
                 node = (int(node[0]), int(node[1]))
-                if 0 <= node[0] < len(board) and 0 <= node[1] < len(board):
-                    extrashape = input(f"Enter the shape at position {node[0]},{node[1]} (V, H, LD, LU, RD, RU): ")
-                    startingshapes.append((node[0], node[1], extrashape))
-                    break
+                if node not in [(x[0], x[1]) for x in startingshapes]:
+                    if 0 <= node[0] < len(board) and 0 <= node[1] < len(board):
+                        extrashape = input(f"Enter the shape at position {node[0]},{node[1]} (V, H, LD, LU, RD, RU): ")
+                        startingshapes.append((node[0], node[1], extrashape))
+                        break
+                    else:
+                        print("Node position out of bounds. Please try again.")
                 else:
-                    print("Node position out of bounds. Please try again.")
+                    print("Node already written with a shape. Type o to overwrite, or any other key to re-enter.")
+                    overwrite = input()
+                    if overwrite.lower() == 'o':
+                        if 0 <= node[0] < len(board) and 0 <= node[1] < len(board):
+                            extrashape = input(f"Enter the shape at position {node[0]},{node[1]} (V, H, LD, LU, RD, RU): ")
+                            startingshapes.append((node[0], node[1], extrashape))
+                            break
             except (ValueError, IndexError):
                 print("Invalid input. Please enter coordinates in the format x,y.")
+
+    @staticmethod
+    def make_board(path, build_board):
+        if len(path) <= 2:
+            return
+
+        previousx, previousy = path[0][0], path[0][1]
+        currentx, currenty = path[1][0], path[1][1]
+        nextx, nexty = path[2][0], path[2][1]
+
+        if nextx + 2 == previousx or nextx - 2 == previousx:
+            build_board[currentx][currenty] = "│"
+        elif nexty + 2 == previousy or nexty - 2 == previousy:
+            build_board[currentx][currenty] = "─"
+        elif nextx + 1 == previousx and nexty + 1 == previousy:
+            if currentx == previousx:
+                build_board[currentx][currenty] = "└"
+            else:
+                build_board[currentx][currenty] = "┐"
+        elif nextx - 1 == previousx and nexty - 1 == previousy:
+            if currentx == previousx:
+                build_board[currentx][currenty] = "┐"
+            else:
+                build_board[currentx][currenty] = "└"
+        elif nextx + 1 == previousx and nexty - 1 == previousy:
+            if currentx == previousx:
+                build_board[currentx][currenty] = "┘"
+            else:
+                build_board[currentx][currenty] = "┌"
+        else:
+            if currentx == previousx:
+                build_board[currentx][currenty] = "┌"
+            else:
+                build_board[currentx][currenty] = "┘"
+
+        Generator.make_board(path[1:], build_board)
 
 
 class Solver:
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
-    def Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation):
-
+    def Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size):
         start = (startingshapes[0][0], startingshapes[0][1])
         end = (startingshapes[1][0], startingshapes[1][1])
         bruteforceneeded = False
@@ -338,12 +362,11 @@ class Solver:
         changecheck = True
         trysecond = False
         dots_two = []
-        satisfactory = False
 
 
-        if len(column_totals) == 0:
-            board_size = len(board[0])
-
+        def get_totals():
+            column_totals = []
+            row_totals = []
             print()
             print("First column is column 0, first row is row 0.")
             print("If you make a mistake, enter any invalid input (e.g. nothing) and you will be prompted to re-enter all column or row totals.")
@@ -402,6 +425,13 @@ class Solver:
                 elif startingshapes[i][2] == 'V':
                     startingshapes[i] = (startingshapes[i][0], startingshapes[i][1], V)
                     board[startingshapes[i][0]][startingshapes[i][1]] = V
+
+            return column_totals, row_totals
+
+        if column_totals == []:
+            column_totals, row_totals = get_totals()
+            while sum(column_totals) != sum(row_totals):
+                column_totals, row_totals = get_totals()
 
         nodenumber = 0
         for i in range(len(column_totals)):
@@ -479,20 +509,12 @@ class Solver:
             if bruteforceneeded == True and generation == "n":
                 unsures.append((a, b, board[a][b]))
 
+
         while any_changes or bruteforceneeded:
-                
+
             any_changes = False
             edgerulesneeded = False
             flagimpossible = False
-            alreadyreplaced = False
-
-            if bruteforceneeded == False:
-                # for i in dots_two
-                # if first and second parts of dots two are a character on the board, remove from dotstwo
-                # e.g. if a node of dotstwo is (1, 2, 3, 4) and board[1][2] is a character, remove from dotstwo
-                for d in dots_two:
-                    if board[d[0]][d[1]] in shapes.values():
-                        dots_two.remove(d)
 
             # First stage: change all Ns which connect to a start or end node to '.'
             print("Initial board:")
@@ -546,7 +568,7 @@ class Solver:
                                 add_to_unsures(i, j - 1)
                                 board[i][j - 1] = '.'
                                 any_changes = True
-                        elif board[i][j] == V:
+                        else:
                             if i + 1 < len(board) and board[i + 1][j] == "N":
                                 add_to_unsures(i + 1, j)
                                 board[i + 1][j] = '.'
@@ -559,9 +581,9 @@ class Solver:
             Solver.print_board(board)
 
             # Second stage: check each column to see if all possible nodes are used
-            changed = True
-            while changed == True:
-                changed = False
+            temp = True
+            while temp == True:
+                temp = False
                 for j in range(len(board)):
                     count = 0
                     for i in range(len(board)):
@@ -572,7 +594,7 @@ class Solver:
                             if board[i][j] == "N":
                                 add_to_unsures(i, j)
                                 board[i][j] = 'X'
-                                changed = True
+                                temp = True
                                 any_changes = True
                     if count > column_totals[j]:
                         flagimpossible = True
@@ -587,7 +609,7 @@ class Solver:
                             if board[i][j] == "N":
                                 add_to_unsures(i, j)
                                 board[i][j] = 'X'
-                                changed = True
+                                temp = True
                                 any_changes = True
                     if count > row_totals[i]:
                         flagimpossible = True
@@ -603,7 +625,7 @@ class Solver:
                             if board[i][j] == "N":
                                 add_to_unsures(i, j)
                                 board[i][j] = '.'
-                                changed = True
+                                temp = True
                                 any_changes = True
                 # do the same for rows
                 for i in range(len(board)):
@@ -616,7 +638,7 @@ class Solver:
                             if board[i][j] == "N":
                                 add_to_unsures(i, j)
                                 board[i][j] = '.'
-                                changed = True
+                                temp = True
                                 any_changes = True
 
             print()
@@ -640,9 +662,9 @@ class Solver:
             # for each empty square in the grid
             # if it is adjacent to 0 or 1 squares from 'indefinites', change it to 'X'
 
-            changed = True
-            while changed:
-                changed = False
+            temp = True
+            while temp:
+                temp = False
                 for i in range(len(board)):
                     for j in range(len(board)):
                         if board[i][j] == "N":
@@ -658,7 +680,7 @@ class Solver:
                             if count <= 1:
                                 add_to_unsures(i, j)
                                 board[i][j] = 'X'
-                                changed = True
+                                temp = True
                                 any_changes = True
             print("Third stage:")
             Solver.print_board(board)
@@ -771,7 +793,6 @@ class Solver:
                                 return a-1,b
                             if shapedir[0] == 'down':
                                 return a+1,b
-
 
                         def removedirectionvisited(i2,j2):
                             if 'left' in shapedir:
@@ -968,7 +989,7 @@ class Solver:
             
             i,j = start
             previ,prevj = start
-            iend,jend = end[0], end[1]
+            iend,jend = end
             isashape = True
             fromstartcount = 1
 
@@ -1131,8 +1152,6 @@ class Solver:
 
 
 
-
-
             edgerulesneeded = False
             if any_changes == False:
                 edgerulesneeded = True
@@ -1289,8 +1308,6 @@ class Solver:
                                         add_to_unsures(i, j)
                                         board[i][j] = "X"
                                         any_changes = True
-                
-
 
 
 
@@ -1308,8 +1325,8 @@ class Solver:
 
                 #TRACE
 
-                possiblementdown = False
-                possiblementup = False
+                possible_down = False
+                possible_up = False
                 possibles = 0
                 for j in range(len(board)):
                     if j - 1 in edgecolumns and j+1 < len(board) and j not in edgecolumns and j-1 >= 0:
@@ -1328,7 +1345,7 @@ class Solver:
                                         k += 1
                                         counter += 1
                                     if counter == column_totals[j] and k < len(board): ###changed
-                                        possiblementdown = True
+                                        possible_down = True
                                         possibles += 1
                                     counter = 1
                                     k = i
@@ -1340,11 +1357,11 @@ class Solver:
                                         k -= 1
                                         counter += 1
                                     if counter == column_totals[j] and k >= 0: ###changed
-                                        possiblementup = True
+                                        possible_up = True
                                         possibles += 1
 
                             if possibles == 1:
-                                if possiblementdown == True:
+                                if possible_down == True:
                                     counter = 0
                                     k = place
                                     while counter < column_totals[j]:
@@ -1356,7 +1373,7 @@ class Solver:
                                             counter += 1
                                         k += 1
                                     any_changes = True
-                                if possiblementup == True:
+                                if possible_up == True:
                                     counter = 0
                                     k = place
                                     while counter < column_totals[j]:
@@ -1442,8 +1459,8 @@ class Solver:
                 # including this node, go up until nodes in column = column total
                 # if any of these nodes are 'X', this direction is considered invalid
                 # if one of the directions is valid, change all of these nodes to '.'
-                possiblementdown = False
-                possiblementup = False
+                possible_down = False
+                possible_up = False
                 possibles = 0
                 for j in range(len(board)):
                     if j + 1 in edgecolumns and j-1 >= 0 and j+1 < len(board) and j not in edgecolumns:
@@ -1462,7 +1479,7 @@ class Solver:
                                         k += 1
                                         counter += 1
                                     if counter == column_totals[j] and k < len(board):
-                                        possiblementdown = True
+                                        possible_down = True
                                         possibles += 1
                                     counter = 1
                                     k = i
@@ -1474,11 +1491,11 @@ class Solver:
                                         k -= 1
                                         counter += 1
                                     if counter == column_totals[j] and k >= 0:
-                                        possiblementup = True
+                                        possible_up = True
                                         possibles += 1
 
                             if possibles == 1:
-                                if possiblementdown == True:
+                                if possible_down == True:
                                     counter = 0
                                     k = place
                                     while counter < column_totals[j]:
@@ -1490,7 +1507,7 @@ class Solver:
                                             counter += 1
                                         k += 1
                                     any_changes = True
-                                if possiblementup == True:
+                                if possible_up == True:
                                     counter = 0
                                     k = place
                                     while counter < column_totals[j]:
@@ -1571,9 +1588,6 @@ class Solver:
 
 
 
-
-
-                # unique rule
                 if column_totals[1] == 2:
                     if start[1] >= 2 and end[1] >= 2:
                         # count the number of dots in the column
@@ -1642,7 +1656,6 @@ class Solver:
                                             if (k != i - temp) and (k != i + temp):
                                                 add_to_unsures(k, len(board) - 2)
                                                 board[k][len(board) - 2] = "X"
-
 
                         if count == 0:
                             for i in range(len(board)):
@@ -1742,7 +1755,6 @@ class Solver:
                 # for each node in the column
                 # if the node to the left is an X, LU,LD,V or the node to the right is an X, RU, RD, V
                 # make the node an X
-
                 for j in range(len(board)):
                     if column_totals[j] == 1 and j not in edgecolumns:
                         for i in range(len(board)):
@@ -1774,9 +1786,7 @@ class Solver:
 
 
 
-
                 if len(board) >= 5:
-
                     # if the first row has row total = definites in row + 1
                     # if board[0][len(board)-4] is a V, LD, LU and board[0][len(board)-2] is a dot and board [0][len(board)-3] is a N and board [0][len(board)-1] is a N
                     # for i in range 0 to 4, if the node is a N, make the node an X
@@ -2470,11 +2480,11 @@ class EditBoard:
 
 
             success = True
-            for i in range(len(board)):
+            for i in range(len(board)): #fix
                 for j in range(len(board)):
                     if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
                         success = False #####break?????????
-            if success == True: 
+            if success == True:
                 #find time
 
                 time2 = datetime.datetime.now()
@@ -2765,18 +2775,18 @@ def PlayGame():
         board_size = 0
         generation = "y"
         generator = Generator()
-        board, column_totals, row_totals, SAVEDBOARD, startingshapes = generator.build_board(board_size)
-        board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation)
+        board, column_totals, row_totals, SAVEDBOARD, startingshapes, board_size = generator.build_board(board_size)
+        board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size)
         while len(startingshapes) > maxstartingshapes:
-            board, column_totals, row_totals, SAVEDBOARD, startingshapes = generator.build_board(board_size)
-            board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation)
+            board, column_totals, row_totals, SAVEDBOARD, startingshapes, board_size = generator.build_board(board_size)
+            board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size)
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
     
     elif gamechoice.upper() == "M":
         generation = "n"
         generator = Generator()
-        board, column_totals, row_totals, SAVEDBOARD, startingshapes = generator.manual_board()
-        board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation)
+        board, column_totals, row_totals, SAVEDBOARD, startingshapes, board_size = generator.manual_board()
+        board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size)
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
     
     elif gamechoice.upper() == "F":
