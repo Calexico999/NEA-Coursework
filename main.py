@@ -9,12 +9,20 @@ class GenerateRandomPath:
         self.board_size = board_size
 
     def generate_start_node(self):
-        edge = False
-        while not edge:
-            startxnode = random.randint(0, self.board_size - 1)
-            startynode = random.randint(0, self.board_size - 1)
-            if startxnode == 0 or startxnode == self.board_size - 1 or startynode == 0 or startynode == self.board_size - 1:
-                edge = True
+        coord1 = random.randint(0, self.board_size - 1)
+        coord2 = random.randint(0,3)
+        if coord2 == 0:
+            startxnode = 0
+            startynode = coord1
+        elif coord2 == 1:
+            startxnode = self.board_size - 1
+            startynode = coord1
+        elif coord2 == 2:
+            startxnode = coord1
+            startynode = 0
+        else:
+            startxnode = coord1
+            startynode = self.board_size - 1
         return startxnode, startynode
 
     def dfs(self, start):
@@ -41,8 +49,6 @@ class GenerateRandomPath:
                         return None
                     return path
 
-            if v in self.visited:
-                continue
             self.visited.add(v)
             x, y = v
             all_next = []
@@ -63,66 +69,60 @@ class GenerateRandomPath:
 
 
 class Generator:
-    def __init__(self):
-        self.starting_shapes = []
-        self.generation = None
-
     def build_board(self, board_size):
         while str(board_size).isnumeric() == False or int(board_size) < 4 or int(board_size) > 10:
             board_size = input("Enter the size of the board (edge length in range 4-10): ")
         board_size = int(board_size)
         path = None
         path_generator = GenerateRandomPath(board_size)  # Instance of path generator
-        # Generate a valid path
         while path is None:
             start = path_generator.generate_start_node()
             path = path_generator.dfs(start)
-        # Build the board with dimensions board_size x board_size
         build_board = [['X' for _ in range(board_size)] for _ in range(board_size)]
-        generated_x = path[0][0]
-        generated_y = path[0][1]        
+        previousx = path[0][0]
+        previousy = path[0][1]        
         currentx = path[1][0]
         currenty = path[1][1]
 
-        if generated_x == currentx:
-            if generated_y < currenty:
+        if previousx == currentx:
+            if previousy < currenty:
                 directionpath = "right"
             else:
                 directionpath = "left"
-        if generated_y == currenty:
-            if generated_x < currentx:
+        else:
+            if previousx < currentx:
                 directionpath = "down"
             else:
                 directionpath = "up"
 
         if directionpath == "right":
-            if generated_x == 0:
-                build_board[generated_x][generated_y] = "└"
-            elif generated_x == board_size - 1:
-                build_board[generated_x][generated_y] = "┌"
-            elif generated_y == 0:
-                build_board[generated_x][generated_y] = "─"
+            if previousx == 0:
+                build_board[previousx][previousy] = "└"
+            elif previousx == board_size - 1:
+                build_board[previousx][previousy] = "┌"
+            elif previousy == 0:
+                build_board[previousx][previousy] = "─"
         elif directionpath == "left":
-            if generated_x == 0:
-                build_board[generated_x][generated_y] = "┘"
-            elif generated_x == board_size - 1:
-                build_board[generated_x][generated_y] = "┐"
-            elif generated_y == board_size - 1:
-                build_board[generated_x][generated_y] = "─"
+            if previousx == 0:
+                build_board[previousx][previousy] = "┘"
+            elif previousx == board_size - 1:
+                build_board[previousx][previousy] = "┐"
+            elif previousy == board_size - 1:
+                build_board[previousx][previousy] = "─"
         elif directionpath == "up":
-            if generated_x == board_size - 1:
-                build_board[generated_x][generated_y] = "│"
-            elif generated_y == 0:
-                build_board[generated_x][generated_y] = "┘"
-            elif generated_y == board_size - 1:
-                build_board[generated_x][generated_y] = "└"
+            if previousx == board_size - 1:
+                build_board[previousx][previousy] = "│"
+            elif previousy == 0:
+                build_board[previousx][previousy] = "┘"
+            elif previousy == board_size - 1:
+                build_board[previousx][previousy] = "└"
         elif directionpath == "down":
-            if generated_x == 0:
-                build_board[generated_x][generated_y] = "│"
-            elif generated_y == 0:
-                build_board[generated_x][generated_y] = "┐"
-            elif generated_y == board_size - 1:
-                build_board[generated_x][generated_y] = "┌"
+            if previousx == 0:
+                build_board[previousx][previousy] = "│"
+            elif previousy == 0:
+                build_board[previousx][previousy] = "┐"
+            elif previousy == board_size - 1:
+                build_board[previousx][previousy] = "┌"
         
         while len(path) > 2 and (currentx != path[-1][0] or currenty != path[-1][1]):
             previousx = path[0][0]
@@ -140,8 +140,7 @@ class Generator:
                 build_board[currentx][currenty] = "─"
             elif nexty - 2 == previousy:
                 build_board[currentx][currenty] = "─"
-
-            if nextx + 1 == previousx and nexty + 1 == previousy:
+            elif nextx + 1 == previousx and nexty + 1 == previousy:
                 if currentx == previousx:
                     build_board[currentx][currenty] = "└"
                 else:
@@ -156,7 +155,7 @@ class Generator:
                     build_board[currentx][currenty] = "┘"
                 else:
                     build_board[currentx][currenty] = "┌"
-            elif nextx - 1 == previousx and nexty + 1 == previousy:
+            else:
                 if currentx == previousx:
                     build_board[currentx][currenty] = "┌"
                 else:
@@ -1573,416 +1572,171 @@ class Solver:
 
 
 
-                ##### to be changed #####
 
                 # unique rule
-                # if 2nd column has column total = 2
-                # if start and end are not in column 2
-                # if there is exactly one dot in column 2
-                # make the dot an H
                 if column_totals[1] == 2:
-                    if any_changes == False:
-                        # if column 1 has no shapes
+                    if start[1] >= 2 and end[1] >= 2:
+                        # count the number of dots in the column
                         count = 0
                         for i in range(len(board)):
-                            if board[i][0] in shapes.values():
+                            if board[i][1] == ".":
                                 count += 1
-                        if count == 0:
-                            satisfactory = False
-                            count = 0
-                            dotpos = []
+                        # if the number of dots is 2, make them both Hs
+                        if count == 2:
                             for i in range(len(board)):
                                 if board[i][1] == ".":
-                                    count += 1
-                                    dotpos.append(i)
-                            if count == 1:
-                                satisfactory = True
-                            if satisfactory == True:
-                                # change the dot in column 2 to an H
-                                add_to_unsures(dotpos[0], 1)
-                                board[dotpos[0]][1] = H
-                                any_changes = True
+                                    add_to_unsures(i, 1)
+                                    board[i][1] = H
+                                    any_changes = True
+                        # if the number of dots is 1, make the the dot an H
+                        if count == 1:
+                            for i in range(len(board)):
+                                if board[i][1] == ".":
+                                    add_to_unsures(i, 1)
+                                    board[i][1] = H
+                                    any_changes = True
+                                    temp = column_totals[0] - 1
+                                    for k in range(len(board)):
+                                        if board[k][1] == "N":
+                                            if (k != i - temp) and (k != i + temp):
+                                                add_to_unsures(k, 1)
+                                                board[k][1] = "X"
 
-                # if 2nd row has row total = 2
-                # if start and end are not in row 2
-                # if there is exactly one dot in row 2
-                # make the dot a V
-                if row_totals[1] == 2:
-                    if any_changes == False:
-                        count = 0
-                        # if row 1 has no shapes
-                        for j in range(len(board)):
-                            if board[0][j] in shapes.values():
-                                count += 1
                         if count == 0:
-                            satisfactory = False
-                            count = 0
-                            dotpos = []
-                            for j in range(len(board)):
-                                if board[1][j] == ".":
+                            # count the number of Hs in the column
+                            for i in range(len(board)):
+                                if board[i][1] == H:
                                     count += 1
-                                    dotpos.append(j)
+                                    ivalue = i
+                            # if the number of Hs is 1
                             if count == 1:
-                                satisfactory = True
-                            if satisfactory == True:
-                                # change the dot in row 2 to a V
-                                add_to_unsures(1, dotpos[0])
-                                board[1][dotpos[0]] = V
-                                any_changes = True
+                                temp = column_totals[0] - 1
+                                for k in range(len(board)):
+                                    if board[k][1] == "N":
+                                        if (k != ivalue - temp) and (k != ivalue + temp):
+                                            add_to_unsures(k, 1)
+                                            board[k][1] = "X"
+                                            any_changes = True
 
-                # if penultimate column has column total = 2
-                # if start and end are not in penultimate column
-                # if there is exactly one dot in penultimate column
-                # make the dot an H
                 if column_totals[len(board) - 2] == 2:
-                    if any_changes == False:
-                        # if last column has no shapes
+                    if start[1] <= len(board) - 3 and end[1] <= len(board) - 3:
                         count = 0
                         for i in range(len(board)):
-                            if board[i][len(board) - 1] in shapes.values():
+                            if board[i][len(board) - 2] == ".":
                                 count += 1
-                        if count == 0:
-                            satisfactory = False
-                            count = 0
-                            dotpos = []
+                        if count == 2:
                             for i in range(len(board)):
                                 if board[i][len(board) - 2] == ".":
-                                    count += 1
-                                    dotpos.append(i)
-                            if count == 1:
-                                satisfactory = True
-                            if satisfactory == True:
-                                # change the dot in penultimate column to an H
-                                add_to_unsures(dotpos[0], len(board) - 2)
-                                board[dotpos[0]][len(board) - 2] = H
-                                any_changes = True
-
-                # if penultimate row has row total = 2
-                # if start and end are not in penultimate row
-                # if there is exactly one dot in penultimate row
-                # make the dot a V
-                if row_totals[len(board) - 2] == 2:
-                    if any_changes == False:
-                        # if last row has no shapes
-                        count = 0
-                        for j in range(len(board)):
-                            if board[len(board) - 1][j] in shapes.values():
-                                count += 1
-                        if count == 0:
-                            satisfactory = False
-                            count = 0
-                            dotpos = []
-                            for j in range(len(board)):
-                                if board[len(board) - 2][j] == ".":
-                                    count += 1
-                                    dotpos.append(j)
-                            if count == 1:
-                                satisfactory = True
-                            if satisfactory == True:
-                                # change the dot in penultimate row to a V
-                                add_to_unsures(len(board) - 2, dotpos[0])
-                                board[len(board) - 2][dotpos[0]] = V
-                                any_changes = True
-
-
-                ### possibly useless rule?
-
-                ### diff rule
-
-                if column_totals[1] == 2:
-                    if any_changes == False or any_changes == True: ###changed
-                        satisfactory = False
-                        count = 0
-                        for i in range(len(board)):
-                            if board[i][1] == H:
-                                count += 1
+                                    add_to_unsures(i, len(board) - 2)
+                                    board[i][len(board) - 2] = H
+                                    any_changes = True
                         if count == 1:
                             for i in range(len(board)):
-                                if board[i][1] in definites.values() and board[i][1] != H:
-                                    satisfactory = False
-                            if satisfactory == True:
-                                for i in range(len(board)):
-                                    #if node is a LD or RD, make the nodes above the node Xs
-                                    # if node is a LU or RU, make the nodes below the node Xs
-                                    if (board[i][0] == LD) or (board[i][0] == RD):
-                                        while i < 0:
-                                            i -= 1
-                                            add_to_unsures(i, 0)
-                                            board[i][0] = "X"
-                                            any_changes = True
-                                    if (board[i][0] == LU) or (board[i][0] == RU):
-                                        while i < len(board):
-                                            i += 1
-                                            add_to_unsures(i, 0)
-                                            board[i][0] = "X"
-                                            any_changes = True
-                                    
-                                # if Xs in column[0] = len(board) - column_totals[0]
-                                # continue
-                                # else
-                                # find the first shape in column[0]
-                                # if the shape is a LD or RD
-                                # countercolumn = 1
-                                # while countercolumn < column_totals[0]
-                                # go down making each node a dot
+                                if board[i][len(board) - 2] == ".":
+                                    add_to_unsures(i, len(board) - 2)
+                                    board[i][len(board) - 2] = H
+                                    any_changes = True
+                                    temp = column_totals[len(board) - 1] - 1
+                                    for k in range(len(board)):
+                                        if board[k][len(board) - 2] == "N":
+                                            if (k != i - temp) and (k != i + temp):
+                                                add_to_unsures(k, len(board) - 2)
+                                                board[k][len(board) - 2] = "X"
 
-                                # if the shape is a LU or RU
-                                # countercolumn = 1
-                                # while countercolumn < column_totals[0]
-                                # go up making each node a dot
-                                # if the shape is a V
-                                #continue
 
-                                for i in range(len(board)):
-                                    if board[i][0] == "X":
-                                        count += 1
-                                if count != len(board) - column_totals[0]:
-                                    found = False
-                                    for i in range(len(board)):
-                                        if board[i][0] in shapes.values():
-                                            found = True
-                                            if board[i][0] == LD or board[i][0] == RD:
-                                                counter = 2
-                                                k = i + 1
-                                                while counter <= column_totals[0]:
-                                                    if k >= len(board):
-                                                        break
-                                                    add_to_unsures(k, 0)
-                                                    board[k][0] = "."
-                                                    k += 1
-                                                    counter += 1
-                                                    any_changes = True
-                                            if board[i][0] == LU or board[i][0] == RU:
-                                                counter = 2
-                                                k = i - 1
-                                                while counter <= column_totals[0]:
-                                                    if k < 0:
-                                                        break
-                                                    add_to_unsures(k, 0)
-                                                    board[k][0] = "."
-                                                    k -= 1
-                                                    counter += 1
-                                                    any_changes = True
+                        if count == 0:
+                            for i in range(len(board)):
+                                if board[i][len(board) - 2] == H:
+                                    count += 1
+                                    ivalue = i
+                            if count == 1:
+                                temp = column_totals[len(board) - 1] - 1
+                                for k in range(len(board)):
+                                    if board[k][len(board) - 2] == "N":
+                                        if (k != ivalue - temp) and (k != ivalue + temp):
+                                            add_to_unsures(k, len(board) - 2)
+                                            board[k][len(board) - 2] = "X"
+                                            any_changes = True
 
                 if row_totals[1] == 2:
-                    if any_changes == False:
-                        satisfactory = False
+                    if start[0] >= 2 and end[0] >= 2:
                         count = 0
                         for j in range(len(board)):
-                            if board[1][j] == V:
+                            if board[1][j] == ".":
                                 count += 1
+                        if count == 2:
+                            for j in range(len(board)):
+                                if board[1][j] == ".":
+                                    add_to_unsures(1, j)
+                                    board[1][j] = V
+                                    any_changes = True
                         if count == 1:
                             for j in range(len(board)):
-                                if board[1][j] in definites.values() and board[1][j] != V:
-                                    satisfactory = False
-                            if satisfactory == True:
-                                for j in range(len(board)):
-                                    if (board[0][j] == H) or (board[0][j] == RD) or (board[0][j] == RU):
-                                        while j < 0:
-                                            j -= 1
-                                            add_to_unsures(0, j)
-                                            board[0][j] = "X"
+                                if board[1][j] == ".":
+                                    add_to_unsures(1, j)
+                                    board[1][j] = V
+                                    any_changes = True
+                                    temp = row_totals[0] - 1
+                                    for k in range(len(board)):
+                                        if board[1][k] == "N":
+                                            if (k != j - temp) and (k != j + temp):
+                                                add_to_unsures(1, k)
+                                                board[1][k] = "X"
+
+                        if count == 0:
+                            for j in range(len(board)):
+                                if board[1][j] == V:
+                                    count += 1
+                                    jvalue = j
+                            if count == 1:
+                                temp = row_totals[0] - 1
+                                for k in range(len(board)):
+                                    if board[1][k] == "N":
+                                        if (k != jvalue - temp) and (k != jvalue + temp):
+                                            add_to_unsures(1, k)
+                                            board[1][k] = "X"
                                             any_changes = True
-                                    if (board[0][j] == LD) or (board[0][j] == RD):
-                                        while j < len(board):
-                                            j += 1
-                                            add_to_unsures(0, j)
-                                            board[0][j] = "X"
-                                            any_changes = True
-
-                                # if Xs in row[0] = len(board) - row_totals[0]
-                                # continue
-                                # else
-                                # find the first shape in row[0]
-                                # if the shape is a RD or RU
-                                # countercolumn = 1
-                                # while countercolumn < row_totals[0]
-                                # go right making each node a dot
-                                # if the shape is a LD or LU
-                                # countercolumn = 1
-                                # while countercolumn < row_totals[0]
-                                # go left making each node a dot
-                                # if the shape is a H
-                                #continue
-
-                                for j in range(len(board)):
-                                    if board[0][j] == "X":
-                                        count += 1
-                                if count != len(board) - row_totals[0]:
-                                    found = False
-                                    for j in range(len(board)):
-                                        if board[0][j] in shapes.values():
-                                            found = True
-                                            if board[0][j] == RD or board[0][j] == RU:
-                                                counter = 2
-                                                k = j + 1
-                                                while counter <= row_totals[0]:
-                                                    if k >= len(board):
-                                                        break
-                                                    add_to_unsures(0, k)
-                                                    board[0][k] = "."
-                                                    k += 1
-                                                    counter += 1
-                                                    any_changes = True
-                                            if board[0][j] == LD or board[0][j] == LU:
-                                                counter = 2
-                                                k = j - 1
-                                                while counter <= row_totals[0]:
-                                                    if k < 0:
-                                                        break
-                                                    add_to_unsures(0, k)
-                                                    board[0][k] = "."
-                                                    k -= 1
-                                                    counter += 1
-                                                    any_changes = True
-
-                if column_totals[len(board) - 2] == 2:
-                    if any_changes == False:
-                        satisfactory = True
-                        count = 0
-                        for i in range(len(board)):
-                            if board[i][len(board) - 2] == H:
-                                count += 1
-                        if count == 1:
-                            for i in range(len(board)):
-                                if board[i][len(board) - 2] in definites.values() and board[i][len(board) - 2] != H:
-                                    satisfactory = False
-                            if satisfactory == True:
-                                for i in range(len(board)):
-                                    if (board[i][len(board) - 1] == LD) or (board[i][len(board) - 1] == RD):
-                                        while i < 0: ####### errrr what is this
-                                            i -= 1
-                                            add_to_unsures(i, len(board) - 1)
-                                            board[i][len(board) - 1] = "X"
-                                            any_changes = True
-                                    if (board[i][len(board) - 1] == LU) or (board[i][len(board) - 1] == RU):
-                                        while i < len(board):
-                                            i += 1
-                                            add_to_unsures(i, len(board) - 1)
-                                            board[i][len(board) - 1] = "X"
-                                            any_changes = True
-
-                                # if Xs in column[len(board) - 1] = len(board) - column_totals[len(board) - 1]
-                                # continue
-                                # else
-                                # find the first shape in column[len(board) - 1]
-                                # if the shape is a LD or RD
-                                # countercolumn = 1
-                                # while countercolumn < column_totals[len(board) - 1]
-                                # go down making each node a dot
-                                # if the shape is a LU or RU
-                                # countercolumn = 1
-                                # while countercolumn < column_totals[len(board) - 1]
-                                # go up making each node a dot
-                                # if the shape is a V
-                                #continue
-
-                                for i in range(len(board)):
-                                    if board[i][len(board) - 1] == "X":
-                                        count += 1
-                                if count != len(board) - column_totals[len(board) - 1]:
-                                    found = False
-                                    for i in range(len(board)):
-                                        if board[i][len(board) - 1] in shapes.values():
-                                            found = True
-                                            if board[i][len(board) - 1] == LD or board[i][len(board) - 1] == RD:
-                                                counter = 2
-                                                k = i + 1
-                                                while counter <= column_totals[len(board) - 1]:
-                                                    if k >= len(board):
-                                                        break
-                                                    add_to_unsures(k, len(board) - 1)
-                                                    board[k][len(board) - 1] = "."
-                                                    k += 1
-                                                    counter += 1
-                                                    any_changes = True
-                                            if board[i][len(board) - 1] == LU or board[i][len(board) - 1] == RU:
-                                                counter = 2
-                                                k = i - 1
-                                                while counter <= column_totals[len(board) - 1]:
-                                                    if k < 0:
-                                                        break
-                                                    add_to_unsures(k, len(board) - 1)
-                                                    board[k][len(board) - 1] = "."
-                                                    k -= 1
-                                                    counter += 1
-                                                    any_changes = True
-
+                
                 if row_totals[len(board) - 2] == 2:
-                    if any_changes == False:
-                        satisfactory = False
+                    if start[0] <= len(board) - 3 and end[0] <= len(board) - 3:
                         count = 0
                         for j in range(len(board)):
-                            if board[len(board) - 2][j] == V:
+                            if board[len(board) - 2][j] == ".":
                                 count += 1
+                        if count == 2:
+                            for j in range(len(board)):
+                                if board[len(board) - 2][j] == ".":
+                                    add_to_unsures(len(board) - 2, j)
+                                    board[len(board) - 2][j] = V
+                                    any_changes = True
                         if count == 1:
                             for j in range(len(board)):
-                                if board[len(board) - 2][j] in definites.values() and board[len(board) - 2][j] != V:
-                                    satisfactory = False
-                            if satisfactory == True:
-                                for j in range(len(board)):
-                                    if (board[len(board) - 1][j] == LD) or (board[len(board) - 1][j] == RD):
-                                        while j < 0:
-                                            j -= 1
-                                            add_to_unsures(len(board) - 1, j)
-                                            board[len(board) - 1][j] = "X"
+                                if board[len(board) - 2][j] == ".":
+                                    add_to_unsures(len(board) - 2, j)
+                                    board[len(board) - 2][j] = V
+                                    any_changes = True
+                                    temp = row_totals[len(board) - 1] - 1
+                                    for k in range(len(board)):
+                                        if board[len(board) - 2][k] == "N":
+                                            if (k != j - temp) and (k != j + temp):
+                                                add_to_unsures(len(board) - 2, k)
+                                                board[len(board) - 2][k] = "X"
+                    
+                        if count == 0:
+                            for j in range(len(board)):
+                                if board[len(board) - 2][j] == V:
+                                    count += 1
+                                    jvalue = j
+                            if count == 1:
+                                temp = row_totals[len(board) - 1] - 1
+                                for k in range(len(board)):
+                                    if board[len(board) - 2][k] == "N":
+                                        if (k != jvalue - temp) and (k != jvalue + temp):
+                                            add_to_unsures(len(board) - 2, k)
+                                            board[len(board) - 2][k] = "X"
                                             any_changes = True
-                                    if (board[len(board) - 1][j] == LU) or (board[len(board) - 1][j] == RU):
-                                        while j < len(board):
-                                            j += 1
-                                            add_to_unsures(len(board) - 1, j)
-                                            board[len(board) - 1][j] = "X"
-                                            any_changes = True
-
-                                # if Xs in row[len(board) - 1] = len(board) - row_totals[len(board) - 1]
-                                # continue
-                                # else
-                                # find the first shape in row[len(board) - 1]
-                                # if the shape is a LD or RD
-                                # countercolumn = 1
-                                # while countercolumn < row_totals[len(board) - 1]
-                                # go down making each node a dot
-                                # if the shape is a LU or RU
-                                # countercolumn = 1
-                                # while countercolumn < row_totals[len(board) - 1]
-                                # go up making each node a dot
-                                # if the shape is a H
-                                #continue
-
-                                for j in range(len(board)):
-                                    if board[len(board) - 1][j] == "X":
-                                        count += 1
-                                if count != len(board) - row_totals[len(board) - 1]:
-                                    found = False
-                                    for j in range(len(board)):
-                                        if board[len(board) - 1][j] in shapes.values():
-                                            found = True
-                                            if board[len(board) - 1][j] == LD or board[len(board) - 1][j] == RD:
-                                                counter = 2
-                                                k = j + 1
-                                                while counter <= row_totals[len(board) - 1]:
-                                                    if k >= len(board):
-                                                        break
-                                                    add_to_unsures(len(board) - 1, k)
-                                                    board[len(board) - 1][k] = "."
-                                                    k += 1
-                                                    counter += 1
-                                                    any_changes = True
-                                            if board[len(board) - 1][j] == LU or board[len(board) - 1][j] == RU:
-                                                counter = 2
-                                                k = j - 1
-                                                while counter <= row_totals[len(board) - 1]:
-                                                    if k < 0:
-                                                        break
-                                                    add_to_unsures(len(board) - 1, k)
-                                                    board[len(board) - 1][k] = "."
-                                                    k -= 1
-                                                    counter += 1
-                                                    any_changes = True
 
 
-
-                #REWRITE
 
                 #for each column which has column total = 1
                 # for each node in the column
@@ -1990,7 +1744,7 @@ class Solver:
                 # make the node an X
 
                 for j in range(len(board)):
-                    if column_totals[j] == 1: ##### and not in edgecolumns surely????? ######
+                    if column_totals[j] == 1 and j not in edgecolumns:
                         for i in range(len(board)):
                             if j - 1 >= 0 and (board[i][j-1] == "X" or board[i][j-1] == LU or board[i][j-1] == LD or board[i][j-1] == V):
                                 add_to_unsures(i, j)
@@ -2005,7 +1759,7 @@ class Solver:
 
                 # do the same for rows
                 for i in range(len(board)):
-                    if row_totals[i] == 1:
+                    if row_totals[i] == 1 and i not in edgerows:
                         for j in range(len(board)):
                             if i - 1 >= 0 and (board[i-1][j] == "X" or board[i-1][j] == LU or board[i-1][j] == RU or board[i-1][j] == H):
                                 add_to_unsures(i, j)
@@ -2020,109 +1774,112 @@ class Solver:
 
 
 
-                # if the first row has row total = definites in row + 1
-                # if board[0][len(board)-4] is a V, LD, LU and board[0][len(board)-2] is a dot and board [0][len(board)-3] is a N and board [0][len(board)-1] is a N
-                # for i in range 0 to 4, if the node is a N, make the node an X
-                # if board[0][3] is a V, RD, RU and board[0][1] is a dot and board [0][2] is a N and board [0][0] is a N
-                # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
 
-                count = 0
-                for j in range(len(board)):
-                    if board[0][j] in definites.values():
-                        count += 1
-                if row_totals[0] == count + 1:
-                    if board[0][len(board) - 4] in [V, LD, LU] and board[0][len(board) - 2] == "." and board[0][len(board) - 3] == 'N' and board[0][len(board) - 1] == 'N':
-                        for i in range(0,len(board)-4):
-                            if board[0][i] == 'N':
-                                add_to_unsures(0, i)
-                                if board[0][i] != "X":
-                                    any_changes = True
-                                board[0][i] = "X"
-                    if board[0][3] in [V, RD, RU] and board[0][1] == "." and board[0][2] == 'N' and board[0][0] == 'N':
-                        for i in range(5, len(board)):
-                            if board[0][i] == 'N':
-                                add_to_unsures(0, i)
-                                if board[0][i] != "X":
-                                    any_changes = True
-                                board[0][i] = "X"
+                if len(board) >= 5:
 
-                # if the first column has column total = definites in column + 1
-                # if board[len(board)-4][0] is a H, RU, LU and board[len(board)-2][0] is a dot and board [len(board)-3][0] is a 'N' and board [len(board)-1][0] is a 'N'
-                # for i in range 0 to 4, if the node is a N, make the node an X
-                # if board[3][0] is a H, RD, LD and board[1][0] is a dot and board [2][0] is a 'N' and board [0][0] is a 'N'
-                # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+                    # if the first row has row total = definites in row + 1
+                    # if board[0][len(board)-4] is a V, LD, LU and board[0][len(board)-2] is a dot and board [0][len(board)-3] is a N and board [0][len(board)-1] is a N
+                    # for i in range 0 to 4, if the node is a N, make the node an X
+                    # if board[0][3] is a V, RD, RU and board[0][1] is a dot and board [0][2] is a N and board [0][0] is a N
+                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
 
-                count = 0
-                for i in range(len(board)):
-                    if board[i][0] in definites.values():
-                        count += 1
-                if column_totals[0] == count + 1:
-                    if board[len(board) - 4][0] in [H, RU, LU] and board[len(board) - 2][0] == "." and board[len(board) - 3][0] == 'N' and board[len(board) - 1][0] == 'N':
-                        for i in range(0,len(board)-4):
-                            if board[i][0] == 'N':
-                                add_to_unsures(i, 0)
-                                if board[i][0] != "X":
-                                    any_changes = True
-                                board[i][0] = "X"
-                    if board[3][0] in [H, RD, LD] and board[1][0] == "." and board[2][0] == 'N' and board[0][0] == 'N':
-                        for i in range(5, len(board)):
-                            if board[i][0] == 'N':
-                                add_to_unsures(i, 0)
-                                if board[i][0] != "X":
-                                    any_changes = True
-                                board[i][0] = "X"
+                    count = 0
+                    for j in range(len(board)):
+                        if board[0][j] in definites.values():
+                            count += 1
+                    if row_totals[0] == count + 1:
+                        if board[0][len(board) - 4] in [V, LD, LU] and board[0][len(board) - 2] == "." and board[0][len(board) - 3] == 'N' and board[0][len(board) - 1] == 'N':
+                            for i in range(0,len(board)-4):
+                                if board[0][i] == 'N':
+                                    add_to_unsures(0, i)
+                                    if board[0][i] != "X":
+                                        any_changes = True
+                                    board[0][i] = "X"
+                        if board[0][3] in [V, RD, RU] and board[0][1] == "." and board[0][2] == 'N' and board[0][0] == 'N':
+                            for i in range(5, len(board)):
+                                if board[0][i] == 'N':
+                                    add_to_unsures(0, i)
+                                    if board[0][i] != "X":
+                                        any_changes = True
+                                    board[0][i] = "X"
 
-                # if the last row has row total = definites in row + 1
-                # if board[len(board)-1][len(board)-4] is a V, LD, LU and board[len(board)-1][len(board)-2] is a dot and board [len(board)-1][len(board)-3] is a N and board [len(board)-1][len(board)-1] is a N
-                # for i in range 0 to 4, if the node is a N, make the node an X
-                # if board[len(board)-1][3] is a V, RD, RU and board[len(board)-1][1] is a dot and board [len(board)-1][2] is a N and board [len(board)-1][0] is a N
-                # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+                    # if the first column has column total = definites in column + 1
+                    # if board[len(board)-4][0] is a H, RU, LU and board[len(board)-2][0] is a dot and board [len(board)-3][0] is a 'N' and board [len(board)-1][0] is a 'N'
+                    # for i in range 0 to 4, if the node is a N, make the node an X
+                    # if board[3][0] is a H, RD, LD and board[1][0] is a dot and board [2][0] is a 'N' and board [0][0] is a 'N'
+                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
 
-                count = 0
-                for j in range(len(board)):
-                    if board[len(board) - 1][j] in definites.values():
-                        count += 1
-                if row_totals[len(board) - 1] == count + 1:
-                    if board[len(board) - 1][len(board) - 4] in [V, LD, LU] and board[len(board) - 1][len(board) - 2] == "." and board[len(board) - 1][len(board) - 3] == 'N' and board[len(board) - 1][len(board) - 1] == 'N':
-                        for i in range(0,len(board)-4):
-                            if board[len(board) - 1][i] == 'N':
-                                add_to_unsures(len(board) - 1, i)
-                                if board[len(board) - 1][i] != "X":
-                                    any_changes = True
-                                board[len(board) - 1][i] = "X"
-                    if board[len(board) - 1][3] in [V, RD, RU] and board[len(board) - 1][1] == "." and board[len(board) - 1][2] == 'N' and board[len(board) - 1][0] == 'N':
-                        for i in range(5, len(board)):
-                            if board[len(board) - 1][i] == 'N':
-                                add_to_unsures(len(board) - 1, i)
-                                if board[len(board) - 1][i] != "X":
-                                    any_changes = True
-                                board[len(board) - 1][i] = "X"
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][0] in definites.values():
+                            count += 1
+                    if column_totals[0] == count + 1:
+                        if board[len(board) - 4][0] in [H, RU, LU] and board[len(board) - 2][0] == "." and board[len(board) - 3][0] == 'N' and board[len(board) - 1][0] == 'N':
+                            for i in range(0,len(board)-4):
+                                if board[i][0] == 'N':
+                                    add_to_unsures(i, 0)
+                                    if board[i][0] != "X":
+                                        any_changes = True
+                                    board[i][0] = "X"
+                        if board[3][0] in [H, RD, LD] and board[1][0] == "." and board[2][0] == 'N' and board[0][0] == 'N':
+                            for i in range(5, len(board)):
+                                if board[i][0] == 'N':
+                                    add_to_unsures(i, 0)
+                                    if board[i][0] != "X":
+                                        any_changes = True
+                                    board[i][0] = "X"
 
-                # if the last column has column total = definites in column + 1
-                # if board[len(board)-4][len(board)-1] is a H, RU, LU and board[len(board)-2][len(board)-1] is a dot and board [len(board)-3][len(board)-1] is a 'N' and board [len(board)-1][len(board)-1] is a 'N'
-                # for i in range 0 to 4, if the node is a N, make the node an X
-                # if board[3][len(board)-1] is a H, RD, LD and board[1][len(board)-1] is a dot and board [2][len(board)-1] is a 'N' and board [0][len(board)-1] is a 'N'
-                # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+                    # if the last row has row total = definites in row + 1
+                    # if board[len(board)-1][len(board)-4] is a V, LD, LU and board[len(board)-1][len(board)-2] is a dot and board [len(board)-1][len(board)-3] is a N and board [len(board)-1][len(board)-1] is a N
+                    # for i in range 0 to 4, if the node is a N, make the node an X
+                    # if board[len(board)-1][3] is a V, RD, RU and board[len(board)-1][1] is a dot and board [len(board)-1][2] is a N and board [len(board)-1][0] is a N
+                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
 
-                count = 0
-                for i in range(len(board)):
-                    if board[i][len(board) - 1] in definites.values():
-                        count += 1
-                if column_totals[len(board) - 1] == count + 1:
-                    if board[len(board) - 4][len(board) - 1] in [H, RU, LU] and board[len(board) - 2][len(board) - 1] == "." and board[len(board) - 3][len(board) - 1] == 'N' and board[len(board) - 1][len(board) - 1] == 'N':
-                        for i in range(0,len(board)-4):
-                            if board[i][len(board) - 1] == 'N':
-                                add_to_unsures(i, len(board) - 1)
-                                if board[i][len(board) - 1] != "X":
-                                    any_changes = True
-                                board[i][len(board) - 1] = "X"
-                    if board[3][len(board) - 1] in [H, RD, LD] and board[1][len(board) - 1] == "." and board[2][len(board) - 1] == 'N' and board[0][len(board) - 1] == 'N':
-                        for i in range(5, len(board)):
-                            if board[i][len(board) - 1] == 'N':
-                                add_to_unsures(i, len(board) - 1)
-                                if board[i][len(board) - 1] != "X":
-                                    any_changes = True
-                                board[i][len(board) - 1] = "X"
+                    count = 0
+                    for j in range(len(board)):
+                        if board[len(board) - 1][j] in definites.values():
+                            count += 1
+                    if row_totals[len(board) - 1] == count + 1:
+                        if board[len(board) - 1][len(board) - 4] in [V, LD, LU] and board[len(board) - 1][len(board) - 2] == "." and board[len(board) - 1][len(board) - 3] == 'N' and board[len(board) - 1][len(board) - 1] == 'N':
+                            for i in range(0,len(board)-4):
+                                if board[len(board) - 1][i] == 'N':
+                                    add_to_unsures(len(board) - 1, i)
+                                    if board[len(board) - 1][i] != "X":
+                                        any_changes = True
+                                    board[len(board) - 1][i] = "X"
+                        if board[len(board) - 1][3] in [V, RD, RU] and board[len(board) - 1][1] == "." and board[len(board) - 1][2] == 'N' and board[len(board) - 1][0] == 'N':
+                            for i in range(5, len(board)):
+                                if board[len(board) - 1][i] == 'N':
+                                    add_to_unsures(len(board) - 1, i)
+                                    if board[len(board) - 1][i] != "X":
+                                        any_changes = True
+                                    board[len(board) - 1][i] = "X"
+
+                    # if the last column has column total = definites in column + 1
+                    # if board[len(board)-4][len(board)-1] is a H, RU, LU and board[len(board)-2][len(board)-1] is a dot and board [len(board)-3][len(board)-1] is a 'N' and board [len(board)-1][len(board)-1] is a 'N'
+                    # for i in range 0 to 4, if the node is a N, make the node an X
+                    # if board[3][len(board)-1] is a H, RD, LD and board[1][len(board)-1] is a dot and board [2][len(board)-1] is a 'N' and board [0][len(board)-1] is a 'N'
+                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
+
+                    count = 0
+                    for i in range(len(board)):
+                        if board[i][len(board) - 1] in definites.values():
+                            count += 1
+                    if column_totals[len(board) - 1] == count + 1:
+                        if board[len(board) - 4][len(board) - 1] in [H, RU, LU] and board[len(board) - 2][len(board) - 1] == "." and board[len(board) - 3][len(board) - 1] == 'N' and board[len(board) - 1][len(board) - 1] == 'N':
+                            for i in range(0,len(board)-4):
+                                if board[i][len(board) - 1] == 'N':
+                                    add_to_unsures(i, len(board) - 1)
+                                    if board[i][len(board) - 1] != "X":
+                                        any_changes = True
+                                    board[i][len(board) - 1] = "X"
+                        if board[3][len(board) - 1] in [H, RD, LD] and board[1][len(board) - 1] == "." and board[2][len(board) - 1] == 'N' and board[0][len(board) - 1] == 'N':
+                            for i in range(5, len(board)):
+                                if board[i][len(board) - 1] == 'N':
+                                    add_to_unsures(i, len(board) - 1)
+                                    if board[i][len(board) - 1] != "X":
+                                        any_changes = True
+                                    board[i][len(board) - 1] = "X"
 
 
                 if bruteforceneeded == True:
@@ -2169,8 +1926,6 @@ class Solver:
                                     flagimpossible = True
 
 
-                    ##### following rule not necessarily working
-
                     # for dot in grid
                     # if the dot is surrounded by 3 shapes which go into it, flag as impossible
                     for i in range(len(board)):
@@ -2199,7 +1954,7 @@ class Solver:
 
             if flagimpossible == True:
                 trynew = True
-                        
+
             edgerulesneeded = False
             if any_changes == False:
                 print("No changes made, entering guessing stage")
@@ -2251,7 +2006,6 @@ class Solver:
                 
                 if changecheck == True and trysecond == False and any_changes == False:
                     changecheck = False
-                    # any_changes = False
                     for i in range(len(board)):
                         for j in range(len(board)):
                             if board[i][j] == ".":
@@ -2729,14 +2483,8 @@ class EditBoard:
                     time = time - time4
                 score = len(board)**2/ time.seconds
 
-                # with open("account.csv", "r") as f:
-                #     #add score to the number in account.csv
-                #     levelscore = f.readline()
-                #     levelscore = levelscore.split(",")
-                #     levelscore[0] = float(levelscore[0] + score)
-                # f.close()
-
                 accdata[0] = str(float(accdata[0]) + score)
+                accdata[6] = str(int(accdata[6]) + 1)
 
                 with open("account.csv", "w") as f:
                     #write levelscore
