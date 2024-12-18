@@ -69,7 +69,6 @@ class GenerateRandomPath:
 
 
 class Generator:
-
     def build_board(self, board_size):
         while str(board_size).isnumeric() == False or int(board_size) < 4 or int(board_size) > 10:
             board_size = input("Enter the size of the board (edge length in range 4-10): ")
@@ -190,7 +189,6 @@ class Generator:
                     row_total += 1
             row_totals.append(row_total)
 
-
         # save state of board, which will not be overwritten
         SAVEDBOARD = []
         for i in range(len(build_board)):
@@ -244,7 +242,7 @@ class Generator:
             try:
                 start = input("Enter the starting position in the format x,y: ").split(',')
                 start = (int(start[0]), int(start[1]))
-                if 0 <= start[0] < size and 0 <= start[1] < size:
+                if 0 <= start[0] < size and 0 <= start[1] < size and (start[0] == 0 or start[0] == size - 1 or start[1] == 0 or start[1] == size - 1):
                     xshape = self.get_shape(start)
                     return start, xshape
                 else:
@@ -265,7 +263,7 @@ class Generator:
             try:
                 end = input("Enter the ending position in the format x,y: ").split(',')
                 end = (int(end[0]), int(end[1]))
-                if 0 <= end[0] < size and 0 <= end[1] < size and end != start:
+                if 0 <= end[0] < size and 0 <= end[1] < size and end != start and (end[0] == 0 or end[0] == size - 1 or end[1] == 0 or end[1] == size - 1):
                     yshape = self.get_shape(end)
                     return end, yshape
                 else:
@@ -280,7 +278,7 @@ class Generator:
                 node = (int(node[0]), int(node[1]))
                 if node not in [(x[0], x[1]) for x in startingshapes]:
                     if 0 <= node[0] < len(board) and 0 <= node[1] < len(board):
-                        extrashape = input(f"Enter the shape at position {node[0]},{node[1]} (V, H, LD, LU, RD, RU): ")
+                        extrashape = self.get_shape(node)
                         startingshapes.append((node[0], node[1], extrashape))
                         break
                     else:
@@ -289,10 +287,9 @@ class Generator:
                     print("Node already written with a shape. Type o to overwrite, or any other key to re-enter.")
                     overwrite = input()
                     if overwrite.lower() == 'o':
-                        if 0 <= node[0] < len(board) and 0 <= node[1] < len(board):
-                            extrashape = input(f"Enter the shape at position {node[0]},{node[1]} (V, H, LD, LU, RD, RU): ")
-                            startingshapes.append((node[0], node[1], extrashape))
-                            break
+                        extrashape = self.get_shape(node)
+                        startingshapes.append((node[0], node[1], extrashape))
+                        break
             except (ValueError, IndexError):
                 print("Invalid input. Please enter coordinates in the format x,y.")
 
@@ -337,6 +334,7 @@ class Solver:
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
+    
     def Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size):
         start = (startingshapes[0][0], startingshapes[0][1])
         end = (startingshapes[1][0], startingshapes[1][1])
@@ -431,6 +429,7 @@ class Solver:
         if column_totals == []:
             column_totals, row_totals = get_totals()
             while sum(column_totals) != sum(row_totals):
+                print("The sum of the column totals must equal the sum of the row totals.")
                 column_totals, row_totals = get_totals()
 
         nodenumber = 0
@@ -986,6 +985,75 @@ class Solver:
                                     directions.append('right')
                             if len(directions) >= 3:
                                 flagimpossible = True
+
+
+                # for each shape in grid
+                # determine what directions the shape goes in
+                # check if the shape in each direction is a compatible shape
+
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] in shapes.values():
+                            shapedir = []
+                            findloopinboard(i, j)
+                            for direction in shapedir:
+                                if direction == 'left' and j - 1 >= 0:
+                                    if board[i][j-1] == V or board[i][j-1] == LU or board[i][j-1] == LD:
+                                        flagimpossible = True
+                                if direction == 'right' and j + 1 < len(board):
+                                    if board[i][j+1] == V or board[i][j+1] == RU or board[i][j+1] == RD:
+                                        flagimpossible = True
+                                if direction == 'up' and i - 1 >= 0:
+                                    if board[i-1][j] == H or board[i-1][j] == RU or board[i-1][j] == LU:
+                                        flagimpossible = True
+                                if direction == 'down' and i + 1 < len(board):
+                                    if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
+                                        flagimpossible = True
+
+                #### for each dot in the grid
+                # if the dot is surrounded by 3 'X's, flag as impossible
+
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] == ".":
+                            count = 0
+                            if i - 1 >= 0 and board[i-1][j] == "X":
+                                count += 1
+                            if i + 1 < len(board) and board[i+1][j] == "X":
+                                count += 1
+                            if j - 1 >= 0 and board[i][j-1] == "X":
+                                count += 1
+                            if j + 1 < len(board) and board[i][j+1] == "X":
+                                count += 1
+                            if count >= 3:
+                                flagimpossible = True
+
+
+                # for dot in grid
+                # if the dot is surrounded by 3 shapes which go into it, flag as impossible
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        if board[i][j] == ".":
+                            count = 0
+                            # if the shape to the left is a shape that goes right
+                            if j - 1 >= 0 and board[i][j-1] in shapes.values():
+                                if board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU:
+                                    count += 1
+                            # if the shape to the right is a shape that goes left
+                            if j + 1 < len(board) and board[i][j+1] in shapes.values():
+                                if board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU:
+                                    count += 1
+                            # if the shape above is a shape that goes down
+                            if i - 1 >= 0 and board[i-1][j] in shapes.values():
+                                if board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD:
+                                    count += 1
+                            # if the shape below is a shape that goes up
+                            if i + 1 < len(board) and board[i+1][j] in shapes.values():
+                                if board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU:
+                                    count += 1
+                            if count >= 3:
+                                flagimpossible = True
+
             
             i,j = start
             previ,prevj = start
@@ -1239,7 +1307,6 @@ class Solver:
                         edgerows.append(i)
 
 
-
                 # for each column
                 # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
                 # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
@@ -1308,7 +1375,6 @@ class Solver:
                                         add_to_unsures(i, j)
                                         board[i][j] = "X"
                                         any_changes = True
-
 
 
                 ###### edge rules part 2 ######
@@ -1587,7 +1653,6 @@ class Solver:
                 Solver.print_board(board)
 
 
-
                 if column_totals[1] == 2:
                     if start[1] >= 2 and end[1] >= 2:
                         # count the number of dots in the column
@@ -1750,7 +1815,6 @@ class Solver:
                                             any_changes = True
 
 
-
                 #for each column which has column total = 1
                 # for each node in the column
                 # if the node to the left is an X, LU,LD,V or the node to the right is an X, RU, RD, V
@@ -1785,14 +1849,7 @@ class Solver:
                                 board[i][j] = "X"
 
 
-
                 if len(board) >= 5:
-                    # if the first row has row total = definites in row + 1
-                    # if board[0][len(board)-4] is a V, LD, LU and board[0][len(board)-2] is a dot and board [0][len(board)-3] is a N and board [0][len(board)-1] is a N
-                    # for i in range 0 to 4, if the node is a N, make the node an X
-                    # if board[0][3] is a V, RD, RU and board[0][1] is a dot and board [0][2] is a N and board [0][0] is a N
-                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
-
                     count = 0
                     for j in range(len(board)):
                         if board[0][j] in definites.values():
@@ -1812,12 +1869,6 @@ class Solver:
                                     if board[0][i] != "X":
                                         any_changes = True
                                     board[0][i] = "X"
-
-                    # if the first column has column total = definites in column + 1
-                    # if board[len(board)-4][0] is a H, RU, LU and board[len(board)-2][0] is a dot and board [len(board)-3][0] is a 'N' and board [len(board)-1][0] is a 'N'
-                    # for i in range 0 to 4, if the node is a N, make the node an X
-                    # if board[3][0] is a H, RD, LD and board[1][0] is a dot and board [2][0] is a 'N' and board [0][0] is a 'N'
-                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
 
                     count = 0
                     for i in range(len(board)):
@@ -1839,12 +1890,6 @@ class Solver:
                                         any_changes = True
                                     board[i][0] = "X"
 
-                    # if the last row has row total = definites in row + 1
-                    # if board[len(board)-1][len(board)-4] is a V, LD, LU and board[len(board)-1][len(board)-2] is a dot and board [len(board)-1][len(board)-3] is a N and board [len(board)-1][len(board)-1] is a N
-                    # for i in range 0 to 4, if the node is a N, make the node an X
-                    # if board[len(board)-1][3] is a V, RD, RU and board[len(board)-1][1] is a dot and board [len(board)-1][2] is a N and board [len(board)-1][0] is a N
-                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
-
                     count = 0
                     for j in range(len(board)):
                         if board[len(board) - 1][j] in definites.values():
@@ -1864,12 +1909,6 @@ class Solver:
                                     if board[len(board) - 1][i] != "X":
                                         any_changes = True
                                     board[len(board) - 1][i] = "X"
-
-                    # if the last column has column total = definites in column + 1
-                    # if board[len(board)-4][len(board)-1] is a H, RU, LU and board[len(board)-2][len(board)-1] is a dot and board [len(board)-3][len(board)-1] is a 'N' and board [len(board)-1][len(board)-1] is a 'N'
-                    # for i in range 0 to 4, if the node is a N, make the node an X
-                    # if board[3][len(board)-1] is a H, RD, LD and board[1][len(board)-1] is a dot and board [2][len(board)-1] is a 'N' and board [0][len(board)-1] is a 'N'
-                    # for i in range len(board) - 5 to len(board)-1, if the node is a N, make the node an X
 
                     count = 0
                     for i in range(len(board)):
@@ -1892,75 +1931,6 @@ class Solver:
                                     board[i][len(board) - 1] = "X"
 
 
-                if bruteforceneeded == True:
-                    
-                    # for each shape in grid
-                    # determine what directions the shape goes in
-                    # check if the shape in each direction is a compatible shape
-
-                    for i in range(len(board)):
-                        for j in range(len(board)):
-                            if board[i][j] in shapes.values():
-                                shapedir = []
-                                findloopinboard(i, j)
-                                for direction in shapedir:
-                                    if direction == 'left' and j - 1 >= 0:
-                                        if board[i][j-1] == V or board[i][j-1] == LU or board[i][j-1] == LD:
-                                            flagimpossible = True
-                                    if direction == 'right' and j + 1 < len(board):
-                                        if board[i][j+1] == V or board[i][j+1] == RU or board[i][j+1] == RD:
-                                            flagimpossible = True
-                                    if direction == 'up' and i - 1 >= 0:
-                                        if board[i-1][j] == H or board[i-1][j] == RU or board[i-1][j] == LU:
-                                            flagimpossible = True
-                                    if direction == 'down' and i + 1 < len(board):
-                                        if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
-                                            flagimpossible = True
-
-                    #### for each dot in the grid
-                    # if the dot is surrounded by 3 'X's, flag as impossible
-
-                    for i in range(len(board)):
-                        for j in range(len(board)):
-                            if board[i][j] == ".":
-                                count = 0
-                                if i - 1 >= 0 and board[i-1][j] == "X":
-                                    count += 1
-                                if i + 1 < len(board) and board[i+1][j] == "X":
-                                    count += 1
-                                if j - 1 >= 0 and board[i][j-1] == "X":
-                                    count += 1
-                                if j + 1 < len(board) and board[i][j+1] == "X":
-                                    count += 1
-                                if count >= 3:
-                                    flagimpossible = True
-
-
-                    # for dot in grid
-                    # if the dot is surrounded by 3 shapes which go into it, flag as impossible
-                    for i in range(len(board)):
-                        for j in range(len(board)):
-                            if board[i][j] == ".":
-                                count = 0
-                                # if the shape to the left is a shape that goes right
-                                if j - 1 >= 0 and board[i][j-1] in shapes.values():
-                                    if board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU:
-                                        count += 1
-                                # if the shape to the right is a shape that goes left
-                                if j + 1 < len(board) and board[i][j+1] in shapes.values():
-                                    if board[i][j+1] == H or board[i][j+1] == LD or board[i][j+1] == LU:
-                                        count += 1
-                                # if the shape above is a shape that goes down
-                                if i - 1 >= 0 and board[i-1][j] in shapes.values():
-                                    if board[i-1][j] == V or board[i-1][j] == RD or board[i-1][j] == LD:
-                                        count += 1
-                                # if the shape below is a shape that goes up
-                                if i + 1 < len(board) and board[i+1][j] in shapes.values():
-                                    if board[i+1][j] == V or board[i+1][j] == RU or board[i+1][j] == LU:
-                                        count += 1
-                                if count >= 3:
-                                    flagimpossible = True
-
 
             if flagimpossible == True:
                 trynew = True
@@ -1971,31 +1941,33 @@ class Solver:
                 bruteforceneeded = True
 
             if (bruteforceneeded == True and any_changes == False and generation != "y") or trynew == True:
+                stuck = False
                 print("Brute force needed")
-
                 # Add all unsures back to board (in reverse order to ensure board is changed to original state)
                 unsures = unsures[::-1]
                 for unsure in unsures:
                     board[unsure[0]][unsure[1]] = unsure[2]
                 unsures = []
-
-
                 if trynew == True:
                     if trysecond == False:
-                        unsureshapes.pop(0)
+                        if len(unsureshapes) == 1:
+                            unsureshapes.pop(0)
+                        else:
+                            stuck = True
                     else:
-                        unsureshapes.pop(1)
+                        if len(unsureshapes) == 1:
+                            unsureshapes.pop(1)
+                        else:
+                            stuck = True
                     trysecond = False
-
                 if len(unsureshapes) == 1:
                     # make the board square of save_state the shape in unsureshapes
-                    board[save_state[0]][save_state[1]] = unsureshapes[0]
+                    board[save_state[0]][save_state[1]] = unsureshapes
                     unsureshapes.pop(0)
                     trynew = False
                     any_changes = True
                     bruteforceneeded = False
                     changecheck = True
-
                 if len(unsureshapes) == 2:
                     if trysecond == False:
                         trysecond = True
@@ -2003,13 +1975,10 @@ class Solver:
                     else:
                         board[save_state[0]][save_state[1]] = save_state[2]
                         trysecond = False
-
                 if trysecond == True:
                     board[nodeguess[0]][nodeguess[1]] = nodeguess[3]
 
-                ###### brute force ######
-
-                #for dot in board
+                # for dot in board
                 # find the number of possible shapes that can go in the dot
                 # if only one possible shape, change the dot to that shape
                 # if two possible shapes, add a tuple to 'dots_two' in the form (i, j, shape1, shape2)
@@ -2154,22 +2123,15 @@ class Solver:
                                     if (i, j, possible[0], possible[1]) not in dots_two:
                                         dots_two.append((i, j, possible[0], possible[1]))
 
-                #reverse dotstwo
-                dots_two = dots_two[::-1]
-
-
-                print(dots_two)
 
                 if any_changes == False and len(dots_two) > 0:
                     unsureshapes = []
-                    ##### nodeguess = first node in dots_two
+                    # nodeguess = first node in dots_two
                     # change the board position designated by the first and second parts of nodeguess to the first shape in the third part of nodeguess
                     # add both shapes to 'unsureshapes'
                     # save old state of board square to save_state
-
-                    ## save state includes the coordinates of the node, and the shape of the node
+                    # save state includes the coordinates of the node, and the shape of the node
                     save_state = [dots_two[0][0], dots_two[0][1], board[dots_two[0][0]][dots_two[0][1]]]
-
                     nodeguess = dots_two[0]
                     board[nodeguess[0]][nodeguess[1]] = nodeguess[2]
                     unsureshapes.append(nodeguess[2])
@@ -2178,14 +2140,39 @@ class Solver:
                     any_changes = True
 
 
-                if any_changes == False and len(dots_two) == 0:
-                    print("Error, quitting")
-                    print("Current board: ")
+                if (any_changes == False and len(dots_two) == 0) or stuck == True:
+                    stuck = False
+                    print("This is how far this program was able to get")
+                    print("It is possible that you made a mistake in your input")
+                    print()
                     Solver.print_board(board)
-                    quit()
-
-
-
+                    print("type y if you would like to aid the program in solving the puzzle, n if you would like to quit")
+                    generation = input()
+                    while generation not in ["y", "n", "Y", "N"]:
+                        print("Invalid input")
+                        print("Enter a valid input, considering the options above")
+                        generation = input()
+                    if generation.upper() == "N":
+                        quit()
+                    if generation.upper() == "Y":
+                        print()
+                        Solver.print_board(board)
+                        rowcol = input("Enter row and column in the form row, column: ")
+                        while not (len(rowcol) == 3) and not (rowcol[1] == ",") and not (rowcol[0].isdigit()) and not (rowcol[2].isdigit()):
+                            print("Invalid input")
+                            print("Enter a valid input, considering the options above")
+                            rowcol = input()
+                        row = int(rowcol[0])
+                        col = int(rowcol[2])
+                        print(f"Enter the shape you would like to add to the board at node {row},{col}")
+                        print("Enter shape: H, V, RD, LD, RU, LU, N, X,.")
+                        shape = input()
+                        while shape not in {"H", "V", "RD", "LD", "RU", "LU", "N", "X", "."}:
+                            print("Invalid input")
+                            print("Enter a valid input, considering the options above")
+                            shape = input()
+                        board[row][col] = shape
+                        any_changes = True
 
 
             if any_changes == False and generation == "y":
@@ -2198,7 +2185,6 @@ class Solver:
                         if SAVEDBOARD[i][j] in shapes.values():
                             if board[i][j] not in shapes.values():
                                 possibleadditions.append((i, j, SAVEDBOARD[i][j]))
-
                 # chose a random shape from possibleadditions, add shape to board and to startingshapes
                 if len(possibleadditions) > 0:
                     chosen = random.choice(possibleadditions)
@@ -2206,24 +2192,22 @@ class Solver:
                     startingshapes.append(chosen)
                     Solver.print_board(board)
                     print("added a shape")
-
                 any_changes = True
 
 
-
 class EditBoard:
+    def print_board(board):
+        for row in board:
+            print(' '.join(map(str, row)))
+
     def manual_edit(board,editboard, column_totals, row_totals):
         timeshow = False
         percshow = False
         hintson = False
         solutionon = False
-
         with open("account.csv", "r") as f:
-            # extract all
-
             accdata = f.readline()
             accdata = accdata.split(",")
-        
         f.close()
         if accdata[1] == "1":
             timeshow = True
@@ -2233,8 +2217,6 @@ class EditBoard:
             hintson = True
         if accdata[4] == "1":
             solutionon = True
-
-
         RD = "┌"
         LD = "┐"
         RU = "└"
@@ -2244,7 +2226,6 @@ class EditBoard:
         DOT = "."
         X = "X"
         N = "N"
-
         changenode = {
         RD: "RD",
         LD: "LD",
@@ -2256,7 +2237,6 @@ class EditBoard:
         X: "X",
         N: "N"
         }
-
         shapes = {
         "RD": RD,
         "LD": LD,
@@ -2265,7 +2245,6 @@ class EditBoard:
         "H": H,
         "V": V
         }
-
         displayboard = []
         displayboard = [['N' for i in range(len(board)+ 1)] for j in range(len(board)+1)]
         displayboard[0][0] = "#"
@@ -2273,170 +2252,117 @@ class EditBoard:
             displayboard[0][i] = column_totals[i-1]
         for i in range(1,len(board)+1):
             displayboard[i][0] = row_totals[i-1]
-
-        for i in range(len(displayboard)):
-            for j in range(len(displayboard)):
-                if displayboard[i][j] == 10:
-                    displayboard[i][j] = "M"
-
+        for i in range(1,len(board)+1):
+            if displayboard[0][i] == 10:
+                displayboard[0][i] = "M"
+        for i in range(1,len(board)+1):
+            if displayboard[i][0] == 10:
+                displayboard[i][0] = "M"
         # add editboard to the bottom right of displayboard
         for i in range(0,len(board)):
             for j in range(0,len(board)):
                 displayboard[i+1][j+1] = editboard[i][j]
-        
         print()
-        #print the board
         Solver.print_board(displayboard)
-
         undostack = []
-        # start time
-
         time = datetime.datetime.now()
-
         time4 = None
-
         while True:
-
             print()
-
             print("Edit the board: ")
             print()
-
             Solver.print_board(displayboard)
             print()
-
             print("Enter row and column in the form row, column")
-            print("Alternatively, enter u to undo last move, p to pause the game, q to quit the game, SAVE to save the board")
+            print("Or enter u to undo last move, p to pause, q to quit, SAVE to save the board")
             if hintson == True and solutionon == True:
                 print("Enter h for a hint, Enter s to see the solution. Only use if you are truly stuck")
             elif hintson == True and solutionon == False:
                 print("Enter h for a hint. Only use if you are truly stuck")
             elif hintson == False and solutionon == True:
                 print("Enter s to see the solution. Only use if you are truly stuck")
-
             rowcol = input()
-
             while rowcol not in ["u", "h", "s", "p", "q", "save", "U", "H", "S", "P", "Q", "SAVE"] and not (len(rowcol) == 3):
                 print("Invalid input")
                 print("Enter a valid input, considering the options above")
                 rowcol = input()
-
             if rowcol.upper() == "P":
                 # start a second timer, which will be subtracted from the first timer upon completion
-
                 time4 = datetime.datetime.now()
                 print("Game paused")
                 for i in range(50):
                     print()
-
                 restart = ""
                 while restart not in ["r", "q", "R", "Q", "m", "M"]:
                     restart = input("Enter r to resume, m to return to main menu or q to quit: ")
                 if restart.upper() == "R":
                     # subtract the time taken from the first timer
-                    #stop time2
                     time3 = datetime.datetime.now()
                     time4 = time3 - time4
                     print("Game resumed")
-
                 if restart.upper() == "Q":
                     print("Game quit")
                     quit()
-
                 if restart.upper() == "M":
                     print("Returning to main menu")
                     MainMenu()
-
             elif rowcol.upper() == "Q":
                 print("Game quit")
                 quit()
-
             elif rowcol.upper() == "U":
                 if len(undostack) > 0:
                     last = undostack.pop()
                     displayboard[last[0] + 1][last[1] + 1] = last[2]
                 else:
                     print("No moves to undo")
-                continue
-
             elif rowcol.upper() == "S":
                 if solutionon == True:
                     print("Solution: ")
                     Solver.print_board(board)
                 else:
                     print("Solutions are disabled")
-        
             elif rowcol.upper() == "H":
-                with open("account.csv", "r") as f:
-                    hintonoff = f.readline()
-                    hintonoff = hintonoff.split(",")
-                    hintonoff = int(hintonoff[1])
-                f.close()
-                if hintonoff == 0:
+                if hintson == True:
                     print("Hints are enabled")
                     print("Providing hint")
-
-
                     possibleadditions = []
                     for i in range(len(board)):
                         for j in range(len(board)):
                             if board[i][j] in shapes.values():
                                 if displayboard[i+1][j+1] not in shapes.values():
                                     possibleadditions.append((i, j, board[i][j]))
-
                     chosen = random.choice(possibleadditions)
                     undostack.append((chosen[0], chosen[1], chosen[2]))
                     displayboard[chosen[0] + 1][chosen[1] + 1] = chosen[2]
-                
                 else:
                     print("Hints are disabled")
-
             elif rowcol.upper() == "SAVE":
                 data = board, editboard, column_totals, row_totals
-
                 filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
                 filename = filename + ".pkl"
-
-
-                # confirm that this is a file
                 files = find_pkl_files()
                 if filename in files:
                     print("File already exists")
-                    
                 else:
                     with open(filename, "wb") as f:
                         pickle.dump(data, f)
-
                     f.close()
                     print("Board saved")
                     quitoption = input("Enter q to quit, or any other key to continue: ")
                     if quitoption == "q":
                         quit()
-
             else:
-                #confirm that the input is valid
-
-                #if any character in rowcol is not a digit or a comma
-                #print invalid input
-
                 if any([char not in "0123456789," for char in rowcol]):
                     print("Invalid input")
-                    continue
-
-
                 if rowcol.count(",") != 1 or rowcol[0] == "," or rowcol[-1] == ",":
                     print("Invalid input")
-                
                 else:
                     rowcol = rowcol.split(",")
-
                     row = int(rowcol[0]) + 1
                     col = int(rowcol[1]) + 1
-
                     if row < 1 or row > len(board) or col < 1 or col > len(board):
                         print("Invalid input")
                         continue
-
                     shape = input("Enter shape, dot, N or X: ")
                     if shape in changenode.values():
                         if shape == "V":
@@ -2468,40 +2394,51 @@ class EditBoard:
                             displayboard[row][col] = N
                         Solver.print_board(displayboard)
                         print()
-
-
-
             if timeshow == True:
                 temp = datetime.datetime.now()
                 temp = temp - time
                 print("Time taken so far in seconds: ", temp.seconds)
             if percshow == True:
-                print("Percent complete: ", (sum([1 for i in range(len(board)) for j in range(len(board)) if displayboard[i+1][j+1] in shapes.values()])/(len(board)**2))*100, "%")
-
-
+                print("Percentage complete: ", round(sum([1 for i in range(len(board)) for j in range(len(board)) if displayboard[i+1][j+1] in shapes.values()]) / sum([1 for i in range(len(board)) for j in range(len(board)) if board[i][j] in shapes.values()]) * 100, 3), "%")
             success = True
-            for i in range(len(board)): #fix
+            for i in range(len(board)):
+                if success == False:
+                    break
                 for j in range(len(board)):
                     if board[i][j] != displayboard[i+1][j+1] and board[i][j] != "N" and board[i][j] != "X":
-                        success = False #####break?????????
+                        success = False
+                        break
             if success == True:
-                #find time
-
+                for i in range(len(board)):
+                    if success == False:
+                        break
+                    else:
+                        for j in range(len(board)):
+                            if displayboard[i+1][j+1] == ".":
+                                success = False
+                                break
+            if success == True:
+                # if the number of shapes in the board != sum of column totals, success = False
+                for i in range(len(board)):
+                    if success == False:
+                        break
+                    count = 0
+                    for j in range(len(board)):
+                        if displayboard[j+1][i+1] in shapes.values():
+                            count += 1
+                    if count != column_totals[i]:
+                        success = False
+            if success == True:
                 time2 = datetime.datetime.now()
                 time = time2 - time
                 if time4 != None:
                     time = time - time4
                 score = len(board)**2/ time.seconds
-
                 accdata[0] = str(float(accdata[0]) + score)
                 accdata[6] = str(int(accdata[6]) + 1)
-
                 with open("account.csv", "w") as f:
-                    #write levelscore
                     f.write(accdata[0] + "," + accdata[1] + "," + accdata[2] + "," + accdata[3] + "," + accdata[4] + "," + accdata[5] + "," + accdata[6])
-
                 f.close()
-
                 print("Time taken: ", time.seconds, " seconds")
                 print()
                 print("Solved")
@@ -2511,7 +2448,6 @@ class EditBoard:
                             displayboard[i][j] = "X"
                 Solver.print_board(displayboard)
                 MainMenu()
-                break
 
 
 def GetStats():
@@ -2522,7 +2458,6 @@ def GetStats():
         score = float(data[0])
         gamesplayed = int(data[6])
     f.close()
-
     if gamesplayed == 0:
         print("No games played")
     else:
@@ -2531,13 +2466,10 @@ def GetStats():
 
 def GetLevel():
     with open("account.csv", "r") as f:
-        # read the number in account.csv
         levelscore = f.readline()
-        #split levelscore into a list
         levelscore = levelscore.split(",")
         levelscore = float(levelscore[0])
     f.close()
-
     if levelscore < 1:
         rank = "Beginner"
     elif levelscore >= 1 and levelscore < 5:
@@ -2548,7 +2480,6 @@ def GetLevel():
         rank = "Elite Challenger"
     elif levelscore >= 100:
         rank = "Train Tracks Solver Elite"
-    
     return rank
 
 def Settings():
@@ -2562,37 +2493,27 @@ def Settings():
         onoffsolution = int(data[4])
         maxstartingshapes = int(data[5])
         gamesplayed = int(data[6])
-    
     f.close()
-    print()
     print("Current Settings")
     print()
-
     if onofftimetaken == 0:
         print("Time taken viewing is off")
     else:
         print("Time taken viewing is on")
-
     if onoffpercent == 0:
         print("Percent complete viewing is off")
     else:
         print("Percent complete viewing is on")
-
     if onoffhints == 0:
         print("Hints are off- this is the recommended setting")
-
     else:
         print("Hints are on- this is not the recommended setting")
-
     if onoffsolution == 0:
         print("Solution viewing is off- this is the recommended setting")
     else:
         print("Solution viewing is on- to discourage cheating, we recommend turning this off")
-
     print("Maximum starting shapes: ", maxstartingshapes)
-
     print()
-
     print("Enter 1 to turn time taken viewing on or off")
     print("Enter 2 to turn percent complete viewing on or off")
     print("Enter 3 to turn hints on or off")
@@ -2602,11 +2523,9 @@ def Settings():
     print("Enter 7 to return settings to default")
     print("Enter 8 to return to the main menu")
     print("Enter 9 to reset account")
-
     choice = input()
     while choice not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
         choice = input("Enter a valid choice: ")
-    
     if choice == "1":
         if onofftimetaken == 0:
             print("Time taken viewing is off, type y to turn on or n to keep off: ")
@@ -2622,7 +2541,6 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onofftimetaken = 0
-    
     if choice == "2":
         if onoffpercent == 0:
             print("Percent complete viewing is off, type y to turn on or n to keep off: ")
@@ -2638,7 +2556,6 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffpercent = 0
-        
     if choice == "3":
         if onoffhints == 0:
             print("Hints are off, type y to turn on or n to keep off: ")
@@ -2654,7 +2571,6 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffhints = 0
-
     if choice == "4":
         if onoffsolution == 0:
             print("Solution viewing is off, type y to turn on or n to keep off: ")
@@ -2670,7 +2586,6 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffsolution = 0
-
     if choice == "5":
         print("Enter the maximum starting shapes (minimum of 2): ")
         print("Current maximum: ", maxstartingshapes)
@@ -2679,21 +2594,16 @@ def Settings():
             choice = input("Enter a valid number: ")
         maxstartingshapes = int(choice)
         print("Maximum starting shapes changed to: ", maxstartingshapes)
-
     if choice == "6":
-        # hard mode resets onoffhints to 0, onoffsolution to 0, and maxstartingshapes to 4
         print("Type h to confirm hard mode")
         print("This disables hints, solution viewing and makes maximum starting shapes 4")
-
         choice = input()
         if choice.upper() == "H":
             onoffhints = 0
             onoffsolution = 0
             maxstartingshapes = 4
             print("Hard mode enabled")
-
     if choice == "7":
-        # return settings to default
         print("Settings will be returned to default. Confirm by typing y")
         choice = input()
         if choice.upper() == "Y":
@@ -2703,11 +2613,8 @@ def Settings():
             onoffsolution = 0
             maxstartingshapes = 7
             print("Settings returned to default")
-    
     if choice == "8":
-        # return to main menu
         MainMenu()
-
     if choice == "9":
         print("Are you sure you want to reset your account? Type y to confirm. This cannot be redone.") 
         print("This will reset your score and settings to default.")
@@ -2724,7 +2631,6 @@ def Settings():
 
     with open("account.csv", "w") as f:
         f.write(f"{score},{onofftimetaken},{onoffpercent},{onoffhints},{onoffsolution},{maxstartingshapes},{gamesplayed}")
-
     f.close()
     Settings()
 
@@ -2739,7 +2645,16 @@ def MainMenu():
     print()
     x = GetLevel()
     print("Welcome", x)
-    
+
+    with open("account.csv", "r") as f:
+        data = f.readline()
+        data = data.split(",")
+        gamesplayed = int(data[6])
+    f.close()
+    if gamesplayed == 0:
+        ExplainRules()
+        print("Enter any key to continue")
+        input()
     while True:
         print("Main Menu")
         print("Enter 1 to play a game")
@@ -2756,7 +2671,6 @@ def MainMenu():
             Settings()
         elif choice == "4":
             quit()
-
         print()
 
 def PlayGame():
@@ -2764,7 +2678,6 @@ def PlayGame():
     gamechoice = ""
     while gamechoice not in ["G", "M", "F", "Q", "g", "m", "f", "q"]:
         gamechoice = input("Enter G to generate a board, M to manually input a board, F to read from a file and Q to return to the main menu: ")
-
     if gamechoice.upper() == "G":
         with open("account.csv", "r") as f:
             data = f.readline()
@@ -2799,24 +2712,47 @@ def PlayGame():
         print()
         picklefile = input("Enter the name of the file (Dont include file type) ")
         picklefile = picklefile + ".pkl"
-
         if picklefile not in files:
             print("File not found")
             PlayGame()
-
         with open(picklefile, "rb") as f:
             pick = pickle.load(f)
-        print(pick)
-        board = pick[0]
-        editboard = pick[1]
-        column_totals = pick[2]
-        row_totals = pick[3]
         f.close()
-        generation = "n"
-
+        board, editboard, column_totals, row_totals = pick
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
 
     elif gamechoice.upper() == "Q":
         MainMenu()
+
+def ExplainRules():
+    print("Welcome to the Train Tracks Puzzle Game")
+    print()
+    print("This is a game where you must connect village A to village B")
+    print("You must do this by drawing tracks between the nodes")
+    print("The nodes are represented using a coordinate system")
+    print("The top left node is 0,0 and the bottom right node is board size - 1, board size - 1")
+    print("i.e. for a 5x5 board, the top left node is 0,0 and the bottom right node is 4,4")
+    print("The top row and left column of the board show the column and row totals respectively")
+    print("The number of tracks you need to fill in each row and column is dictated by these totals")
+    print("The board is mostly filled with Ns, which represent empty nodes")
+    print("Input dots to represent nodes which you know must be tracks, but you don't know the shape yet")
+    print("If you think you know a shape, input the shape")
+    print("The shapes are as follows: ")
+    print("H represents a horizontal track")
+    print("V represents a vertical track")
+    print("RD represents a track that connects to the node above and to the right")
+    print("LD represents a track that connects to the node above and to the left")
+    print("RU represents a track that connects to the node below and to the right")
+    print("LU represents a track that connects to the node below and to the left")
+    print("You can also input X to represent a node that cannot be a track")
+    print("You can undo your previous move by typing u")
+    print("There are also a few other features such as hints and solution viewing")
+    print("If you are stuck on a puzzle which you have attempted in real life, you can input the board")
+    print("The program will then attempt to solve the puzzle")
+    print("You can also save the board to a file")
+    print("If you just want to play a random game, enter 1 in the Main Menu, followed by G to generate")
+    print("Then follow any further instructions")
+    print("Good luck!")
+    print()
 
 MainMenu()
