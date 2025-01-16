@@ -32,15 +32,19 @@ class GenerateRandomPath:
             startynode = self.board_size - 1
         return startxnode, startynode
 
-    ###################################################################
-    # GROUP A SKILL: COMPLEX USER-DEFINED ALGORITHM, including a stack#
-    ###################################################################
+    ################################################
+    # GROUP A SKILL: COMPLEX USER-DEFINED ALGORITHM#
+    ################################################
     def dfs(self, start):
         # Performs a depth-first search to generate a random path on the board
         min_length = (self.board_size ** 2) * 0.4
         max_length = (self.board_size ** 2) * 0.6
         stack = [(start, [start])]
         self.visited = set()
+
+        ##################################
+        # GROUP A SKILL: STACK OPERATIONS#
+        ##################################
 
         while stack:
             v, path = stack.pop()
@@ -1128,6 +1132,11 @@ class Solver:
             else:
                 isashape = False
 
+
+            ################################################
+            # GROUP A SKILL: Complex user-defined algorithm#
+            ################################################
+
             while isashape == True and (iend != i or jend != j): #follow the path from the start node to the end node. Leave the loop if the end node is reached or if not on a shape
                 isashape = False
                 # if node is an H and prevnode was to the left
@@ -1218,6 +1227,7 @@ class Solver:
                     j = j + 1
                     fromstartcount += 1
                     isashape = True
+
 
             if iend == i and jend == j: #if end node reached
                 if fromstartcount != nodenumber: #if the number of nodes visited is not equal to the number of nodes in the path, flag as impossible
@@ -1372,7 +1382,7 @@ class Solver:
                             for j in range(len(board)):
                                 if board[i][j] == "N":
                                     possible = False
-                                    if j - 1 >= 0 and board[i][j-1] == ".": ###### add some shapes to the dot?
+                                    if j - 1 >= 0 and board[i][j-1] == ".":
                                         dots.append((i, j))
                                         possible = True
                                     if j + 1 < len(board) and board[i][j+1] == ".":
@@ -1394,6 +1404,11 @@ class Solver:
                                         any_changes = True
 
 
+
+                ################################################
+                # GROUP A SKILL: Complex user-defined algorithm#
+                ################################################
+
                 # edge rules part 2
                 # for each column
                 # if column to the left is an edge
@@ -1407,6 +1422,7 @@ class Solver:
                 # if one of the directions is valid, change all of these nodes to '.'
 
                 #TRACE
+                #POSSIBLY RE WRITE possibles = 1 RECURSIVELY
 
                 possible_down = False
                 possible_up = False
@@ -1664,9 +1680,7 @@ class Solver:
                                             counter += 1
                                         k -= 1
                                     any_changes = True
-                
-                print("Unique rule used")
-                print()
+
                 Solver.print_board(board)
 
                 # edge rules part 3
@@ -1831,39 +1845,67 @@ class Solver:
                                             board[len(board) - 2][k] = "X"
                                             any_changes = True
 
-                # edge rules part 4
-                #for each column which has column total = 1
-                # for each node in the column
-                # if the node to the left is an X, LU,LD,V or the node to the right is an X, RU, RD, V
-                # make the node an X
-                for j in range(len(board)):
-                    if column_totals[j] == 1 and j not in edgecolumns:
-                        for i in range(len(board)):
-                            if j - 1 >= 0 and (board[i][j-1] == "X" or board[i][j-1] == LU or board[i][j-1] == LD or board[i][j-1] == V):
-                                add_to_unsures(i, j)
-                                if board[i][j] != "X":
-                                    any_changes = True
-                                board[i][j] = "X"
-                            if j + 1 < len(board) and (board[i][j+1] == "X" or board[i][j+1] == RU or board[i][j+1] == RD or board[i][j+1] == V):
-                                add_to_unsures(i, j)
-                                if board[i][j] != "X":
-                                    any_changes = True
-                                board[i][j] = "X"
 
+
+                # edge rules part 4
+                # for each column
+                # if every node in the column is an X N or H
+                # and the number of Hs in the column is equal to the column total - 1
+                # for each other node in the column
+                # if the node to the left is an X, LU, LD, V or the node to the right is an X, RU, RD, V
+                # make the node an X
+                temp = True
+                for j in range(len(board)):
+                    for i in range(len(board)):
+                        if board[i][j] not in ["X", "N", "H"]:
+                            temp = False
+                    if temp == True:
+                        count = 0
+                        for i in range(len(board)):
+                            if board[i][j] == H:
+                                count += 1
+                        if count == column_totals[j] - 1:
+                            for i in range(len(board)):
+                                if j - 1 >= 0 and (board[i][j-1] == "X" or board[i][j-1] == LU or board[i][j-1] == LD or board[i][j-1] == V):
+                                    add_to_unsures(i, j)
+                                    if board[i][j] != "X":
+                                        any_changes = True
+                                    board[i][j] = "X"
+                                if j + 1 < len(board) and (board[i][j+1] == "X" or board[i][j+1] == RU or board[i][j+1] == RD or board[i][j+1] == V):
+                                    add_to_unsures(i, j)
+                                    if board[i][j] != "X":
+                                        any_changes = True
+                                    board[i][j] = "X"
+                
                 # do the same for rows
+                temp = True
                 for i in range(len(board)):
-                    if row_totals[i] == 1 and i not in edgerows:
+                    for j in range(len(board)):
+                        if board[i][j] not in ["X", "N", "V"]:
+                            temp = False
+                    if temp == True:
+                        count = 0
                         for j in range(len(board)):
-                            if i - 1 >= 0 and (board[i-1][j] == "X" or board[i-1][j] == LU or board[i-1][j] == RU or board[i-1][j] == H):
-                                add_to_unsures(i, j)
-                                if board[i][j] != "X":
-                                    any_changes = True
-                                board[i][j] = "X"
-                            if i + 1 < len(board) and (board[i+1][j] == "X" or board[i+1][j] == LD or board[i+1][j] == RD or board[i+1][j] == H):
-                                add_to_unsures(i, j)
-                                if board[i][j] != "X":
-                                    any_changes = True
-                                board[i][j] = "X"
+                            if board[i][j] == V:
+                                count += 1
+                        if count == row_totals[i] - 1:
+                            for j in range(len(board)):
+                                if i - 1 >= 0 and (board[i-1][j] == "X" or board[i-1][j] == LU or board[i-1][j] == RU or board[i-1][j] == H):
+                                    add_to_unsures(i, j)
+                                    if board[i][j] != "X":
+                                        any_changes = True
+                                    board[i][j] = "X"
+                                if i + 1 < len(board) and (board[i+1][j] == "X" or board[i+1][j] == LD or board[i+1][j] == RD or board[i+1][j] == H):
+                                    add_to_unsures(i, j)
+                                    if board[i][j] != "X":
+                                        any_changes = True
+                                    board[i][j] = "X"
+                
+
+
+                ################################################
+                # GROUP A SKILL: Complex user-defined algorithm#
+                ################################################
 
                 # edge rules part 5
                 if len(board) >= 5: # rule doesn't work for 4x4
@@ -1949,7 +1991,7 @@ class Solver:
 
 
             if flagimpossible == True:
-                trynew = True
+                trynew = True # The guess was incorrect
 
             edgerulesneeded = False
             if any_changes == False:
@@ -1960,6 +2002,12 @@ class Solver:
             if (bruteforceneeded == True and any_changes == False and generation != "y") or trynew == True: #Enter guessing stage
                 stuck = False
                 print("Brute force needed")
+
+
+                ########################################
+                # GROUP A SKILL: List operation-reveral#
+                ########################################
+
                 # Add all unsures back to board (in reverse order to ensure board is changed to original state)
                 unsures = unsures[::-1]
                 for unsure in unsures:
@@ -2000,6 +2048,11 @@ class Solver:
                 # if only one possible shape, change the dot to that shape
                 # if two possible shapes, add a tuple to 'dots_two' in the form (i, j, shape1, shape2)
                 
+
+                ################################################
+                # GROUP A SKILL: Complex user-defined algorithm#
+                ################################################
+
                 if changecheck == True and trysecond == False and any_changes == False: # determine which nodes have two possible shapes
                     changecheck = False
                     for i in range(len(board)):
@@ -2215,6 +2268,11 @@ class Solver:
 # GROUP A SKILL: OOP#
 #####################
 class EditBoard:
+
+    ###########################################
+    # GROUP A SKILL: List operation using join#
+    ###########################################
+
     def print_board(board):
         for row in board:
             print(' '.join(map(str, row)))
@@ -2224,6 +2282,15 @@ class EditBoard:
         percshow = False
         hintson = False
         solutionon = False
+        hintsused = 0
+        solution_used = False
+
+
+
+        #####################################
+        # GROUP B SKILL: READING FROM A FILE#
+        #####################################
+
         with open("account.csv", "r") as f:
             accdata = f.readline()
             accdata = accdata.split(",")
@@ -2265,6 +2332,15 @@ class EditBoard:
         "H": H,
         "V": V
         }
+        
+                # count the number of shapes in the board
+        
+        countshapes = 0
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] in shapes.values():
+                    countshapes += 1
+        
         displayboard = []
         displayboard = [['N' for i in range(len(board)+ 1)] for j in range(len(board)+1)]
         displayboard[0][0] = "#"
@@ -2283,6 +2359,14 @@ class EditBoard:
         for i in range(0,len(board)):
             for j in range(0,len(board)):
                 displayboard[i+1][j+1] = editboard[i][j]
+
+        startshapes = []
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] in shapes.values():
+                    startshapes.append((i, j, board[i][j]))
+
+
         print()
         Solver.print_board(displayboard)
         undostack = []
@@ -2313,6 +2397,10 @@ class EditBoard:
                 print("Game paused")
                 for i in range(50):
                     print()
+                # print the time taken so far
+                time5 = datetime.datetime.now()
+                time5 = time5 - time
+                print(f"Time taken so far: {time5.seconds} seconds")
                 restart = ""
                 while restart not in ["r", "q", "R", "Q", "m", "M"]:
                     restart = input("Enter r to resume, m to return to main menu or q to quit: ")
@@ -2330,7 +2418,7 @@ class EditBoard:
             elif rowcol.upper() == "Q":
                 print("Game quit")
                 quit()
-            elif rowcol.upper() == "U":
+            elif rowcol.upper() == "U": #### STACK OPERATION
                 if len(undostack) > 0:
                     last = undostack.pop()
                     displayboard[last[0] + 1][last[1] + 1] = last[2]
@@ -2338,23 +2426,31 @@ class EditBoard:
                     print("No moves to undo")
             elif rowcol.upper() == "S":
                 if solutionon == True:
+                    solution_used = True
                     print("Solution: ")
                     Solver.print_board(board)
                 else:
                     print("Solutions are disabled")
             elif rowcol.upper() == "H":
                 if hintson == True:
-                    print("Hints are enabled")
-                    print("Providing hint")
-                    possibleadditions = []
-                    for i in range(len(board)):
-                        for j in range(len(board)):
-                            if board[i][j] in shapes.values():
-                                if displayboard[i+1][j+1] not in shapes.values():
-                                    possibleadditions.append((i, j, board[i][j]))
-                    chosen = random.choice(possibleadditions)
-                    undostack.append((chosen[0], chosen[1], chosen[2]))
-                    displayboard[chosen[0] + 1][chosen[1] + 1] = chosen[2]
+                    # if time taken is under 3 minutes, do not provide the hint
+                    temp = datetime.datetime.now()
+                    temp = temp - time
+                    if temp.seconds < 180:
+                        print("Time taken is under 3 minutes, hint not usable yet")
+                    else:
+                        hintsused += 1
+                        print("Hints are enabled")
+                        print("Providing hint")
+                        possibleadditions = []
+                        for i in range(len(board)):
+                            for j in range(len(board)):
+                                if board[i][j] in shapes.values():
+                                    if displayboard[i+1][j+1] not in shapes.values():
+                                        possibleadditions.append((i, j, board[i][j]))
+                        chosen = random.choice(possibleadditions)
+                        undostack.append((chosen[0], chosen[1], chosen[2]))
+                        displayboard[chosen[0] + 1][chosen[1] + 1] = chosen[2]
                 else:
                     print("Hints are disabled")
             elif rowcol.upper() == "SAVE":
@@ -2362,9 +2458,15 @@ class EditBoard:
                 filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
                 filename = filename + ".pkl"
                 files = find_pkl_files()
-                if filename in files:
+                while filename in files:
                     print("File already exists")
+                    filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
+                    filename = filename + ".pkl"
                 else:
+
+                    ##########################################
+                    # GROUP B SKILL: Writing to a pickle file#
+                    ##########################################
                     with open(filename, "wb") as f:
                         pickle.dump(data, f)
                     f.close()
@@ -2384,6 +2486,12 @@ class EditBoard:
                     if row < 1 or row > len(board) or col < 1 or col > len(board):
                         print("Invalid input")
                         continue
+
+                    # if node in startshapes, do not allow the user to change it
+                    if (row - 1, col - 1, displayboard[row][col]) in startshapes:
+                        print("Cannot change starting shapes")
+                        continue
+
                     shape = input("Enter shape, dot, N or X: ")
                     if shape in changenode.values():
                         if shape == "V":
@@ -2419,9 +2527,11 @@ class EditBoard:
                 temp = datetime.datetime.now()
                 temp = temp - time
                 print("Time taken so far in seconds: ", temp.seconds)
-            if percshow == True:
+            if percshow == True:#### complex
                 print("Percentage complete: ", round(sum([1 for i in range(len(board)) for j in range(len(board)) if displayboard[i+1][j+1] in shapes.values()]) / sum([1 for i in range(len(board)) for j in range(len(board)) if board[i][j] in shapes.values()]) * 100, 3), "%")
-            
+
+            if hintsused > 0:
+                print("Hints used: ", hintsused)
             success = True #assume the board is solved
             for i in range(len(board)):
                 if success == False:
@@ -2452,12 +2562,46 @@ class EditBoard:
                         success = False
             if success == True: #if the board is solved, edit the account file and print a congratulatory message
                 time2 = datetime.datetime.now()
+
+                ###############################################################
+                # GROUP B SKILL: Simple user-defined mathematical calculations#
+                ###############################################################
+
                 time = time2 - time
                 if time4 != None:
                     time = time - time4
                 score = len(board)**2/ time.seconds
+
+
+
+                countshapes = countshapes/len(board)**2
+                # if countshapes is greater than 0.1, halve the score
+                # if countshapes is greater than 0.2, halve the score again
+                # do this repeatedly until countshapes is less than the number
+                temp = False
+                countcheck = 0.1
+                while temp == False:
+                    if countshapes > countcheck:
+                        score = score / 2
+                        countcheck += 0.1
+                    else:
+                        temp = True
+
+                # halve the score for every hint used
+                score = score / (2**hintsused)
+                # if the solution was used, divide the score by 10
+                if solution_used == True:
+                    score = score / 10
                 accdata[0] = str(float(accdata[0]) + score)
                 accdata[6] = str(int(accdata[6]) + 1)
+
+
+
+
+                ###################################
+                # GROUP B SKILL: Writing to a file#
+                ###################################
+
                 with open("account.csv", "w") as f:
                     f.write(accdata[0] + "," + accdata[1] + "," + accdata[2] + "," + accdata[3] + "," + accdata[4] + "," + accdata[5] + "," + accdata[6])
                 f.close()
@@ -2474,6 +2618,12 @@ class EditBoard:
 
 def GetStats():
     print(GetLevel())
+
+
+    #####################################
+    # GROUP B SKILL: Reading from a file#
+    #####################################
+
     with open("account.csv", "r") as f:
         data = f.readline()
         data = data.split(",")
@@ -2487,6 +2637,11 @@ def GetStats():
         print("Average score: ", score/gamesplayed)
 
 def GetLevel():
+
+    #####################################
+    # GROUP B SKILL: Reading from a file#
+    #####################################
+
     with open("account.csv", "r") as f:
         levelscore = f.readline()
         levelscore = levelscore.split(",")
@@ -2505,6 +2660,11 @@ def GetLevel():
     return rank
 
 def Settings():
+
+    #####################################
+    # GROUP B SKILL: Reading from a file#
+    #####################################
+
     with open("account.csv", "r") as f:
         data = f.readline()
         data = data.split(",")
@@ -2545,6 +2705,7 @@ def Settings():
     print("Enter 7 to return settings to default")
     print("Enter 8 to return to the main menu")
     print("Enter 9 to reset account")
+    change = False
     choice = input()
     while choice not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
         choice = input("Enter a valid choice: ")
@@ -2556,6 +2717,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onofftimetaken = 1
+                change = True
         else:
             print("Time taken viewing is on, type y to turn off or n to keep on: ")
             choice = input()
@@ -2563,6 +2725,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onofftimetaken = 0
+                change = True
     if choice == "2":
         if onoffpercent == 0:
             print("Percent complete viewing is off, type y to turn on or n to keep off: ")
@@ -2571,6 +2734,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffpercent = 1
+                change = True
         else:
             print("Percent complete viewing is on, type y to turn off or n to keep on: ")
             choice = input()
@@ -2578,6 +2742,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffpercent = 0
+                change = True
     if choice == "3":
         if onoffhints == 0:
             print("Hints are off, type y to turn on or n to keep off: ")
@@ -2586,6 +2751,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffhints = 1
+                change = True
         else:
             print("Hints are on, type y to turn off or n to keep on: ")
             choice = input()
@@ -2593,6 +2759,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffhints = 0
+                change = True
     if choice == "4":
         if onoffsolution == 0:
             print("Solution viewing is off, type y to turn on or n to keep off: ")
@@ -2601,6 +2768,7 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffsolution = 1
+                change = True
         else:
             print("Solution viewing is on, type y to turn off or n to keep on: ")
             choice = input()
@@ -2608,14 +2776,16 @@ def Settings():
                 choice = input("Enter a valid choice: ")
             if choice == "y":
                 onoffsolution = 0
+                change = True
     if choice == "5":
-        print("Enter the maximum starting shapes (minimum of 2): ")
+        print("Enter the maximum starting shapes (minimum of 2, maximum of 10): ")
         print("Current maximum: ", maxstartingshapes)
         choice = input()
-        while not choice.isdigit() or int(choice) < 2:
+        while not choice.isdigit() or int(choice) < 2 or int(choice) > 10:
             choice = input("Enter a valid number: ")
         maxstartingshapes = int(choice)
         print("Maximum starting shapes changed to: ", maxstartingshapes)
+        change = True
     if choice == "6":
         print("Type h to confirm hard mode")
         print("This disables hints, solution viewing and makes maximum starting shapes 4")
@@ -2625,6 +2795,7 @@ def Settings():
             onoffsolution = 0
             maxstartingshapes = 4
             print("Hard mode enabled")
+            change = True
     if choice == "7":
         print("Settings will be returned to default. Confirm by typing y")
         choice = input()
@@ -2635,6 +2806,7 @@ def Settings():
             onoffsolution = 0
             maxstartingshapes = 7
             print("Settings returned to default")
+            change = True
     if choice == "8":
         MainMenu()
     if choice == "9":
@@ -2649,15 +2821,27 @@ def Settings():
             onoffsolution = 0
             maxstartingshapes = 7
             gamesplayed = 0
+            change = True
             print("Account reset")
 
-    with open("account.csv", "w") as f:
-        f.write(f"{score},{onofftimetaken},{onoffpercent},{onoffhints},{onoffsolution},{maxstartingshapes},{gamesplayed}")
-    f.close()
+    if change == True:
+
+        ###################################
+        # GROUP B SKILL: Writing to a file#
+        ###################################
+
+        with open("account.csv", "w") as f:
+            f.write(f"{score},{onofftimetaken},{onoffpercent},{onoffhints},{onoffsolution},{maxstartingshapes},{gamesplayed}")
+        f.close()
     Settings()
 
 def find_pkl_files():
     files = []
+
+    ###############################################
+    # GROUP B SKILL: Scan for files in a directory#
+    ###############################################
+
     for file in os.listdir():
         if file.endswith(".pkl"):
             files.append(file)
@@ -2667,6 +2851,11 @@ def MainMenu():
     print()
     x = GetLevel()
     print("Welcome", x)
+
+
+    #####################################
+    # GROUP B SKILL: Reading from a file#
+    #####################################
 
     with open("account.csv", "r") as f:
         data = f.readline()
@@ -2682,7 +2871,8 @@ def MainMenu():
         print("Enter 1 to play a game")
         print("Enter 2 to view your stats")
         print("Enter 3 to view settings")
-        print("Enter 4 to quit")
+        print("Enter 4 to explain rules")
+        print("Enter 5 to quit")
         print()
         choice = input()
         if choice == "1":
@@ -2692,6 +2882,8 @@ def MainMenu():
         elif choice == "3":
             Settings()
         elif choice == "4":
+            ExplainRules()
+        elif choice == "5":
             quit()
         print()
 
@@ -2701,6 +2893,11 @@ def PlayGame():
     while gamechoice not in ["G", "M", "F", "Q", "g", "m", "f", "q"]:
         gamechoice = input("Enter G to generate a board, M to manually input a board, F to read from a file and Q to return to the main menu: ")
     if gamechoice.upper() == "G":
+
+        #####################################
+        # GROUP B SKILL: Reading from a file#
+        #####################################
+
         with open("account.csv", "r") as f:
             data = f.readline()
             data = data.split(",")
@@ -2732,11 +2929,16 @@ def PlayGame():
         for file in files:
             print(file)
         print()
-        picklefile = input("Enter the name of the file (Dont include file type) ")
+        picklefile = input("Enter the name of the file (Don't include file type) ")
         picklefile = picklefile + ".pkl"
         if picklefile not in files:
             print("File not found")
             PlayGame()
+
+        ############################################
+        # GROUP B SKILL: Reading from a pickle file#
+        ############################################
+
         with open(picklefile, "rb") as f:
             pick = pickle.load(f)
         f.close()
@@ -2779,6 +2981,16 @@ def ExplainRules():
     print()
 
 def Checkaccountfileexists():
+
+    #####################################
+    # GROUP B SKILL: Searching for files#
+    #####################################
+
+    ###########################################
+    # GROUP B SKILL: Reading/Writing to a file#
+    ###########################################
+
+
     # if account file exists, check if length is 7
     if os.path.exists("account.csv"):
         with open("account.csv", "r") as f:
@@ -2788,6 +3000,13 @@ def Checkaccountfileexists():
                 with open("account.csv", "w") as f:
                     f.write("0,1,0,0,0,7,0")
         f.close()
+
+
+
+    #################################
+    # GROUP B SKILL: Creating a file#
+    #################################
+
     # if account file does not exist, create it with default settings
     if not os.path.exists("account.csv"):
         with open("account.csv", "w") as f:
