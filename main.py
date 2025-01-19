@@ -396,9 +396,13 @@ class Solver:
                         i = 11
 
                 for i in range(len(column_totals)):
-                    if column_totals[i] > board_size:
-                        print("No column total cannot be greater than the board size. Re-enter all column totals.")
-                        column_totals = []
+                    if column_totals[i] > board_size or column_totals[i] <= 0:
+                        print("No column total cannot be greater than the board size or less than 1. Re-enter all column totals.")
+                        column_totals.append(0)
+                        break
+
+                if len(column_totals) > board_size:
+                    column_totals = []
 
 
 
@@ -414,9 +418,13 @@ class Solver:
                         i = 11
 
                 for i in range(len(row_totals)):
-                    if row_totals[i] > board_size:
-                        print("No row total cannot be greater than the board size. Re-enter all row totals.")
-                        row_totals = []
+                    if row_totals[i] > board_size or row_totals[i] <= 0:
+                        print("No row total cannot be greater than the board size or less than 1. Re-enter all row totals.")
+                        row_totals.append(0)
+                        break
+
+                if len(row_totals) > board_size:
+                    row_totals = []
 
 
             for i in range(len(startingshapes)):
@@ -668,7 +676,7 @@ class Solver:
             ##################################################
 
             # Third stage of main loop:
-            # for each empty square in the grid
+            # for each empty node in the grid
             # if it can connect to a maximum of 1 node, change it to an X as it is not possible to connect to only one node unless a start/end node
 
             temp = True
@@ -754,7 +762,7 @@ class Solver:
 
             # Fifth stage of main loop:
             # for each dot in the grid
-            # if it is adjacent to exactly 2 from 'characters', change it the character which fits the pattern
+            # if it is adjacent to exactly 2 possible directions, change it the character which fits the pattern
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] == '.':
@@ -772,7 +780,7 @@ class Solver:
                         if i + 1 < len(board) and ((board[i+1][j] == V) or (board[i+1][j] == RU) or (board[i+1][j] == LU) or (board[i+1][j] == '.') or (board[i+1][j] == "N")):
                             count += 1
                             directions.append('down')
-                        #if there are exactly 2 characters adjacent to the dot
+                        #if there are exactly 2 possible directions for the dot
                         # draw the appropriate character
                         if count == 2:
                             add_to_unsures(i, j)
@@ -1032,24 +1040,6 @@ class Solver:
                                     if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
                                         flagimpossible = True
 
-                #### for each dot in the grid
-                # if the dot is surrounded by 3 'X's, flag as impossible
-
-                for i in range(len(board)):
-                    for j in range(len(board)):
-                        if board[i][j] == ".":
-                            count = 0
-                            if i - 1 >= 0 and board[i-1][j] == "X":
-                                count += 1
-                            if i + 1 < len(board) and board[i+1][j] == "X":
-                                count += 1
-                            if j - 1 >= 0 and board[i][j-1] == "X":
-                                count += 1
-                            if j + 1 < len(board) and board[i][j+1] == "X":
-                                count += 1
-                            if count >= 3:
-                                flagimpossible = True
-
 
                 # for dot in grid
                 # if the dot is surrounded by 3 shapes which go into it, flag as impossible
@@ -1252,6 +1242,7 @@ class Solver:
 
 
             if edgerulesneeded == True: #Use niche rules to try and help solving the puzzle
+                # pre-edge rule
                 # if an edge column/row total is equal to the length of the board - 1, if there are two isolated Ns in the column/row, change them to dots
                 if column_totals[0] == len(board) - 1:
                     if (board[2][0] == H or board[2][0] == LD or board[2][0] == RD) and (board[0][0] == 'N'):
@@ -1333,11 +1324,11 @@ class Solver:
                     if count == len(board):
                         edgerows.append(i)
 
-                # edge rules part 1
+                # edge rule 1
                 # for each column
                 # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
-                # if yes, for each square in the column which is 'N' and above or below a dot, add this coordinate to a list
-                # if the length of list is 1, change the square to a dot, and change all other 'N's in the column to 'X'
+                # if yes, for each node in the column which is 'N' and above or below a dot, add this coordinate to a list
+                # if the length of list is 1, change the node to a dot, and change all other 'N's in the column to 'X'
 
                 for j in range(len(board)):
                     if (j - 1 in edgecolumns) or (j + 1 in edgecolumns) and j not in edgecolumns:
@@ -1421,8 +1412,6 @@ class Solver:
                 # if any of these nodes are 'X', this direction is considered invalid
                 # if one of the directions is valid, change all of these nodes to '.'
 
-                #TRACE
-                #POSSIBLY RE WRITE possibles = 1 RECURSIVELY
 
                 possible_down = False
                 possible_up = False
@@ -1486,8 +1475,8 @@ class Solver:
                                     any_changes = True
                                                            
                 # do the same for rows
-                possiblementright = False
-                possiblementleft = False
+                possibleright = False
+                possibleleft = False
                 possibles = 0
                 for i in range(len(board)):
                     if i - 1 in edgerows and i+1 < len(board) and i-1 >= 0 and i not in edgerows:
@@ -1506,7 +1495,7 @@ class Solver:
                                         k += 1
                                         counter += 1
                                     if counter == row_totals[i] and k < len(board): ###changed
-                                        possiblementright = True
+                                        possibleright = True
                                         possibles += 1
                                     counter = 1
                                     k = j
@@ -1518,11 +1507,11 @@ class Solver:
                                         k -= 1
                                         counter += 1
                                     if counter == row_totals[i] and k >= 0: ###changed
-                                        possiblementleft = True
+                                        possibleleft = True
                                         possibles += 1
 
                             if possibles == 1:
-                                if possiblementright == True:
+                                if possibleright == True:
                                     counter = 0
                                     k = place
                                     while counter < row_totals[i]:
@@ -1534,7 +1523,7 @@ class Solver:
                                             counter += 1
                                         k += 1
                                     any_changes = True
-                                if possiblementleft == True:
+                                if possibleleft == True:
                                     counter = 0
                                     k = place
                                     while counter < row_totals[i]:
@@ -1620,8 +1609,8 @@ class Solver:
                                     any_changes = True
                 
                 # do the same for rows
-                possiblementright = False
-                possiblementleft = False
+                possibleright = False
+                possibleleft = False
                 possibles = 0
                 for i in range(len(board)):
                     if i + 1 in edgerows and i-1 >= 0 and i + 1 < len(board) and i not in edgerows:
@@ -1640,7 +1629,7 @@ class Solver:
                                         k += 1
                                         counter += 1
                                     if counter == row_totals[i] and k < len(board):
-                                        possiblementright = True
+                                        possibleright = True
                                         possibles += 1
                                     counter = 1
                                     k = j
@@ -1652,11 +1641,11 @@ class Solver:
                                         k -= 1
                                         counter += 1
                                     if counter == row_totals[i] and k >= 0:
-                                        possiblementleft = True
+                                        possibleleft = True
                                         possibles += 1
 
                             if possibles == 1:
-                                if possiblementright == True:
+                                if possibleright == True:
                                     counter = 0
                                     k = place
                                     while counter < row_totals[i]:
@@ -1668,7 +1657,7 @@ class Solver:
                                             counter += 1
                                         k += 1
                                     any_changes = True
-                                if possiblementleft == True:
+                                if possibleleft == True:
                                     counter = 0
                                     k = place
                                     while counter < row_totals[i]:
@@ -2000,7 +1989,7 @@ class Solver:
 
 
             if (bruteforceneeded == True and any_changes == False and generation != "y") or trynew == True: #Enter guessing stage
-                stuck = False
+                stuck = True
                 print("Brute force needed")
 
 
@@ -2015,19 +2004,14 @@ class Solver:
                 unsures = []
                 if trynew == True:
                     if trysecond == False:
-                        if len(unsureshapes) == 1:
-                            unsureshapes.pop(0)
-                        else:
-                            stuck = True
+                        unsureshapes.pop(0)
                     else:
-                        if len(unsureshapes) == 1:
-                            unsureshapes.pop(1)
-                        else:
-                            stuck = True
+                        unsureshapes.pop(1)
                     trysecond = False
                 if len(unsureshapes) == 1:
-                    # make the board square of save_state the shape in unsureshapes
-                    board[save_state[0]][save_state[1]] = unsureshapes
+                    # make the board node of save_state the shape in unsureshapes
+                    board[save_state[0]][save_state[1]] = unsureshapes[0]
+                    stuck = False
                     unsureshapes.pop(0)
                     trynew = False
                     any_changes = True
@@ -2042,6 +2026,7 @@ class Solver:
                         trysecond = False
                 if trysecond == True:
                     board[nodeguess[0]][nodeguess[1]] = nodeguess[3]
+                    stuck = False
 
                 # for dot in board
                 # find the number of possible shapes that can go in the dot
@@ -2054,6 +2039,7 @@ class Solver:
                 ################################################
 
                 if changecheck == True and trysecond == False and any_changes == False: # determine which nodes have two possible shapes
+                    dots_two = []
                     changecheck = False
                     for i in range(len(board)):
                         for j in range(len(board)):
@@ -2199,7 +2185,7 @@ class Solver:
                     # nodeguess = first node in dots_two
                     # change the board position designated by the first and second parts of nodeguess to the first shape in the third part of nodeguess
                     # add both shapes to 'unsureshapes'
-                    # save old state of board square to save_state
+                    # save old state of board node to save_state
                     # save state includes the coordinates of the node, and the shape of the node
                     save_state = [dots_two[0][0], dots_two[0][1], board[dots_two[0][0]][dots_two[0][1]]]
                     nodeguess = dots_two[0]
@@ -2208,9 +2194,10 @@ class Solver:
                     unsureshapes.append(nodeguess[3])
                     dots_two.pop(0)
                     any_changes = True
+                    stuck = False
 
 
-                if (any_changes == False and len(dots_two) == 0) or stuck == True:
+                if stuck == True and len(dots_two) == 0: # if no more changes can be made
                     stuck = False
                     print("This is how far this program was able to get")
                     print("It is possible that you made a mistake in your input")
@@ -2418,7 +2405,10 @@ class EditBoard:
             elif rowcol.upper() == "Q":
                 print("Game quit")
                 quit()
-            elif rowcol.upper() == "U": #### STACK OPERATION
+            elif rowcol.upper() == "U":
+                #################################
+                # GROUP A SKILL: Stack operation#
+                #################################
                 if len(undostack) > 0:
                     last = undostack.pop()
                     displayboard[last[0] + 1][last[1] + 1] = last[2]
@@ -2527,7 +2517,10 @@ class EditBoard:
                 temp = datetime.datetime.now()
                 temp = temp - time
                 print("Time taken so far in seconds: ", temp.seconds)
-            if percshow == True:#### complex
+            if percshow == True:
+                ##################################################
+                # GROUP B SKILL: COMPLEX MATHEMATICAL CALCULATION#
+                ##################################################
                 print("Percentage complete: ", round(sum([1 for i in range(len(board)) for j in range(len(board)) if displayboard[i+1][j+1] in shapes.values()]) / sum([1 for i in range(len(board)) for j in range(len(board)) if board[i][j] in shapes.values()]) * 100, 3), "%")
 
             if hintsused > 0:
