@@ -360,10 +360,7 @@ class Generator:
 # GROUP A SKILL: OOP#
 #####################
 class Solver:
-    def print_board(board): # Only for debugging purposes. To be deleted in final version
-        for row in board:
-            print(' '.join(map(str, row)))
-    
+
     def Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size): #Attempt to solve the board it is given. If the board was generated, shapes may need to be added in order for the board to be solved.
         start = (startingshapes[0][0], startingshapes[0][1])
         end = (startingshapes[1][0], startingshapes[1][1])
@@ -550,9 +547,6 @@ class Solver:
             ##################################################
 
             # First stage of main loop: change all Ns which connect to a shape to '.'
-            print("Initial board:")
-            Solver.print_board(board)
-            print("\nFirst stage:")
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] in shapes.values():
@@ -610,8 +604,6 @@ class Solver:
                                 add_to_unsures(i - 1, j)
                                 board[i - 1][j] = '.'
                                 any_changes = True
-
-            Solver.print_board(board)
 
 
             #################################################
@@ -678,10 +670,6 @@ class Solver:
                                 temp = True
                                 any_changes = True
 
-            print()
-            print("Second stage:")
-            Solver.print_board(board)
-
 
             ##################################################
             # GROUP A SKILL: Optimized user-defined algorithm#
@@ -711,9 +699,6 @@ class Solver:
                                 board[i][j] = 'X'
                                 temp = True
                                 any_changes = True
-            print("Third stage:")
-            Solver.print_board(board)
-            print()
 
 
             ##################################################
@@ -761,11 +746,6 @@ class Solver:
                                     board[i][j] = V
                                 any_changes = True
                                 temp = False
-
-
-            print()
-            print("Fourth stage:")
-            Solver.print_board(board)
 
 
             ######################################################################################
@@ -998,9 +978,6 @@ class Solver:
                                 board[i][j] = findshape(directions[0], directions[1])
                                 any_changes = True
 
-            print()
-            print("Fifth stage:")
-            Solver.print_board(board)
 
 
             ###################################################
@@ -1235,15 +1212,14 @@ class Solver:
                 if fromstartcount != nodenumber: #if the number of nodes visited is not equal to the number of nodes in the path, flag as impossible
                     flagimpossible = True
                 else:
-                    print("Solved succesfully")
-                    Solver.print_board(board)
+                    print()
+                    print("Solved succesfully by the Solver")
                     print()
                     # create Editboard with all nodes as "N"
                     # add startingshapes to Editboard
                     editboard = [['N' for i in range(len(board))] for j in range(len(board))]
                     for i in range(len(startingshapes)):
                         editboard[startingshapes[i][0]][startingshapes[i][1]] = startingshapes[i][2]
-                    Solver.print_board(board)
 
                     return board, editboard, column_totals, row_totals
 
@@ -1682,7 +1658,6 @@ class Solver:
                                         k -= 1
                                     any_changes = True
 
-                Solver.print_board(board)
 
                 # edge rules part 3
                 if column_totals[1] == 2:
@@ -1996,13 +1971,11 @@ class Solver:
 
             edgerulesneeded = False
             if any_changes == False:
-                print("No changes made, entering guessing stage")
                 bruteforceneeded = True
 
 
             if (bruteforceneeded == True and any_changes == False and generation != "y") or trynew == True: #Enter guessing stage
                 stuck = True
-                print("Brute force needed")
 
 
                 ########################################
@@ -2214,7 +2187,7 @@ class Solver:
                     print("This is how far this program was able to get")
                     print("It is possible that you made a mistake in your input")
                     print()
-                    Solver.print_board(board)
+                    EditBoard.print_board(board)
                     print("type y if you would like to aid the program in solving the puzzle, n if you would like to quit")
                     generation = input()
                     while generation not in ["y", "n", "Y", "N"]:
@@ -2225,7 +2198,7 @@ class Solver:
                         quit()
                     if generation.upper() == "Y":
                         print()
-                        Solver.print_board(board)
+                        EditBoard.print_board(board)
                         rowcol = input("Enter row and column in the form row, column: ")
                         while not (len(rowcol) == 3) and not (rowcol[1] == ",") and not (rowcol[0].isdigit()) and not (rowcol[2].isdigit()):
                             print("Invalid input")
@@ -2245,8 +2218,6 @@ class Solver:
 
 
             if any_changes == False and generation == "y":
-                Solver.print_board(board)
-                print("adding hint")
                 # add all nodes with a shape in SAVEDBOARD but not in board to possibleadditions
                 possibleadditions = []
                 for i in range(len(board)):
@@ -2259,8 +2230,6 @@ class Solver:
                     chosen = random.choice(possibleadditions)
                     board[chosen[0]][chosen[1]] = chosen[2]
                     startingshapes.append(chosen)
-                    Solver.print_board(board)
-                    print("added a shape")
                 any_changes = True
 
 #####################
@@ -2373,7 +2342,7 @@ class EditBoard:
             print()
             print("Edit the board: ")
             print()
-            Solver.print_board(displayboard)
+            EditBoard.print_board(displayboard)
             print()
             print("Enter row and column in the form row,column")
             print("Or enter u to undo last move, p to pause, q to quit, SAVE to save the board")
@@ -2428,7 +2397,7 @@ class EditBoard:
                 if solutionon == True:
                     solution_used = True
                     print("Solution: ")
-                    Solver.print_board(board)
+                    EditBoard.print_board(board)
                 else:
                     print("Solutions are disabled")
             elif rowcol.upper() == "H":
@@ -2521,7 +2490,7 @@ class EditBoard:
                         elif shape == "N":
                             undostack.append((row - 1, col - 1, displayboard[row][col]))
                             displayboard[row][col] = N
-                        Solver.print_board(displayboard)
+                        EditBoard.print_board(displayboard)
                         print()
             if timeshow == True:
                 temp = datetime.datetime.now()
@@ -2615,7 +2584,7 @@ class EditBoard:
                     for j in range(len(displayboard)):
                         if displayboard[i][j] == "N":
                             displayboard[i][j] = "X"
-                Solver.print_board(displayboard)
+                EditBoard.print_board(displayboard)
                 MainMenu() #return to main menu
 
 
