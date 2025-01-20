@@ -2354,8 +2354,6 @@ class EditBoard:
                     startshapes.append((i, j, board[i][j]))
 
 
-        print()
-        Solver.print_board(displayboard)
         undostack = []
         time = datetime.datetime.now()
         time4 = None
@@ -2365,7 +2363,7 @@ class EditBoard:
             print()
             Solver.print_board(displayboard)
             print()
-            print("Enter row and column in the form row, column")
+            print("Enter row and column in the form row,column")
             print("Or enter u to undo last move, p to pause, q to quit, SAVE to save the board")
             if hintson == True and solutionon == True:
                 print("Enter h for a hint, Enter s to see the solution. Only use if you are truly stuck")
@@ -2449,7 +2447,7 @@ class EditBoard:
                 filename = filename + ".pkl"
                 files = find_pkl_files()
                 while filename in files:
-                    print("File already exists")
+                    print("File with that name already exists")
                     filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
                     filename = filename + ".pkl"
                 else:
@@ -2610,9 +2608,8 @@ class EditBoard:
 
 
 def GetStats():
-    print(GetLevel())
-
-
+    print("Your current level: ",GetLevel())
+    
     #####################################
     # GROUP B SKILL: Reading from a file#
     #####################################
@@ -2627,7 +2624,8 @@ def GetStats():
         print("No games played")
     else:
         print("Games played: ", gamesplayed)
-        print("Average score: ", score/gamesplayed)
+        # average score should be to 2 decimal places
+        print("Average score: ", round(score/gamesplayed, 2))
 
 def GetLevel():
 
@@ -2773,10 +2771,10 @@ def Settings():
     if choice == "5":
         print("Enter the maximum starting shapes (minimum of 2, maximum of 10): ")
         print("Current maximum: ", maxstartingshapes)
-        choice = input()
-        while not choice.isdigit() or int(choice) < 2 or int(choice) > 10:
-            choice = input("Enter a valid number: ")
-        maxstartingshapes = int(choice)
+        temp = input()
+        while not temp.isdigit() or int(temp) < 2 or int(temp) > 10:
+            temp = input("Enter a valid number: ")
+        maxstartingshapes = int(temp)
         print("Maximum starting shapes changed to: ", maxstartingshapes)
         change = True
     if choice == "6":
@@ -2803,8 +2801,8 @@ def Settings():
     if choice == "8":
         MainMenu()
     if choice == "9":
-        print("Are you sure you want to reset your account? Type y to confirm. This cannot be redone.") 
-        print("This will reset your score and settings to default.")
+        print("Are you sure you want to reset your account? Type y to confirm. This cannot be undone.") 
+        print("This will reset your score, games played and settings to default.")
         choice = input()
         if choice.upper() == "Y":
             score = 0
@@ -2921,6 +2919,12 @@ def PlayGame():
         print()
         for file in files:
             print(file)
+
+        # if no files are available, print a message explaining this
+        if len(files) == 0:
+            print("No files available")
+            PlayGame()
+
         print()
         picklefile = input("Enter the name of the file (Don't include file type) ")
         picklefile = picklefile + ".pkl"
@@ -2968,7 +2972,7 @@ def ExplainRules():
     print("If you are stuck on a puzzle which you have attempted in real life, you can input the board")
     print("The program will then attempt to solve the puzzle")
     print("You can also save the board to a file")
-    print("If you just want to play a random game, enter 1 in the Main Menu, followed by G to generate")
+    print("If you just want to play a random generated game, enter 1 in the Main Menu, followed by G to generate")
     print("Then follow any further instructions")
     print("Good luck!")
     print()
