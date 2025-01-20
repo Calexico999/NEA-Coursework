@@ -99,39 +99,46 @@ class Generator:
         previousy = path[0][1]        
         currentx = path[1][0]
         currenty = path[1][1]
+
+        left = False
+        right = False
+        up = False
+        down = False
+
+
         if previousx == currentx:
             if previousy < currenty:
-                directionpath = "right"
+                right = True
             else:
-                directionpath = "left"
+                left = True
         else:
             if previousx < currentx:
-                directionpath = "down"
+                down = True
             else:
-                directionpath = "up"
+                up = True
 
-        if directionpath == "right":
+        if right:
             if previousx == 0:
                 build_board[previousx][previousy] = "└"
             elif previousx == board_size - 1:
                 build_board[previousx][previousy] = "┌"
             elif previousy == 0:
                 build_board[previousx][previousy] = "─"
-        elif directionpath == "left":
+        elif left:
             if previousx == 0:
                 build_board[previousx][previousy] = "┘"
             elif previousx == board_size - 1:
                 build_board[previousx][previousy] = "┐"
             elif previousy == board_size - 1:
                 build_board[previousx][previousy] = "─"
-        elif directionpath == "up":
+        elif up:
             if previousx == board_size - 1:
                 build_board[previousx][previousy] = "│"
             elif previousy == 0:
                 build_board[previousx][previousy] = "┘"
             elif previousy == board_size - 1:
                 build_board[previousx][previousy] = "└"
-        elif directionpath == "down":
+        elif down:
             if previousx == 0:
                 build_board[previousx][previousy] = "│"
             elif previousy == 0:
@@ -141,48 +148,53 @@ class Generator:
         
         Generator.make_board(path, build_board)
 
+        left = False
+        right = False
+        up = False
+        down = False
+
         currentx = path[-2][0]
         currenty = path[-2][1]
         endx = path[-1][0]
         endy = path[-1][1]
         if currentx == endx:
             if currenty < endy:
-                directionpath = "right"
+                right = True
             else:
-                directionpath = "left"
+                left = True
         else:
             if currentx < endx:
-                directionpath = "down"
+                down = True
             else:
-                directionpath = "up"
+                up = True
 
         if endx == 0:
-            if directionpath == "right":
+            if right:
                 build_board[endx][endy] = "┘"
-            elif directionpath == "up":
+            elif up:
                 build_board[endx][endy] = "│"
-            elif directionpath == "left":
+            elif left:
                 build_board[endx][endy] = "└"
         elif endx == board_size - 1:
-            if directionpath == "right":
+            if right:
                 build_board[endx][endy] = "┐"
-            elif directionpath == "down":
+            elif down:
                 build_board[endx][endy] = "│"
-            elif directionpath == "left":
+            elif left:
                 build_board[endx][endy] = "┌"
         elif endy == 0:
-            if directionpath == "left":
+            if left:
                 build_board[endx][endy] = "─"
-            elif directionpath == "down":
+            elif down:
                 build_board[endx][endy] = "┘"
-            elif directionpath == "up":
+            elif up:
                 build_board[endx][endy] = "┐"
         elif endy == board_size - 1:
-            if directionpath == "right":
+            if right:
                 build_board[endx][endy] = "─"
-            elif directionpath == "down":
+            elif down:
                 build_board[endx][endy] = "└"
-            elif directionpath == "up":
+            elif up:
                 build_board[endx][endy] = "┌"
 
 
@@ -2552,6 +2564,7 @@ class EditBoard:
                     if count != column_totals[i]:
                         success = False
             if success == True: #if the board is solved, edit the account file and print a congratulatory message
+
                 time2 = datetime.datetime.now()
 
                 ###############################################################
@@ -2562,7 +2575,6 @@ class EditBoard:
                 if time4 != None:
                     time = time - time4
                 score = len(board)**2/ time.seconds
-
 
 
                 countshapes = countshapes/len(board)**2
