@@ -63,6 +63,7 @@ class GenerateRandomPath:
                         return None
                     return path
 
+            # Add the current node to the visited set
             self.visited.add(v)
             x, y = v
             all_next = []
@@ -94,6 +95,7 @@ class Generator:
         while path is None:
             start = path_generator.generate_start_node()
             path = path_generator.dfs(start)
+        # Create a board with all nodes as X
         build_board = [['X' for _ in range(board_size)] for _ in range(board_size)]
         previousx = path[0][0]
         previousy = path[0][1]        
@@ -105,7 +107,7 @@ class Generator:
         up = False
         down = False
 
-
+        # Determine the direction from the first node
         if previousx == currentx:
             if previousy < currenty:
                 right = True
@@ -145,7 +147,7 @@ class Generator:
                 build_board[previousx][previousy] = "┐"
             elif previousy == board_size - 1:
                 build_board[previousx][previousy] = "┌"
-        
+        # Build the rest of the board
         Generator.make_board(path, build_board)
 
         left = False
@@ -153,6 +155,7 @@ class Generator:
         up = False
         down = False
 
+        # Add the last node, based on the position of the penultimate node
         currentx = path[-2][0]
         currenty = path[-2][1]
         endx = path[-1][0]
@@ -197,10 +200,11 @@ class Generator:
             elif up:
                 build_board[endx][endy] = "┌"
 
-
         xshape = build_board[start[0]][start[1]]
         yshape = build_board[path[-1][0]][path[-1][1]]
         listofchars = ["┌", "┐", "└", "┘", "─", "│"]
+
+        # Determine the column and row totals
         column_totals = []
         row_totals = []
         for i in range(board_size):
@@ -238,7 +242,7 @@ class Generator:
         while board_size.isnumeric() == False or int(board_size) < 4 or int(board_size) > 10:
             board_size = input("Enter the size of the board (edge length in range 4-10): ")
         board_size = int(board_size)
-
+        # Create a board with all nodes as N
         board = [["N"] * board_size for _ in range(board_size)]
         start, xshape = self.get_starting_position(board_size)
         end, yshape = self.get_ending_position(board_size, start)
@@ -329,6 +333,8 @@ class Generator:
         currentx, currenty = path[1][0], path[1][1]
         nextx, nexty = path[2][0], path[2][1]
 
+        # Use the position of the nodes before and after the current node to determine the shape of the current node
+
         if nextx + 2 == previousx or nextx - 2 == previousx:
             build_board[currentx][currenty] = "│"
         elif nexty + 2 == previousy or nexty - 2 == previousy:
@@ -374,19 +380,24 @@ class Solver:
         LU = "┘"
         H = "─"
         V = "│"
+        # Alternate characters
         DOT = "."
         NULL = "N"
         X = "X"
+        # Initialize lists
         unsures = []
-        trynew = False
         dots = []
         unsureshapes = []
+        dots_two = []
+        # Initial boolean states
         changecheck = True
         trysecond = False
-        dots_two = []
+        trynew = False
+        bruteforce_entered = False
 
 
         def get_totals():# Called if the board is being manually manipulated by the user.
+            # This subroutine allows the user to enter the column and row totals for the board
             column_totals = []
             row_totals = []
             print()
@@ -465,7 +476,7 @@ class Solver:
                 column_totals, row_totals = get_totals()
 
         nodenumber = 0
-        for i in range(len(column_totals)):# The number of shapes in the board is calculated. This is used verify if the board is solved correctly.
+        for i in range(len(column_totals)):# The number of shapes in the board is calculated. This is used to verify if the board is solved correctly.
             nodenumber += column_totals[i]
         
         #Dictionary of all possible shapes
@@ -531,7 +542,7 @@ class Solver:
                 elif b == 'down':
                     return RD
 
-        def add_to_unsures(a,b):#Used to add a node to the unsures list
+        def add_to_unsures(a,b):#Used to add a node to the unsures list, if needed
             if bruteforceneeded == True and generation == "n":
                 unsures.append((a, b, board[a][b])) #Unsures is stored as a list of tuples. Each tuple contains the position of the node and the shape of the node
 
@@ -547,6 +558,7 @@ class Solver:
             ##################################################
 
             # First stage of main loop: change all Ns which connect to a shape to '.'
+            # If a change is made, set any_changes to True
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] in shapes.values():
@@ -611,8 +623,9 @@ class Solver:
             #################################################
 
             # Second stage of main loop: check each column to see if any dots/Xs can be added
+            # If a change is made, set any_changes to True
             temp = True
-            while temp == True: # Repeat stage if a change was made
+            while temp: # Repeat stage if a change was made
                 temp = False
                 for j in range(len(board)):
                     count = 0
@@ -678,9 +691,9 @@ class Solver:
             # Third stage of main loop:
             # for each empty node in the grid
             # if it can connect to a maximum of 1 node, change it to an X as it is not possible to connect to only one node unless a start/end node
-
+            # If a change is made, set any_changes to True
             temp = True
-            while temp:
+            while temp: # Repeat stage if a change was made
                 temp = False
                 for i in range(len(board)):
                     for j in range(len(board)):
@@ -708,8 +721,9 @@ class Solver:
             # Fourth stage of main loop:
             # for each dot in the grid
             # if it is adjacent to 2 shapes, change it the character which fits the pattern
+            # If a change is made, set any_changes to True
             temp = False
-            while temp == False:
+            while temp == False: # Repeat stage if a change was made
                 temp = True
                 for i in range(len(board)):
                     for j in range(len(board)):
@@ -748,13 +762,14 @@ class Solver:
                                 temp = False
 
 
-            ######################################################################################
-            # GROUP A SKILL: Complex user-defined algorithm (especially in the if count == 3 loop#
-            ######################################################################################
+            #######################################################################################
+            # GROUP A SKILL: Complex user-defined algorithm (especially in the if count == 3 loop)#
+            #######################################################################################
 
             # Fifth stage of main loop:
             # for each dot in the grid
             # if it is adjacent to exactly 2 possible directions, change it the character which fits the pattern
+            # If a change is made, set any_changes to True
             for i in range(len(board)):
                 for j in range(len(board)):
                     if board[i][j] == '.':
@@ -989,20 +1004,20 @@ class Solver:
                 for i in range(len(board)):
                     for j in range(len(board)):
                         if board[i][j] == '.':
-                            directions = []
+                            count = 0
                             if i - 1 >= 0:
                                 if (board[i-1][j] == RU) or (board[i-1][j] == LU) or (board[i-1][j] == H) or (board[i-1][j] == 'X'):
-                                    directions.append('up')
+                                    count += 1
                             if i + 1 < len(board):
                                 if (board[i+1][j] == RD) or (board[i+1][j] == LD) or (board[i+1][j] == H) or (board[i+1][j] == 'X'):
-                                    directions.append('down')
+                                    count += 1
                             if j - 1 >= 0:
                                 if (board[i][j-1] == LU) or (board[i][j-1] == LD) or (board[i][j-1] == V) or (board[i][j-1] == 'X'):
-                                    directions.append('left')
+                                    count += 1
                             if j + 1 < len(board):
                                 if (board[i][j+1] == RU) or (board[i][j+1] == RD) or (board[i][j+1] == V) or (board[i][j+1] == 'X'):
-                                    directions.append('right')
-                            if len(directions) >= 3:
+                                    count += 1
+                            if count >= 3:
                                 flagimpossible = True
 
 
@@ -1055,6 +1070,7 @@ class Solver:
                             if count >= 3:
                                 flagimpossible = True
 
+            # Check if the board has been solved yet
 
             i,j = start
             previ,prevj = start
@@ -1213,8 +1229,7 @@ class Solver:
                     flagimpossible = True
                 else:
                     print()
-                    print("Solved succesfully by the Solver")
-                    print()
+                    print("Solved successfully by the Solver")
                     # create Editboard with all nodes as "N"
                     # add startingshapes to Editboard
                     editboard = [['N' for i in range(len(board))] for j in range(len(board))]
@@ -1232,6 +1247,7 @@ class Solver:
             if edgerulesneeded == True: #Use niche rules to try and help solving the puzzle
                 # pre-edge rule
                 # if an edge column/row total is equal to the length of the board - 1, if there are two isolated Ns in the column/row, change them to dots
+                # If a change is made to the board, set any_changes to True
                 if column_totals[0] == len(board) - 1:
                     if (board[2][0] == H or board[2][0] == LD or board[2][0] == RD) and (board[0][0] == 'N'):
                         add_to_unsures(0, 0)
@@ -1288,7 +1304,7 @@ class Solver:
                         board[len(board) - 1][len(board) - 2] = "."
                         any_changes = True
 
-                
+                #Establish default edge columns and rows
                 edgecolumns = []
                 edgerows = []
                 edgecolumns.append(-1)
@@ -1317,6 +1333,7 @@ class Solver:
                 # if column to the left or right is in edgecolumns, check if the number of 'definites' in the column is equal to the column total - 1
                 # if yes, for each node in the column which is 'N' and above or below a dot, add this coordinate to a list
                 # if the length of list is 1, change the node to a dot, and change all other 'N's in the column to 'X'
+                # If a change is made to the board, set any_changes to True
 
                 for j in range(len(board)):
                     if (j - 1 in edgecolumns) or (j + 1 in edgecolumns) and j not in edgecolumns:
@@ -1399,13 +1416,14 @@ class Solver:
                 # including this node, go up until nodes in column = column total
                 # if any of these nodes are 'X', this direction is considered invalid
                 # if one of the directions is valid, change all of these nodes to '.'
+                # If a change is made to the board, set any_changes to True
 
 
                 possible_down = False
                 possible_up = False
                 possibles = 0
                 for j in range(len(board)):
-                    if j - 1 in edgecolumns and j+1 < len(board) and j not in edgecolumns and j-1 >= 0:
+                    if j - 1 in edgecolumns and j+1 < len(board) and j not in edgecolumns and j-1 >= 0 and j+1 not in edgecolumns:
                         if (column_totals[j-1] == 1 or column_totals[j-1] == 0) and column_totals[j+1] == 1:
                             for i in range(len(board)):
                                 if (board[i][j-1] in shapes.values()):
@@ -1467,7 +1485,7 @@ class Solver:
                 possibleleft = False
                 possibles = 0
                 for i in range(len(board)):
-                    if i - 1 in edgerows and i+1 < len(board) and i-1 >= 0 and i not in edgerows:
+                    if i - 1 in edgerows and i+1 < len(board) and i-1 >= 0 and i not in edgerows and i+1 not in edgerows:
                         if (row_totals[i-1] == 1 or row_totals[i-1] == 0) and row_totals[i+1] == 1:
                             for j in range(len(board)):
                                 if (board[i-1][j] == H) or (board[i-1][j] == RD) or (board[i-1][j] == RU) or (board[i-1][j] == LD) or (board[i-1][j] == LU) or (board[i-1][j] == V):
@@ -1535,11 +1553,12 @@ class Solver:
                 # including this node, go up until nodes in column = column total
                 # if any of these nodes are 'X', this direction is considered invalid
                 # if one of the directions is valid, change all of these nodes to '.'
+                # If a change is made to the board, set any_changes to True
                 possible_down = False
                 possible_up = False
                 possibles = 0
                 for j in range(len(board)):
-                    if j + 1 in edgecolumns and j-1 >= 0 and j+1 < len(board) and j not in edgecolumns:
+                    if j + 1 in edgecolumns and j-1 >= 0 and j+1 < len(board) and j not in edgecolumns and j - 1 not in edgecolumns:
                         if (column_totals[j+1] == 1 or column_totals[j+1] == 0) and column_totals[j-1] == 1:
                             for i in range(len(board)):
                                 if (board[i][j+1] in shapes.values()):
@@ -1601,7 +1620,7 @@ class Solver:
                 possibleleft = False
                 possibles = 0
                 for i in range(len(board)):
-                    if i + 1 in edgerows and i-1 >= 0 and i + 1 < len(board) and i not in edgerows:
+                    if i + 1 in edgerows and i-1 >= 0 and i + 1 < len(board) and i not in edgerows and i - 1 not in edgerows:
                         if (row_totals[i+1] == 1 or row_totals[i+1] == 0) and row_totals[i-1] == 1:
                             for j in range(len(board)):
                                 if (board[i+1][j] == H) or (board[i+1][j] == RD) or (board[i+1][j] == RU) or (board[i+1][j] == LD) or (board[i+1][j] == LU) or (board[i+1][j] == V):
@@ -1660,6 +1679,8 @@ class Solver:
 
 
                 # edge rules part 3
+                # Unique rule if the outermost inner column/row has a total of 2 and the start and end nodes are not in the corresponding column/row or its adjacent edge column/row
+                # If a change is made to the board, set any_changes to True
                 if column_totals[1] == 2:
                     if start[1] >= 2 and end[1] >= 2:
                         # count the number of dots in the column
@@ -1822,7 +1843,6 @@ class Solver:
                                             any_changes = True
 
 
-
                 # edge rules part 4
                 # for each column
                 # if every node in the column is an X N or H
@@ -1830,6 +1850,7 @@ class Solver:
                 # for each other node in the column
                 # if the node to the left is an X, LU, LD, V or the node to the right is an X, RU, RD, V
                 # make the node an X
+                # If a change is made to the board, set any_changes to True
                 temp = True
                 for j in range(len(board)):
                     for i in range(len(board)):
@@ -1967,7 +1988,12 @@ class Solver:
 
 
             if flagimpossible == True:
-                trynew = True # The guess was incorrect
+                # if the program has not entered the bruteforcer yet and it was manually inputted, claim the user must've entered their data wrong
+                if bruteforce_entered == False:
+                    print("The data you have entered is impossible to solve. Please check your data and consider trying again if you think you made a mistake")
+                    PlayGame()
+                else:
+                    trynew = True # The guess was incorrect
 
             edgerulesneeded = False
             if any_changes == False:
@@ -1976,11 +2002,11 @@ class Solver:
 
             if (bruteforceneeded == True and any_changes == False and generation != "y") or trynew == True: #Enter guessing stage
                 stuck = True
+                bruteforce_entered = True
 
-
-                ########################################
-                # GROUP A SKILL: List operation-reveral#
-                ########################################
+                #########################################
+                # GROUP A SKILL: List operation-reversal#
+                #########################################
 
                 # Add all unsures back to board (in reverse order to ensure board is changed to original state)
                 unsures = unsures[::-1]
@@ -1992,6 +2018,7 @@ class Solver:
                         unsureshapes.pop(0)
                     else:
                         unsureshapes.pop(1)
+                    # Reset trysecond to False
                     trysecond = False
                 if len(unsureshapes) == 1:
                     # make the board node of save_state the shape in unsureshapes
@@ -2017,20 +2044,21 @@ class Solver:
                 # find the number of possible shapes that can go in the dot
                 # if only one possible shape, change the dot to that shape
                 # if two possible shapes, add a tuple to 'dots_two' in the form (i, j, shape1, shape2)
-                
+
 
                 ################################################
                 # GROUP A SKILL: Complex user-defined algorithm#
                 ################################################
 
                 if changecheck == True and trysecond == False and any_changes == False: # determine which nodes have two possible shapes
+                    # Initialize dots_two and changecheck
                     dots_two = []
                     changecheck = False
                     for i in range(len(board)):
                         for j in range(len(board)):
                             if board[i][j] == ".":
                                 possible = []
-                                ### for each dot that connects to a shape
+                                # for each dot that connects to a shape, check the other three directions which are possible directions from the dot
                                 # for example if the shape at [i][j-1] is H, RD, RU, check the other three directions to see if any are dots or 'N's
                                 # if they are add the corresponding shapes to 'possible'
                                 if j - 1 >= 0 and (board[i][j-1] == H or board[i][j-1] == RD or board[i][j-1] == RU):
@@ -2254,7 +2282,6 @@ class EditBoard:
         solution_used = False
 
 
-
         #####################################
         # GROUP B SKILL: READING FROM A FILE#
         #####################################
@@ -2280,7 +2307,7 @@ class EditBoard:
         DOT = "."
         X = "X"
         N = "N"
-        #changenode is all possible nodetypes which the user can input to a node
+        # Changenode is all possible nodetypes which the user can input to a node
         changenode = {
         RD: "RD",
         LD: "LD",
@@ -2292,6 +2319,7 @@ class EditBoard:
         X: "X",
         N: "N"
         }
+        # Shapes is all possible track shapes which can be added to the board
         shapes = {
         "RD": RD,
         "LD": LD,
@@ -2302,13 +2330,13 @@ class EditBoard:
         }
         
                 # count the number of shapes in the board
-        
+
         countshapes = 0
         for i in range(len(board)):
             for j in range(len(board)):
                 if board[i][j] in shapes.values():
                     countshapes += 1
-        
+
         displayboard = []
         displayboard = [['N' for i in range(len(board)+ 1)] for j in range(len(board)+1)]
         displayboard[0][0] = "#"
@@ -2344,6 +2372,7 @@ class EditBoard:
             print()
             EditBoard.print_board(displayboard)
             print()
+            # Display the possible options for the user to input
             print("Enter row and column in the form row,column")
             print("Or enter u to undo last move, p to pause, q to quit, SAVE to save the board")
             if hintson == True and solutionon == True:
@@ -2362,8 +2391,8 @@ class EditBoard:
                 time4 = datetime.datetime.now()
                 print("Game paused")
                 for i in range(50):
-                    print()
-                # print the time taken so far
+                    print() # Block the screen so the user cannot see the board
+                # obtain the time taken so far
                 time5 = datetime.datetime.now()
                 time5 = time5 - time
                 print(f"Time taken so far: {time5.seconds} seconds")
@@ -2502,8 +2531,9 @@ class EditBoard:
                 ##################################################
                 print("Percentage complete: ", round(sum([1 for i in range(len(board)) for j in range(len(board)) if displayboard[i+1][j+1] in shapes.values()]) / sum([1 for i in range(len(board)) for j in range(len(board)) if board[i][j] in shapes.values()]) * 100, 3), "%")
 
-            if hintsused > 0:
+            if hintsused > 0: # Print the number of hints used so far if > 0
                 print("Hints used: ", hintsused)
+            
             success = True #assume the board is solved
             for i in range(len(board)):
                 if success == False:
@@ -2533,18 +2563,16 @@ class EditBoard:
                     if count != column_totals[i]:
                         success = False
             if success == True: #if the board is solved, edit the account file and print a congratulatory message
-
+                # Obtain current time
                 time2 = datetime.datetime.now()
 
                 ###############################################################
                 # GROUP B SKILL: Simple user-defined mathematical calculations#
                 ###############################################################
-
+                
+                # Calculate the overall time taken
                 time = time2 - time
-                if time4 != None:
-                    time = time - time4
                 score = len(board)**2/ time.seconds
-
 
                 countshapes = countshapes/len(board)**2
                 # if countshapes is greater than 0.1, halve the score
@@ -2568,8 +2596,6 @@ class EditBoard:
                 accdata[6] = str(int(accdata[6]) + 1)
 
 
-
-
                 ###################################
                 # GROUP B SKILL: Writing to a file#
                 ###################################
@@ -2577,7 +2603,6 @@ class EditBoard:
                 with open("account.csv", "w") as f:
                     f.write(accdata[0] + "," + accdata[1] + "," + accdata[2] + "," + accdata[3] + "," + accdata[4] + "," + accdata[5] + "," + accdata[6])
                 f.close()
-                print("Time taken: ", time.seconds, " seconds")
                 print()
                 print("Solved")
                 for i in range(len(displayboard)):
@@ -2585,6 +2610,8 @@ class EditBoard:
                         if displayboard[i][j] == "N":
                             displayboard[i][j] = "X"
                 EditBoard.print_board(displayboard)
+                print()
+                print("Time taken: ", time.seconds, " seconds")
                 MainMenu() #return to main menu
 
 
@@ -2943,10 +2970,10 @@ def ExplainRules():
     print("The shapes are as follows: ")
     print("H represents a horizontal track")
     print("V represents a vertical track")
-    print("RD represents a track that connects to the node above and to the right")
-    print("LD represents a track that connects to the node above and to the left")
-    print("RU represents a track that connects to the node below and to the right")
-    print("LU represents a track that connects to the node below and to the left")
+    print("RU represents a track that connects to the node above and to the right")
+    print("LU represents a track that connects to the node above and to the left")
+    print("RD represents a track that connects to the node below and to the right")
+    print("LD represents a track that connects to the node below and to the left")
     print("You can also input X to represent a node that cannot be a track")
     print("You can undo your previous move by typing u")
     print("There are also a few other features such as hints and solution viewing")
