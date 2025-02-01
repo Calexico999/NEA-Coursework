@@ -1101,7 +1101,7 @@ class Solver:
                                 any_changes = True
 
 
-            if bruteforceneeded == True and generation == "n":
+            if bruteforceneeded == True and generation == "n" and flagimpossible == False: # if flagimpossible is already set to True, the subroutine will not have an effect
                 flagimpossible = check_if_impossible(flagimpossible) # Check if the board is impossible to solve
 
 
