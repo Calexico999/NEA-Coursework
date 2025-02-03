@@ -3032,7 +3032,7 @@ def Checkaccountfileexists():
     #####################################
 
     #########################################
-    # GROUP B SKILL: READING/CREATING A FILE#
+    # GROUP B SKILL: READING(/OVERWRITING) A FILE#
     #########################################
 
 
