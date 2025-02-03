@@ -579,7 +579,7 @@ class Solver:
 
 
         ###################################################
-        # GROUP A SKILL: Optimized user-defined algorithms#
+        # GROUP A SKILL: OPTIMIZED USER-DEFINED ALGORITHMS#
         ###################################################
         def check_if_impossible(flagimpossible):#Checks if the board is impossible to solve
             # if a dot is surrounded by 3 or 4 nodes that it cant go into, set impossible
@@ -661,7 +661,7 @@ class Solver:
 
 
             ##################################################
-            # GROUP A SKILL: Optimized user defined algorithm#
+            # GROUP A SKILL: OPTIMIZED USER-DEFINED ALGORITHM#
             ##################################################
 
             # First stage of main loop: change all Ns which connect to a shape to '.'
@@ -726,7 +726,7 @@ class Solver:
 
 
             #################################################
-            # GROUP A SKILL: Optimized user-defined algorithm#
+            # GROUP A SKILL: OPTIMIZED USER-DEFINED ALGORITHM#
             #################################################
 
             # Second stage of main loop: check each column to see if any dots/Xs can be added
@@ -792,7 +792,7 @@ class Solver:
 
 
             ##################################################
-            # GROUP A SKILL: Optimized user-defined algorithm#
+            # GROUP A SKILL: OPTIMIZED USER-DEFINED ALGORITHM#
             ##################################################
 
             # Third stage of main loop:
@@ -822,7 +822,7 @@ class Solver:
 
 
             ##################################################
-            # GROUP A SKILL: Optimized user-defined algorithm#
+            # GROUP A SKILL: OPTIMIZED USER-DEFINED ALGORITHMS#
             ##################################################
 
             # Fourth stage of main loop:
@@ -870,7 +870,7 @@ class Solver:
 
 
             #######################################################################################
-            # GROUP A SKILL: Complex user-defined algorithm (especially in the if count == 3 loop)#
+            # GROUP A SKILL: COMPLEX USER-DEFINED ALGORITHMS (ESPECIALLY IN THE IF COUNT = 3 LOOP)#
             #######################################################################################
 
             # Fifth stage of main loop:
@@ -1164,7 +1164,7 @@ class Solver:
 
 
             ################################################
-            # GROUP A SKILL: Complex user-defined algorithm#
+            # GROUP A SKILL: COMPLEX USER DEFINED ALGORITHM#
             ################################################
 
             while isashape == True and (iend != i or jend != j): #follow the path from the start node to the end node. Leave the loop if the end node is reached or if not on a shape
@@ -1473,7 +1473,7 @@ class Solver:
                                             break
                                         k += 1
                                         counter += 1
-                                    if counter == column_totals[j] and k < len(board): ###changed
+                                    if counter == column_totals[j] and k < len(board):
                                         possible_down = True
                                         possibles += 1
                                     counter = 1
@@ -1485,7 +1485,7 @@ class Solver:
                                             break
                                         k -= 1
                                         counter += 1
-                                    if counter == column_totals[j] and k >= 0: ###changed
+                                    if counter == column_totals[j] and k >= 0:
                                         possible_up = True
                                         possibles += 1
 
@@ -1535,7 +1535,7 @@ class Solver:
                                             break
                                         k += 1
                                         counter += 1
-                                    if counter == row_totals[i] and k < len(board): ###changed
+                                    if counter == row_totals[i] and k < len(board):
                                         possibleright = True
                                         possibles += 1
                                     counter = 1
@@ -1547,7 +1547,7 @@ class Solver:
                                             break
                                         k -= 1
                                         counter += 1
-                                    if counter == row_totals[i] and k >= 0: ###changed
+                                    if counter == row_totals[i] and k >= 0:
                                         possibleleft = True
                                         possibles += 1
 
@@ -1570,7 +1570,7 @@ class Solver:
                                     while counter < row_totals[i]:
                                         if board[i][k] in definites.values():
                                             counter += 1
-                                        if board[i][k] == "N": ###outofrange
+                                        if board[i][k] == "N":
                                             add_to_unsures(i, k)
                                             board[i][k] = "."
                                             counter += 1
@@ -2488,6 +2488,10 @@ class EditBoard:
                 else:
                     print("Hints are disabled")
             elif rowcol.upper() == "SAVE":
+                # Overwrite editboard with the data in displayboard
+                for i in range(len(board)):
+                    for j in range(len(board)):
+                        editboard[i][j] = displayboard[i+1][j+1]
                 data = board, editboard, column_totals, row_totals
                 filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
                 filename = filename + ".pkl"
@@ -2499,7 +2503,7 @@ class EditBoard:
                 else:
 
                     ##########################################
-                    # GROUP B SKILL: Writing to a pickle file#
+                    # GROUP B SKILL: WRITING TO A PICKLE FILE#
                     ##########################################
                     with open(filename, "wb") as f:
                         pickle.dump(data, f)
@@ -2603,7 +2607,7 @@ class EditBoard:
                 time2 = datetime.datetime.now()
 
                 ###############################################################
-                # GROUP B SKILL: Simple user-defined mathematical calculations#
+                # GROUP B SKILL: SIMPLE USER DEFINED MATHEMATICAL CALCULATIONS#
                 ###############################################################
                 
                 # Calculate the overall time taken
@@ -2633,7 +2637,7 @@ class EditBoard:
 
 
                 ###################################
-                # GROUP B SKILL: Writing to a file#
+                # GROUP B SKILL: WRITING TO A FILE#
                 ###################################
 
                 with open("account.csv", "w") as f:
@@ -2655,7 +2659,7 @@ def GetStats():
     print("Your current level: ",GetLevel())
     
     #####################################
-    # GROUP B SKILL: Reading from a file#
+    # GROUP B SKILL: READING FROM A FILE#
     #####################################
 
     with open("account.csv", "r") as f:
@@ -2674,7 +2678,7 @@ def GetStats():
 def GetLevel():
 
     #####################################
-    # GROUP B SKILL: Reading from a file#
+    # GROUP B SKILL: READING FROM A FILE#
     #####################################
 
     with open("account.csv", "r") as f:
@@ -2697,7 +2701,7 @@ def GetLevel():
 def Settings():
 
     #####################################
-    # GROUP B SKILL: Reading from a file#
+    # GROUP B SKILL: READING FROM A FILE#
     #####################################
 
     with open("account.csv", "r") as f:
@@ -2862,7 +2866,7 @@ def Settings():
     if change == True:
 
         ###################################
-        # GROUP B SKILL: Writing to a file#
+        # GROUP B SKILL: WRITING TO A FILE#
         ###################################
 
         with open("account.csv", "w") as f:
@@ -2874,7 +2878,7 @@ def find_pkl_files():
     files = []
 
     ###############################################
-    # GROUP B SKILL: Scan for files in a directory#
+    # GROUP B SKILL: SCAN FOR FILES IN A DIRECTORY#
     ###############################################
 
     for file in os.listdir():
@@ -2889,7 +2893,7 @@ def MainMenu():
 
 
     #####################################
-    # GROUP B SKILL: Reading from a file#
+    # GROUP B SKILL: READING FROM A FILE#
     #####################################
 
     with open("account.csv", "r") as f:
@@ -2930,7 +2934,7 @@ def PlayGame():
     if gamechoice.upper() == "G":
 
         #####################################
-        # GROUP B SKILL: Reading from a file#
+        # GROUP B SKILL: READING FROM A FILE#
         #####################################
 
         with open("account.csv", "r") as f:
@@ -2977,7 +2981,7 @@ def PlayGame():
             PlayGame()
 
         ############################################
-        # GROUP B SKILL: Reading from a pickle file#
+        # GROUP B SKILL: READING FROM A PICKLE FILE#
         ############################################
 
         with open(picklefile, "rb") as f:
@@ -3024,12 +3028,12 @@ def ExplainRules():
 def Checkaccountfileexists():
 
     #####################################
-    # GROUP B SKILL: Searching for files#
+    # GROUP B SKILL: SEARCHING FOR FILES#
     #####################################
 
-    ###########################################
-    # GROUP B SKILL: Reading/Writing to a file#
-    ###########################################
+    #########################################
+    # GROUP B SKILL: READING/CREATING A FILE#
+    #########################################
 
 
     # if account file exists, check if length is 7
@@ -3045,7 +3049,7 @@ def Checkaccountfileexists():
 
 
     #################################
-    # GROUP B SKILL: Creating a file#
+    # GROUP B SKILL: CREATING A FILE#
     #################################
 
     # if account file does not exist, create it with default settings
