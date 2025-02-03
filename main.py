@@ -2630,8 +2630,8 @@ class EditBoard:
                 # halve the score for every hint used
                 score = score / (2**hintsused)
                 # if the solution was used, divide the score by 10
-                if solution_used == True:
-                    score = score / 10
+                if solution_used == False:
+                    score = score * 10
                 accdata[0] = str(float(accdata[0]) + score)
                 accdata[6] = str(int(accdata[6]) + 1)
 
