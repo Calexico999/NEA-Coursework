@@ -2251,15 +2251,15 @@ class Solver:
                     print("It is possible that you made a mistake in your input")
                     print()
                     EditBoard.print_board(board)
-                    print("type y if you would like to aid the program in solving the puzzle, n if you would like to quit")
-                    generation = input()
-                    while generation not in ["y", "n", "Y", "N"]:
+                    print("type y if you would like to aid the program in solving the puzzle, n if you would like to quit to main menu")
+                    aid = input()
+                    while aid not in ["y", "n", "Y", "N"]:
                         print("Invalid input")
                         print("Enter a valid input, considering the options above")
-                        generation = input()
-                    if generation.upper() == "N":
-                        quit()
-                    if generation.upper() == "Y":
+                        aid = input()
+                    if aid.upper() == "N":
+                        MainMenu()
+                    if aid.upper() == "Y":
                         print()
                         EditBoard.print_board(board)
                         rowcol = input("Enter row and column in the form row, column: ")
