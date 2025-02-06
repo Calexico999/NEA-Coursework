@@ -625,7 +625,7 @@ class Solver:
                             if direction == 'down' and i + 1 < len(board):
                                 if board[i+1][j] == H or board[i+1][j] == RD or board[i+1][j] == LD:
                                     flagimpossible = True
-
+            shapedir = []
 
             # for dot in grid
             # if the dot is surrounded by 3 shapes which go into it, flag as impossible
@@ -1103,6 +1103,7 @@ class Solver:
 
             if bruteforceneeded == True and generation == "n" and flagimpossible == False: # if flagimpossible is already set to True, the subroutine will not have an effect
                 flagimpossible = check_if_impossible(flagimpossible) # Check if the board is impossible to solve
+                shapedir = []
 
 
             # Check if the board has been solved yet
@@ -2247,6 +2248,8 @@ class Solver:
 
                 if stuck == True and len(dots_two) == 0: # if no more changes can be made
                     stuck = False
+                    bruteforceneeded = False
+                    bruteforce_entered = False
                     print("This is how far this program was able to get")
                     print("It is possible that you made a mistake in your input")
                     print()
@@ -2270,14 +2273,35 @@ class Solver:
                         row = int(rowcol[0])
                         col = int(rowcol[2])
                         print(f"Enter the shape you would like to add to the board at node {row},{col}")
-                        print("Enter shape: H, V, RD, LD, RU, LU, N, X,.")
+                        print("Enter shape: H, V, RD, LD, RU, LU, X,.")
                         shape = input()
-                        while shape not in {"H", "V", "RD", "LD", "RU", "LU", "N", "X", "."}:
+                        while shape not in {"H", "V", "RD", "LD", "RU", "LU", "X", "."}:
                             print("Invalid input")
                             print("Enter a valid input, considering the options above")
                             shape = input()
-                        board[row][col] = shape
+                        # add the shape to the board
+                        if shape == "H":
+                            board[row][col] = H
+                        elif shape == "V":
+                            board[row][col] = V
+                        elif shape == "RD":
+                            board[row][col] = RD
+                        elif shape == "LD":
+                            board[row][col] = LD
+                        elif shape == "RU":
+                            board[row][col] = RU
+                        elif shape == "LU":
+                            board[row][col] = LU
+                        elif shape == "X":
+                            board[row][col] = X
+                        else:
+                            board[row][col] = "."
                         any_changes = True
+                        # reset unsureshapes and changecheck
+                        unsureshapes = []
+                        changecheck = True
+                        # add the board change to starting shapes
+                        startingshapes.append((row, col, board[row][col]))
 
 
             if any_changes == False and generation == "y":
