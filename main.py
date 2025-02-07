@@ -2539,7 +2539,7 @@ class EditBoard:
             else:
                 if any([char not in "0123456789," for char in rowcol]):
                     print("Invalid input")
-                if rowcol.count(",") != 1 or rowcol[0] == "," or rowcol[-1] == ",":
+                elif rowcol.count(",") != 1 or rowcol[0] == "," or rowcol[-1] == ",":
                     print("Invalid input")
                 else:
                     rowcol = rowcol.split(",")
@@ -2668,7 +2668,7 @@ class EditBoard:
                     f.write(accdata[0] + "," + accdata[1] + "," + accdata[2] + "," + accdata[3] + "," + accdata[4] + "," + accdata[5] + "," + accdata[6])
                 f.close()
                 print()
-                print("Solved")
+                print("Congratulations! You have solved the puzzle")
                 for i in range(len(displayboard)):
                     for j in range(len(displayboard)):
                         if displayboard[i][j] == "N":
