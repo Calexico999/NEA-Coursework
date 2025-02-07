@@ -2463,6 +2463,8 @@ class EditBoard:
                     # subtract the time taken from the first timer
                     time3 = datetime.datetime.now()
                     time4 = time3 - time4
+                    # add this time to time
+                    time += time4
                     print("Game resumed")
                 if restart.upper() == "Q":
                     print("Game quit")
