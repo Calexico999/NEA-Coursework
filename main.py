@@ -2977,6 +2977,8 @@ def PlayGame():
         while len(startingshapes) > maxstartingshapes:
             board, column_totals, row_totals, SAVEDBOARD, startingshapes, board_size = generator.build_board(board_size)
             board, editboard, column_totals, row_totals = Solver.Solve(board, column_totals, row_totals, SAVEDBOARD, startingshapes, generation, board_size)
+            if len(startingshapes) > maxstartingshapes:
+                print("Too many starting shapes, generating new board")
         EditBoard.manual_edit(board,editboard,column_totals,row_totals)
     
     elif gamechoice.upper() == "M":
