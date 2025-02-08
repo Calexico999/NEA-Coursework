@@ -2519,7 +2519,9 @@ class EditBoard:
                     for j in range(len(board)):
                         editboard[i][j] = displayboard[i+1][j+1]
                 data = board, editboard, column_totals, row_totals
-                filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
+                filename = ""
+                while filename == "":
+                    filename = input("Enter the new name of the file you want to save the board to (dont include file type) ")
                 filename = filename + ".pkl"
                 files = find_pkl_files()
                 while filename in files:
